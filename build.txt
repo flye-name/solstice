@@ -1,0 +1,3 @@
+displayName = lol
+author = Ebonfly, Lion8Cake, Incattus, DannnDrawsThings, boredguy9, Maskano, Ralken
+version = 0.1
