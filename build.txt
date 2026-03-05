@@ -1,3 +1,4 @@
 displayName = lol
 author = Ebonfly, Lion8cake, Incattus, DannnDrawsThings, boredguy9, Maskano, Ralken, Zoey
 version = 0.1
+modReferences = SubworldLibrary

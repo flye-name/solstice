@@ -19,26 +19,30 @@
 	  	<Folder Include="Assets\Images\" />
 	  	<Folder Include="Assets\Music\" />
 	  	<Folder Include="Assets\Sounds\" />
-	  	<Folder Include="Content\" />
-	  	<Folder Include="Core\" />
 
-		<AdditionalFiles Include="Assets\**"/>
-		<PackageReference Include="ZourceGen" Version="1.0.3" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
+		<AdditionalFiles Include="Assets\**" />
+		<PackageReference Include="ZourceGen" Version="1.0.3" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
 	  		
-		<PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1"/>
-		<Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false"/>
-		<Publicize Include="tModLoader;FNA" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false"/>
+		<PackageReference Include="Krafs.Publicizer" PrivateAssets="true" Version="2.2.1" />
+		<Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
+		<Publicize Include="tModLoader;FNA" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(DesignTimeBuild)' != 'true'">
-		<EffectFiles Include="**/*.hlsl"/>
-		<EffectFiles Include="**/*.fx"/>
+		<EffectFiles Include="**/*.hlsl" />
+		<EffectFiles Include="**/*.fx" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="SubworldLibrary">
+	    <HintPath>..\ModAssemblies\SubworldLibrary.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 	<Target Name="BuildEffects" BeforeTargets="BuildMod">
-		<Exec Condition="$([MSBuild]::IsOSPlatform('Windows'))" Command="@(EffectFiles->'&quot;./Assets/Effects/Compiler/fxc.exe&quot; &quot;%(RecursiveDir)%(FileName)%(Extension)&quot; /T fx_2_0 /nologo /Fo &quot;%(RecursiveDir)%(FileName).fxc&quot; &#xA;&#xD;')" IgnoreExitCode="true"/>
+		<Exec Condition="$([MSBuild]::IsOSPlatform('Windows'))" Command="@(EffectFiles->'&quot;./Assets/Effects/Compiler/fxc.exe&quot; &quot;%(RecursiveDir)%(FileName)%(Extension)&quot; /T fx_2_0 /nologo /Fo &quot;%(RecursiveDir)%(FileName).fxc&quot; &#xA;&#xD;')" IgnoreExitCode="true" />
 
-		<Exec Condition="$([MSBuild]::IsOSPlatform('Linux'))" Command="@(EffectFiles->'wine &quot;./Assets/Effects/Compiler/fxc.exe&quot; &quot;%(RecursiveDir)%(FileName)%(Extension)&quot; /T fx_2_0 /nologo /Fo &quot;%(RecursiveDir)%(FileName).fxc&quot; &#xA;&#xD;')" IgnoreExitCode="true"/>
+		<Exec Condition="$([MSBuild]::IsOSPlatform('Linux'))" Command="@(EffectFiles->'wine &quot;./Assets/Effects/Compiler/fxc.exe&quot; &quot;%(RecursiveDir)%(FileName)%(Extension)&quot; /T fx_2_0 /nologo /Fo &quot;%(RecursiveDir)%(FileName).fxc&quot; &#xA;&#xD;')" IgnoreExitCode="true" />
 	</Target>
 	
 </Project>

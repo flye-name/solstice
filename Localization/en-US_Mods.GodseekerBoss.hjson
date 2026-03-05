@@ -1,2 +1,11 @@
-# This file will automatically update with entries for new content after a build and reload.
+Items: {
+	AerieTestItem: {
+		DisplayName: Aerie Test Item
+		Tooltip: ""
+	}
 
+	AerieBrick: {
+		DisplayName: Aerie Brick
+		Tooltip: ""
+	}
+}
