@@ -38,6 +38,14 @@ namespace GodseekerBoss.Core.Subworlds
 		{
 			Main.cloudAlpha = 0f;
 			Main.raining = false;
+			Main.cloudBGActive = 0f;
+			for (int i = 0; i < Main.cloud.Length; i++)
+			{
+				Main.cloud[i].active = false;
+			}
+			Main.time = 27000;
+			Main.dayTime = true;
+			Main.eclipse = false;
 		}
 
 		//public override bool ShouldSave => true;
