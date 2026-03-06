@@ -9,3 +9,10 @@ Items: {
 		Tooltip: ""
 	}
 }
+
+Biomes: {
+	AerieBiome: {
+		DisplayName: The Aerie
+		TownNPCDialogueName: Ok who tf is living here tho
+	}
+}
