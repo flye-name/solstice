@@ -12,7 +12,7 @@ public class AerieBiome : ModBiome
 
     public override ModSurfaceBackgroundStyle SurfaceBackgroundStyle => ModContent.GetInstance<AerieBackground>();
 
-    public override int Music => MusicLoader.GetMusicSlot(Mod, "Assets/Music/YharonAuricSoulMusic"); //Again, credit is all moonburns, purely a placeholder for now
+    public override int Music => MusicLoader.GetMusicSlot(Mod, "Assets/Music/YharonAuricSoulMusic"); // Again, credit is all moonburns, purely a placeholder for now
 
     public override string MapBackground => "GodseekerBoss/Assets/Images/MapBG33";
 

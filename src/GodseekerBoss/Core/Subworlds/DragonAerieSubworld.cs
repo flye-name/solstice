@@ -38,7 +38,7 @@ public class DragonAerieSubworld : Subworld
         }
     }
 
-    //Probs useless since objects should spawn with 0 opacity anyways, but still here to ensure that if objects spawn anyways, they are faded out and not instantly disabled
+    // Probs useless since objects should spawn with 0 opacity anyways, but still here to ensure that if objects spawn anyways, they are faded out and not instantly disabled
     private static void UpdateOpacity_HideSkyEntities(On_AmbientSky.FadingSkyEntity.orig_UpdateOpacity orig, object self, int frameCount)
     {
         if (Active)
