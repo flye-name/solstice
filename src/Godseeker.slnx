@@ -1,0 +1,16 @@
+<Solution>
+
+	<Folder Name="/daybreak-mod/">
+		<Project Path="daybreak-mod/src/Daybreak.CodeAnalysis/Daybreak.CodeAnalysis.csproj" />
+		<Project Path="daybreak-mod/src/Daybreak.SourceGen/Daybreak.SourceGen.csproj" />
+		<Project Path="daybreak-mod/src/Daybreak/Daybreak.csproj" />
+	</Folder>
+
+	<Folder Name="/Generators/AssetGen/">
+		<Project Path="Generators/ZourceGen/src/AssetGen/AssetGen.csproj" />
+		<Project Path="Generators/ZourceGen/src/shader-reader/ShaderDecompiler.csproj" />
+	</Folder>
+
+	<Project Path="GodseekerBoss/GodseekerBoss.csproj" />
+
+</Solution>

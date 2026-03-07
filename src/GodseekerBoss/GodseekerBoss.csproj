@@ -1,0 +1,22 @@
+<Project>
+	
+	<Import Project="..\Mod.targets" />
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+	</PropertyGroup>
+
+	<!-- Publicizer -->
+	<ItemGroup>
+		<Publicize Include="tModLoader;ReLogic;FNA" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
+	</ItemGroup>
+	
+	<!-- References -->
+	<ItemGroup>
+		<Reference Include="SubworldLibrary">
+			<HintPath>..\ModAssemblies\SubworldLibrary.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+</Project>

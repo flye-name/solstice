@@ -1,0 +1,23 @@
+<Project Sdk="Tomat.Terraria.ModLoader.Sdk">
+
+	<Import Project="$(MSBuildThisFileDirectory)Generators\ZourceGen\src\AssetGen.targets"/>
+
+	<!-- References -->
+	<ItemGroup>
+		<ProjectReference Include="$(MSBuildThisFileDirectory)daybreak-mod\src\Daybreak\Daybreak.csproj"/>
+		<ProjectReference Include="$(MSBuildThisFileDirectory)daybreak-mod\src\Daybreak.CodeAnalysis\Daybreak.CodeAnalysis.csproj" PrivateAssets="All" ReferenceOutputAssembly="false" OutputItemType="Analyzer"/>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+
+		<Nullable>enable</Nullable>
+
+		<!-- Yet to port to tml-build's asset generation -->
+		<TmlBuildIncludeSourceGenerators>false</TmlBuildIncludeSourceGenerators>
+
+		<!-- Type conflict with 'IgnoresAccessChecksToAttribute' -->
+		<NoWarn>$(NoWarn);CS0436</NoWarn>
+	</PropertyGroup>
+
+</Project>

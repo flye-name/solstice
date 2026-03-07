@@ -1,0 +1,7 @@
+displayName = big godseeker elite mod
+author = Ebonfly, Lion8cake, Incattus, DannnDrawsThings, boredguy9, Maskano, Ralken, Zoey
+version = 0.1
+
+modReferences = Daybreak@2.3.0, SubworldLibrary@2.2.3.3
+
+buildIgnore = .tml-build\*, lib\*, .idea\*, .vs\*, *.tmp, Assets\Effects\Compiler\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, .editorconfig, TemplateEngineHost\*
