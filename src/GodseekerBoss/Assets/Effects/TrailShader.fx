@@ -4,23 +4,19 @@ struct PSInput
     float2 TexCoord : TEXCOORD0;
     float4 Position : SV_Position;
 };
+
 struct VSInput
 {
     float4 Color : COLOR0;
     float2 TexCoord : TEXCOORD0;
     float4 Position : POSITION;
 };
-texture2D tex;
-sampler2D texSampler = sampler_state
-{
-    Texture = <tex>;
-    MinFilter = Linear;
-    MagFilter = Linear;
-    AddressU = Wrap;
-    AddressV = Wrap;
-};
+
+sampler uImage0 : register(s0);
+
 bool useActualCol = false;
 matrix WorldViewProjection;
+
 PSInput MainVS(VSInput input)
 {
     PSInput output = (PSInput) 0;
@@ -35,19 +31,23 @@ float4 MainPS(PSInput input) : COLOR0
 {
     return input.Color;
 }
+
 float4 TexturePS(PSInput input) : COLOR0
 {
-    float4 c = tex2D(texSampler, input.TexCoord);
+    float4 c = tex2D(uImage0, input.TexCoord);
     float4 col = input.Color * max(c.r, max(c.g, c.b));
+    
     if (useActualCol)
+    {
         col = c * max(c.r, max(c.g, c.b)) * input.Color.a;
-
+    }
+    
     return col;
 }
 
 technique Technique1
 {
-    pass Texture
+    pass Pass1
     {
         VertexShader = compile vs_2_0 MainVS();
         PixelShader = compile ps_2_0 TexturePS();
