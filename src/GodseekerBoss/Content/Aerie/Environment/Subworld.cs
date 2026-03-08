@@ -52,6 +52,7 @@ public class AerieSubworld : Subworld
         Main.dayTime = true;
         Main.eclipse = false;
         Main.windSpeedTarget = -1f;
+        Main.windSpeedCurrent = -1f;
     }
 
     // public override bool ShouldSave => true;
