@@ -1,31 +1,56 @@
 ﻿using Daybreak.Common.Features.Hooks;
-using SubworldLibrary;
+using Microsoft.Xna.Framework.Graphics;
+using MonoMod.Cil;
 using System.Collections.Generic;
 using Terraria;
-using Terraria.GameContent.Generation;
 using Terraria.GameContent.Skies;
-using Terraria.IO;
+using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
-using Terraria.WorldBuilding;
+using BackgroundTextures = GodseekerBoss.GeneratedAssets.Assets.Images.Aerie.Backgrounds.Textures;
 
-namespace GodseekerBoss.Core.Subworlds;
+namespace GodseekerBoss.Content.Aerie.Environment;
 
-public class DragonAerieSubworld : Subworld
+public class AerieBackground : ModSurfaceBackgroundStyle
 {
     #region Edits
 
     [OnLoad]
     private static void Load()
     {
+        IL_Main.DoDraw += DoDraw_CaptureSky;
+
         On_AmbientSky.FadingSkyEntity.Update += Update_DisableSkyEntities;
         On_AmbientSky.FadingSkyEntity.UpdateOpacity += UpdateOpacity_HideSkyEntities;
 
         On_Main.DrawSunAndMoon += DrawSunAndMoon_HideSun;
     }
 
+    private static void DoDraw_CaptureSky(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        // Change the sampler state used for the background
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchLdsfld<Main>(nameof(Main.spriteBatch)),
+            i => i.MatchLdcI4(0),
+            i => i.MatchLdcI4(0),
+            i => i.MatchCallvirt<OverlayManager>(nameof(OverlayManager.Draw))
+        );
+
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchLdsfld<SamplerState>(nameof(SamplerState.LinearClamp))
+        );
+
+        c.EmitPop();
+
+        c.EmitDelegate(() => SamplerState.PointClamp);
+    }
+
     private static void Update_DisableSkyEntities(On_AmbientSky.FadingSkyEntity.orig_Update orig, object self, int frameCount)
     {
-        if (Active)
+        if (AerieSubworld.Active)
         {
             if (((AmbientSky.FadingSkyEntity)self).Opacity <= 0)
             {
@@ -41,7 +66,7 @@ public class DragonAerieSubworld : Subworld
     // Probs useless since objects should spawn with 0 opacity anyways, but still here to ensure that if objects spawn anyways, they are faded out and not instantly disabled
     private static void UpdateOpacity_HideSkyEntities(On_AmbientSky.FadingSkyEntity.orig_UpdateOpacity orig, object self, int frameCount)
     {
-        if (Active)
+        if (AerieSubworld.Active)
         {
             if (((AmbientSky.FadingSkyEntity)self).Opacity > 0)
             {
@@ -60,7 +85,7 @@ public class DragonAerieSubworld : Subworld
 
     private static void DrawSunAndMoon_HideSun(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Microsoft.Xna.Framework.Color moonColor, Microsoft.Xna.Framework.Color sunColor, float tempMushroomInfluence)
     {
-        if (!Active)
+        if (!AerieSubworld.Active)
         {
             orig(self, sceneArea, moonColor, sunColor, tempMushroomInfluence);
         }
@@ -70,7 +95,7 @@ public class DragonAerieSubworld : Subworld
     {
         public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
         {
-            if (Active)
+            if (AerieSubworld.Active)
             {
                 foreach (int index in pool.Keys)
                 {
@@ -82,47 +107,41 @@ public class DragonAerieSubworld : Subworld
 
     #endregion
 
-    public static bool Active => SubworldSystem.IsActive<DragonAerieSubworld>();
-
-    public override int Width => 1000;
-
-    public override int Height => 400;
-
-    public override List<GenPass> Tasks => new List<GenPass>() 
+    public override void ModifyFarFades(float[] fades, float transitionSpeed)
     {
-        new PassLegacy("Aerie Settings", new WorldGenLegacyMethod(AerieSubworldSettings))
-    };
-
-    private static void AerieSubworldSettings(GenerationProgress progres, GameConfiguration configurations)
-    {
-        Main.worldSurface = Main.maxTilesY;
-        Main.rockLayer = Main.maxTilesY + 42;
-    }
-
-    public override void SetStaticDefaults()
-    {
-            
-    }
-
-    public override void OnLoad()
-    {
-        SubworldSystem.hideUnderworld = true;
-    }
-
-    public override void Update()
-    {
-        Main.cloudAlpha = 0f;
-        Main.raining = false;
-        Main.cloudBGActive = 0f;
-        for (int i = 0; i < Main.cloud.Length; i++)
+        for (int i = 0; i < fades.Length; i++)
         {
-            Main.cloud[i].active = false;
+            if (i == Slot)
+            {
+                fades[i] += transitionSpeed;
+                if (fades[i] > 1f)
+                {
+                    fades[i] = 1f;
+                }
+            }
+            else
+            {
+                fades[i] -= transitionSpeed;
+                if (fades[i] < 0f)
+                {
+                    fades[i] = 0f;
+                }
+            }
         }
-        Main.time = 27000;
-        Main.dayTime = true;
-        Main.eclipse = false;
-        Main.windSpeedTarget = -1f;
     }
 
-    // public override bool ShouldSave => true;
+    public override int ChooseFarTexture()
+    {
+        return BackgroundTextureLoader.GetBackgroundSlot(BackgroundTextures.Far.Key);
+    }
+
+    public override int ChooseMiddleTexture()
+    {
+        return BackgroundTextureLoader.GetBackgroundSlot(BackgroundTextures.Mid.Key);
+    }
+
+    public override int ChooseCloseTexture(ref float scale, ref double parallax, ref float a, ref float b)
+    {
+        return -1;
+    }
 }

@@ -1,10 +1,9 @@
-﻿using GodseekerBoss.Content.Biomes.Backgrounds;
-using GodseekerBoss.Core.Subworlds;
-using SubworldLibrary;
+﻿using SubworldLibrary;
 using Terraria;
 using Terraria.ModLoader;
+using BackgroundTextures = GodseekerBoss.GeneratedAssets.Assets.Images.Aerie.Backgrounds.Textures;
 
-namespace GodseekerBoss.Content.Biomes;
+namespace GodseekerBoss.Content.Aerie.Environment;
 
 public class AerieBiome : ModBiome
 {
@@ -14,10 +13,10 @@ public class AerieBiome : ModBiome
 
     public override int Music => MusicLoader.GetMusicSlot(Mod, "Assets/Music/YharonAuricSoulMusic"); // Again, credit is all moonburns, purely a placeholder for now
 
-    public override string MapBackground => "GodseekerBoss/Assets/Images/MapBG33";
+    public override string MapBackground => BackgroundTextures.Map.Key;
 
     public override bool IsBiomeActive(Player player)
     {
-        return SubworldSystem.IsActive<DragonAerieSubworld>();
+        return SubworldSystem.IsActive<AerieSubworld>();
     }
 }

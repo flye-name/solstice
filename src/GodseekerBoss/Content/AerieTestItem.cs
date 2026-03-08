@@ -1,4 +1,4 @@
-﻿using GodseekerBoss.Core.Subworlds;
+﻿using GodseekerBoss.Content.Aerie.Environment;
 using SubworldLibrary;
 using Terraria;
 using Terraria.ID;
@@ -26,8 +26,8 @@ namespace GodseekerBoss.Content
         {
             if (player.whoAmI == Main.myPlayer)
             {
-                if (!SubworldSystem.IsActive<DragonAerieSubworld>())
-                    SubworldSystem.Enter<DragonAerieSubworld>();
+                if (!SubworldSystem.IsActive<AerieSubworld>())
+                    SubworldSystem.Enter<AerieSubworld>();
                 else
                     SubworldSystem.Exit();
             }
