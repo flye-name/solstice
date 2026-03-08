@@ -1,11 +1,8 @@
-﻿using Daybreak.Common.Features.Hooks;
-using SubworldLibrary;
+﻿using SubworldLibrary;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Generation;
-using Terraria.GameContent.Skies;
 using Terraria.IO;
-using Terraria.ModLoader;
 using Terraria.WorldBuilding;
 
 namespace GodseekerBoss.Content.Aerie.Environment;
