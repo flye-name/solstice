@@ -1,7 +1,8 @@
 ﻿using Daybreak.Common.Features.Hooks;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
-using System.Collections.Generic;
+using System;
 using Terraria;
 using Terraria.GameContent.Skies;
 using Terraria.Graphics.Effects;
@@ -23,6 +24,8 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         On_AmbientSky.FadingSkyEntity.UpdateOpacity += UpdateOpacity_HideSkyEntities;
 
         On_Main.DrawSunAndMoon += DrawSunAndMoon_HideSun;
+
+        On_Main.DrawStarsInBackground += DrawStarsInBackground_Gradient;
     }
 
     private static void DoDraw_CaptureSky(ILContext il)
@@ -91,17 +94,17 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         }
     }
 
-    private sealed class DisableSpawns : GlobalNPC
+    private static void DrawStarsInBackground_Gradient(On_Main.orig_DrawStarsInBackground orig, Main self, Main.SceneArea sceneArea, bool artificial)
     {
-        public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
+        if (AerieSubworld.Active)
         {
-            if (AerieSubworld.Active)
-            {
-                foreach (int index in pool.Keys)
-                {
-                    pool[index] = 0f;
-                }
-            }
+            var dest = new Rectangle(0, 0, Main.screenWidth, Math.Max(Main.screenHeight, BackgroundTextures.Sky.Value.Height));
+
+            Main.spriteBatch.Draw(BackgroundTextures.Sky, dest, Color.White);
+        }
+        else
+        {
+            orig(self, sceneArea, artificial);
         }
     }
 

@@ -112,7 +112,7 @@ public record struct WindParticle : IParticle
 
         float brightness = MathF.Sin(Lifetime * MathHelper.Pi) * Main.atmo * MathF.Abs(Wind);
 
-        float alpha = 0.4f; // TODO: Config
+        float alpha = 0.2f; // TODO: Config
 
         // Color based on the tile at the center of the trail
         Vector3 center = positions[positions.Length / 2];

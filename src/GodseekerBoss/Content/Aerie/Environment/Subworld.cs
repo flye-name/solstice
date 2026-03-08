@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Generation;
 using Terraria.IO;
+using Terraria.ModLoader;
 using Terraria.WorldBuilding;
 
 namespace GodseekerBoss.Content.Aerie.Environment;
@@ -53,4 +54,18 @@ public class AerieSubworld : Subworld
     }
 
     // public override bool ShouldSave => true;
+
+    private sealed class DisableSpawns : GlobalNPC
+    {
+        public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
+        {
+            if (Active)
+            {
+                foreach (int index in pool.Keys)
+                {
+                    pool[index] = 0f;
+                }
+            }
+        }
+    }
 }
