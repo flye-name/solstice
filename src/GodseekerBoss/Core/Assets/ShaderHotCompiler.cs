@@ -5,7 +5,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Terraria.ModLoader;
 
-namespace ZenSkies.Core.Assets;
+namespace GodseekerBoss.Core.Assets;
 
 #if DEBUG
 
@@ -30,7 +30,7 @@ public static class ShaderHotCompiler
 
     private static string modSource = "";
 
-    private readonly static Mod mod = ModContent.GetInstance<ModImpl>();
+    private readonly static Mod mod = ModContent.GetInstance<GodseekerBoss>();
 
     [OnLoad]
     private static void Load()

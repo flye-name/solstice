@@ -10,7 +10,7 @@ using System.Reflection;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace ZenSkies.Core.Assets;
+namespace GodseekerBoss.Core.Assets;
 
 #if DEBUG
 
@@ -34,7 +34,7 @@ internal static class AssetReloader
 
     private static LocalAssetSource? assetSource;
 
-    private readonly static Mod mod = ModContent.GetInstance<ModImpl>();
+    private readonly static Mod mod = ModContent.GetInstance<GodseekerBoss>();
 
     [OnLoad]
     private static void Load()
