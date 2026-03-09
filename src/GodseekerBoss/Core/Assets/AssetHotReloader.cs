@@ -181,6 +181,11 @@ internal static class AssetReloader
 
         public void AddAssetPath(string path)
         {
+            if (AssetPaths.Contains(path))
+            {
+                return;
+            }
+
             AssetPaths = AssetPaths.Append(path).ToArray();
         }
     }
