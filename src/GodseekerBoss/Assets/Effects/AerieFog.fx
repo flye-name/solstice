@@ -4,6 +4,14 @@ float time;
 
 float parallax;
 
+float steps = 3;
+
+const float4x4 bayer =
+    float4x4(0, 8, 2, 10,
+             12, 4, 14, 6,
+             3, 11, 1, 9,
+             15, 7, 13, 5) / 16;
+
 float fbm(float2 p)
 {
     float f = 0;
@@ -14,7 +22,7 @@ float fbm(float2 p)
         float la = pow(2, octave);
         float ga = pow(0.5, octave + 1);
         
-        float2 off = float2((tan(octave / 5) * time + time) * 0.1, -time * 0.02);
+        float2 off = float2((tan(octave / 5) * time + time) * 0.07, -time * 0.1);
         
         f += ga * tex2D(img, la * p + off);
         gat += ga;
@@ -27,7 +35,7 @@ float fbm(float2 p)
 
 float cloudNoise(float2 uv)
 {
-    float clouds = 2 - uv.y + (-pow(uv.y, 4)) * 4;
+    float clouds = .8 - uv.y + (-pow(uv.y, 7)) * 2.5;
     
     uv.y *= 3;
     
@@ -38,17 +46,23 @@ float cloudNoise(float2 uv)
     return saturate(1 - pow(1 - clouds, 3));
 }
 
-float4 Fog(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
+float4 Fog(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0, float2 screenCoords : SV_POSITION) : COLOR0
 {
+    float2 bayeruv = frac(screenCoords.xy / 4) * 4;
+    
     coords.x += parallax;
     
     coords.y = 1 - coords.y;
 
     float4 color = cloudNoise(coords);
     
+    color += (bayer[bayeruv.x][bayeruv.y] - .5) / steps;
+    
+    color = floor(color * steps) / steps;
+    
     color *= sampleColor;
     
-    return color * color.a;
+    return color;
 }
 
 technique Technique1

@@ -70,7 +70,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
             MiscShaders.AerieFog.Apply();
 
-            spriteBatch.Draw(MiscTextures.CoherentNoise, new Rectangle(0, Main.instance.bgTopY + 200, size, size), color);
+            spriteBatch.Draw(MiscTextures.CoherentNoise, new Rectangle(0, Main.instance.bgTopY, size, size), color);
         }
         spriteBatch.Restart(in snapshot);
     }
