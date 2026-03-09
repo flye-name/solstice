@@ -1,4 +1,5 @@
 ﻿using Daybreak.Common.Features.Hooks;
+using Daybreak.Common.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
@@ -8,6 +9,8 @@ using Terraria.GameContent.Skies;
 using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
 using BackgroundTextures = GodseekerBoss.GeneratedAssets.Assets.Images.Aerie.Backgrounds.Textures;
+using MiscTextures = GodseekerBoss.GeneratedAssets.Assets.Images.Textures;
+using MiscShaders = GodseekerBoss.GeneratedAssets.Assets.Effects;
 
 namespace GodseekerBoss.Content.Aerie.Environment;
 
@@ -15,10 +18,16 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 {
     #region Edits
 
+    private static readonly Color far_fog_color = new(195, 154, 243);
+    private static readonly Color mid_fog_color = new(208, 189, 255);
+
     [OnLoad]
     private static void Load()
     {
-        IL_Main.DoDraw += DoDraw_CaptureSky;
+        On_Main.DrawSurfaceBG_BackMountainsStep1 += DrawSurfaceBG_BackMountainsStep1_Fog;
+        On_Main.DrawSurfaceBG_BackMountainsStep2 += On_Main_DrawSurfaceBG_BackMountainsStep2;
+
+        IL_Main.DoDraw += DoDraw_CorrectSamplerState;
 
         On_AmbientSky.FadingSkyEntity.Update += Update_DisableSkyEntities;
         On_AmbientSky.FadingSkyEntity.UpdateOpacity += UpdateOpacity_HideSkyEntities;
@@ -28,7 +37,45 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         On_Main.DrawStarsInBackground += DrawStarsInBackground_Gradient;
     }
 
-    private static void DoDraw_CaptureSky(ILContext il)
+    private static void DrawSurfaceBG_BackMountainsStep1_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, double backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBGTopHack)
+    {
+        orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBGTopHack);
+
+        if (AerieSubworld.Active)
+        {
+            DrawFog(Main.spriteBatch, far_fog_color);
+        }
+    }
+
+    private static void On_Main_DrawSurfaceBG_BackMountainsStep2(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
+    {
+        orig(self, pushBGTopHack);
+
+        if (AerieSubworld.Active)
+        {
+            DrawFog(Main.spriteBatch, mid_fog_color);
+        }
+    }
+
+    private static void DrawFog(SpriteBatch spriteBatch, Color color)
+    {
+        spriteBatch.End(out var snapshot);
+        Main.spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
+        {
+            int size = Math.Max(Main.screenWidth, Main.screenHeight);
+
+            MiscShaders.AerieFog.Parallax = (float)(Main.screenPosition.X * Main.instance.bgParallax) / Main.screenWidth;
+
+            MiscShaders.AerieFog.Time = Main.GlobalTimeWrappedHourly * 0.15f * ((float)Main.instance.bgParallax + 1f);
+
+            MiscShaders.AerieFog.Apply();
+
+            spriteBatch.Draw(MiscTextures.CoherentNoise, new Rectangle(0, Main.instance.bgTopY + 200, size, size), color);
+        }
+        spriteBatch.Restart(in snapshot);
+    }
+
+    private static void DoDraw_CorrectSamplerState(ILContext il)
     {
         var c = new ILCursor(il);
 
