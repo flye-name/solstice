@@ -69,7 +69,7 @@ public record struct WindParticle : IParticle
             IsActive = false;
         }
 
-        float wave = MathF.Sin((Lifetime + Main.GlobalTimeWrappedHourly) * wave_frequency) * wave_amplitude;
+        float wave = MathF.Sin((Lifetime + ((float)Main.timeForVisualEffects / 60f)) * wave_frequency) * wave_amplitude;
 
         Vector2 newVelocity = new(Wind, wave);
 

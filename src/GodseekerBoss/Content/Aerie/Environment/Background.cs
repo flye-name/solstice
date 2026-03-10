@@ -62,15 +62,19 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         spriteBatch.End(out var snapshot);
         Main.spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
         {
-            int size = Math.Max(Main.screenWidth, Main.screenHeight);
+            Vector2 size = new(Main.screenWidth, Main.screenHeight);
+
+            var source = new Rectangle(0, Main.instance.bgTopY, (int)size.X, (int)size.Y);
 
             MiscShaders.AerieFog.Parallax = (float)(Main.screenPosition.X * Main.instance.bgParallax) / Main.screenWidth;
 
-            MiscShaders.AerieFog.Time = Main.GlobalTimeWrappedHourly * 0.15f * ((float)Main.instance.bgParallax + 1f);
+            MiscShaders.AerieFog.Time = Main.GlobalTimeWrappedHourly * 0.05f * ((float)Main.instance.bgParallax + 1f);
+
+            MiscShaders.AerieFog.Source = new Vector4(source.X, source.Y, source.Width, source.Height);
 
             MiscShaders.AerieFog.Apply();
 
-            spriteBatch.Draw(MiscTextures.CoherentNoise, new Rectangle(0, Main.instance.bgTopY, size, size), color);
+            spriteBatch.Draw(MiscTextures.CoherentNoise, source, color);
         }
         spriteBatch.Restart(in snapshot);
     }

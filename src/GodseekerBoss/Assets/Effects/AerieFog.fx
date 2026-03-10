@@ -4,7 +4,9 @@ float time;
 
 float parallax;
 
-float steps = 3;
+float4 source;
+
+float steps = 2;
 
 const float4x4 bayer =
     float4x4(0, 8, 2, 10,
@@ -46,9 +48,11 @@ float cloudNoise(float2 uv)
     return saturate(1 - pow(1 - clouds, 3));
 }
 
-float4 Fog(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0, float2 screenCoords : SV_POSITION) : COLOR0
+float4 Fog(float4 sampleColor : COLOR0, float2 uv : TEXCOORD0, float2 screenCoords : SV_POSITION) : COLOR0
 {
-    float2 bayeruv = frac(screenCoords.xy / 4) * 4;
+    float2 bayeruv = frac((screenCoords.xy + float2(floor(source.z * parallax / 2) * 2, 0)) / 4) * 4;
+    
+    float2 coords = (screenCoords - source.xy) / max(source.z, source.w);
     
     coords.x += parallax;
     
@@ -56,9 +60,8 @@ float4 Fog(float4 sampleColor : COLOR0, float2 coords : TEXCOORD0, float2 screen
 
     float4 color = cloudNoise(coords);
     
-    color += (bayer[bayeruv.x][bayeruv.y] - .5) / steps;
-    
-    color = floor(color * steps) / steps;
+    color += (bayer[bayeruv.x][bayeruv.y]) / steps;
+    color = floor(color.a * steps) / steps;
     
     color *= sampleColor;
     
