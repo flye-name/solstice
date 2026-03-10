@@ -8,6 +8,11 @@ Items: {
 		DisplayName: Aerie Brick
 		Tooltip: ""
 	}
+
+	WorldSpawnSetter: {
+		DisplayName: World Spawn Setter
+		Tooltip: ""
+	}
 }
 
 Biomes: {

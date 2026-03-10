@@ -53,7 +53,7 @@ public class AerieSubworld : Subworld
         Main.windSpeedCurrent = -1f;
     }
 
-    // public override bool ShouldSave => true;
+    public override bool ShouldSave => true;
 
     private sealed class DisableSpawns : GlobalNPC
     {
