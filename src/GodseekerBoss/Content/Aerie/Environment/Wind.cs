@@ -203,9 +203,6 @@ public static class Wind
     {
         const float spawn_chance = 22f;
 
-        const float x_margin = 300f;
-        const float y_margin = 320f;
-
         float spawnChance = spawn_chance / MathF.Abs(Main.WindForVisuals);
 
         if (!Main.rand.NextBool((int)spawnChance))
@@ -215,14 +212,17 @@ public static class Wind
 
         Vector2 screensize = new(Main.screenWidth, Main.screenHeight);
 
-        float screenCenter = Main.screenPosition.X + (screensize.X * 0.5f);
+        float offset = -Main.WindForVisuals + Math.Clamp(Main.LocalPlayer.velocity.X / 50, -3f, 3f);
 
-        Rectangle spawn = new(
-            (int)(screenCenter - ((screensize.X + (MathF.Max(-Main.WindForVisuals, 0f) * x_margin)) * Main.WindForVisuals * 0.5f)),
-            (int)(Main.screenPosition.Y - y_margin),
-            (int)x_margin,
-            (int)(screensize.Y + y_margin)
-        );
+        offset = Utils.Remap(offset, -1, 1, 0, 1, false);
+
+        Vector2 screenCenter = Main.screenPosition +
+            new Vector2(
+                screensize.X * offset,
+                screensize.Y * 0.5f
+            );
+
+        Rectangle spawn = Utils.CenteredRectangle(screenCenter, new(screensize.X * 0.8f, screensize.Y + 600));
 
         spawn.Inflate(offscreen_margin, offscreen_margin);
 
