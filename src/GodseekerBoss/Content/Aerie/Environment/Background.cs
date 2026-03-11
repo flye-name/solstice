@@ -9,8 +9,8 @@ using Terraria.GameContent.Skies;
 using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
 using BackgroundTextures = GodseekerBoss.GeneratedAssets.Assets.Images.Aerie.Backgrounds.Textures;
-using MiscTextures = GodseekerBoss.GeneratedAssets.Assets.Images.Textures;
 using MiscShaders = GodseekerBoss.GeneratedAssets.Assets.Effects;
+using MiscTextures = GodseekerBoss.GeneratedAssets.Assets.Images.Textures;
 
 namespace GodseekerBoss.Content.Aerie.Environment;
 
@@ -25,7 +25,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
     private static void Load()
     {
         On_Main.DrawSurfaceBG_BackMountainsStep1 += DrawSurfaceBG_BackMountainsStep1_Fog;
-        On_Main.DrawSurfaceBG_BackMountainsStep2 += On_Main_DrawSurfaceBG_BackMountainsStep2;
+        On_Main.DrawSurfaceBG_BackMountainsStep2 += DrawSurfaceBG_BackMountainsStep2_Fog;
 
         IL_Main.DoDraw += DoDraw_CorrectSamplerState;
 
@@ -34,7 +34,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
         On_Main.DrawSunAndMoon += DrawSunAndMoon_HideSun;
 
-        On_Main.DrawStarsInBackground += DrawStarsInBackground_Gradient;
+        On_Main.DrawStarsInBackground += DrawStarsInBackground_Sky;
     }
 
     private static void DrawSurfaceBG_BackMountainsStep1_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, double backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBGTopHack)
@@ -47,7 +47,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         }
     }
 
-    private static void On_Main_DrawSurfaceBG_BackMountainsStep2(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
+    private static void DrawSurfaceBG_BackMountainsStep2_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
     {
         orig(self, pushBGTopHack);
 
@@ -60,7 +60,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
     private static void DrawFog(SpriteBatch spriteBatch, Color color)
     {
         spriteBatch.End(out var snapshot);
-        Main.spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
+        spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
         {
             Vector2 size = new(Main.screenWidth, Main.screenHeight);
 
@@ -145,13 +145,28 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         }
     }
 
-    private static void DrawStarsInBackground_Gradient(On_Main.orig_DrawStarsInBackground orig, Main self, Main.SceneArea sceneArea, bool artificial)
+    private static void DrawStarsInBackground_Sky(On_Main.orig_DrawStarsInBackground orig, Main self, Main.SceneArea sceneArea, bool artificial)
     {
         if (AerieSubworld.Active)
         {
-            var dest = new Rectangle(0, 0, Main.screenWidth, Math.Max(Main.screenHeight, BackgroundTextures.Sky.Value.Height));
+            var skyDest = new Rectangle(0, 0, Main.screenWidth, Math.Max(Main.screenHeight, BackgroundTextures.Sky.Value.Height));
 
-            Main.spriteBatch.Draw(BackgroundTextures.Sky, dest, Color.White);
+            Main.spriteBatch.Draw(BackgroundTextures.Sky, skyDest, Color.White);
+
+            Main.spriteBatch.End(out var snapshot);
+            Main.spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearClamp, BlendState = BlendState.Additive });
+            {
+                Vector2 size = new(Main.screenWidth, Main.screenHeight);
+
+                var ringsDest = Utils.CenteredRectangle(size * 0.5f, new(MathF.Max(Main.screenWidth, Main.screenHeight)));
+
+                MiscShaders.AerieRing.Time = Main.GlobalTimeWrappedHourly;
+
+                MiscShaders.AerieRing.Apply();
+
+                Main.spriteBatch.Draw(BackgroundTextures.Ring, ringsDest, Color.White);
+            }
+            Main.spriteBatch.Restart(in snapshot);
         }
         else
         {
