@@ -15,16 +15,9 @@ namespace GodseekerBoss.Content.Aerie.Environment;
 // TODO: HighFPSSupport Compatibility
 public record struct WindParticle : IParticle
 {
-    private const int max_old_positions = 60;
+    private const int max_old_positions = 50;
 
     private const float width = 5f;
-
-    private const float lifetime_increment = 0.0063f;
-
-    private const float wave_frequency = 0.6f;
-    private const float wave_amplitude = 0.1f;
-
-    private const float loop_range = 0.06f;
 
     private const float loop_offset = 0.3f;
 
@@ -68,7 +61,7 @@ public record struct WindParticle : IParticle
 
     void IParticle.Update()
     {
-        parallaxOffset += (Main.screenPosition - Main.screenLastPosition) * -Parallax;
+        const float lifetime_increment = 0.0063f;
 
         float increment = lifetime_increment * MathF.Abs(Wind);
 
@@ -79,6 +72,11 @@ public record struct WindParticle : IParticle
             IsActive = false;
         }
 
+        parallaxOffset += (Main.screenPosition - Main.screenLastPosition) * -Parallax;
+
+        const float wave_frequency = 0.6f;
+        const float wave_amplitude = 0.1f;
+
         float wave = MathF.Sin((Lifetime + ((float)Main.timeForVisualEffects / 60f)) * wave_frequency) * wave_amplitude;
 
         var newVelocity = new Vector2(Wind, wave) * Utils.Remap(Parallax, parallax_min, parallax_max, 0.6f, 1.2f);
@@ -86,6 +84,8 @@ public record struct WindParticle : IParticle
         // Loop behavior, similar to vanilla paper airplanes
         if (ShouldLoop)
         {
+            const float loop_range = 0.06f;
+
             float range = loop_range / MathHelper.Clamp(MathF.Abs(Wind), 0.01f, 1);
             range *= 0.5f;
 
@@ -122,13 +122,16 @@ public record struct WindParticle : IParticle
             return;
         }
 
+        const float parallax_scale_min = 0.3f;
+        const float parallax_scale_max = 1.65f;
+
+        const float alpha = 0.14f;
+
         float brightness =
             MathF.Sin(Lifetime * MathHelper.Pi)
             * Main.atmo
             * MathF.Abs(Wind)
-            * Utils.Remap(Parallax, parallax_min, parallax_max, 0.3f, 2f);
-
-        float alpha = 0.13f; // TODO: Config
+            * Utils.Remap(Parallax, parallax_min, parallax_max, parallax_scale_min, parallax_scale_max);
 
         Color color = Main.ColorOfTheSkies * brightness * alpha;
         color.A = 0;
