@@ -45,7 +45,7 @@ public class AerieBrickTile : ModTile
     {
         if (j % 2 == 0)
         {
-            tileFrameY += 90;
+            tileFrameY += 270;
         }
     }
 }
