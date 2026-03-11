@@ -26,9 +26,12 @@ public record struct WindParticle : IParticle
 
     private const float loop_range = 0.06f;
 
-    private const float loop_max_offset = 0.3f;
+    private const float loop_offset = 0.3f;
 
     private const float velocity_magnitude = 19f;
+
+    private const float parallax_min = -0.5f;
+    private const float parallax_max = 0.15f;
 
     public Vector2 Position { get; set; }
 
@@ -38,6 +41,8 @@ public record struct WindParticle : IParticle
 
     public float Wind { get; init; }
 
+    public float Parallax { get; init; }
+
     public float LoopOffset { get; init; }
 
     public bool ShouldLoop { get; init; }
@@ -46,13 +51,16 @@ public record struct WindParticle : IParticle
 
     public bool IsActive { get; set; }
 
-    public WindParticle(Vector2 position, float wind, bool shouldLoop)
+    private Vector2 parallaxOffset;
+
+    public WindParticle(Vector2 position, float wind, bool shouldLoop, bool foreground)
     {
         Position = position;
         OldPositions = new Vector2[max_old_positions];
         Velocity = Vector2.Zero;
         Wind = wind;
-        LoopOffset = Main.rand.NextFloat(-loop_max_offset, loop_max_offset);
+        Parallax = Main.rand.NextFloat(foreground ? 0 : parallax_min, foreground ? parallax_max : 0);
+        LoopOffset = Main.rand.NextFloat(-loop_offset, loop_offset);
         ShouldLoop = shouldLoop;
         Lifetime = 0f;
         IsActive = true;
@@ -60,6 +68,8 @@ public record struct WindParticle : IParticle
 
     void IParticle.Update()
     {
+        parallaxOffset += (Main.screenPosition - Main.screenLastPosition) * -Parallax;
+
         float increment = lifetime_increment * MathF.Abs(Wind);
 
         Lifetime += increment;
@@ -71,7 +81,7 @@ public record struct WindParticle : IParticle
 
         float wave = MathF.Sin((Lifetime + ((float)Main.timeForVisualEffects / 60f)) * wave_frequency) * wave_amplitude;
 
-        Vector2 newVelocity = new(Wind, wave);
+        var newVelocity = new Vector2(Wind, wave) * Utils.Remap(Parallax, parallax_min, parallax_max, 0.6f, 1.2f);
 
         // Loop behavior, similar to vanilla paper airplanes
         if (ShouldLoop)
@@ -100,9 +110,11 @@ public record struct WindParticle : IParticle
 
     readonly void IParticle.Draw(SpriteBatch spriteBatch, GraphicsDevice device)
     {
+        var offset = parallaxOffset;
+
         Vector3[] positions =
             OldPositions.Where(pos => pos != default)
-            .Select(p => new Vector3(p - Main.screenPosition, 0))
+            .Select(p => new Vector3(p + offset - Main.screenPosition, 0))
             .ToArray();
 
         if (positions.Length <= 2)
@@ -110,19 +122,17 @@ public record struct WindParticle : IParticle
             return;
         }
 
-        float brightness = MathF.Sin(Lifetime * MathHelper.Pi) * Main.atmo * MathF.Abs(Wind);
+        float brightness =
+            MathF.Sin(Lifetime * MathHelper.Pi)
+            * Main.atmo
+            * MathF.Abs(Wind)
+            * Utils.Remap(Parallax, parallax_min, parallax_max, 0.3f, 2f);
 
-        float alpha = 0.2f; // TODO: Config
-
-        // Color based on the tile at the center of the trail
-        Vector3 center = positions[positions.Length / 2];
-
-        Point tilePosition = (new Vector2(center.X, center.Y) - Main.screenPosition).ToTileCoordinates();
+        float alpha = 0.13f; // TODO: Config
 
         Color color = Main.ColorOfTheSkies * brightness * alpha;
         color.A = 0;
 
-        // TODO: Use upcoming DAYBREAK rendering
         VertexPositionColorTexture[] vertices =
             TriangleStripBuilder.BuildPath(positions,
             t => MathF.Sin(t * MathHelper.Pi) * brightness * width,
@@ -143,18 +153,21 @@ public static class Wind
 
     private const int offscreen_margin = 100;
 
-    public const int WIND_COUNT = 120;
-    public static readonly ParticleHandler<WindParticle> Winds = new(WIND_COUNT);
+    public const int WIND_COUNT = 60;
+    public static readonly ParticleHandler<WindParticle> BackgroundWind = new(WIND_COUNT);
+    public static readonly ParticleHandler<WindParticle> ForegroundWind = new(WIND_COUNT);
 
     [OnLoad]
     private static void Load()
     {
-        On_Main.DrawInfernoRings += InGameDraw;
+        On_Main.DrawBackgroundBlackFill += DrawBackgroundBlackFill_BackgroundWind;
+
+        On_Main.DrawInfernoRings += DrawInfernoRings_ForegroundWind;
 
         On_Dust.UpdateDust += UpdateDust_Wind;
     }
 
-    private static void InGameDraw(On_Main.orig_DrawInfernoRings orig, Main self)
+    private static void DrawBackgroundBlackFill_BackgroundWind(On_Main.orig_DrawBackgroundBlackFill orig, Main self)
     {
         orig(self);
 
@@ -163,26 +176,37 @@ public static class Wind
             return;
         }
 
-        Draw();
-    }
-
-    private static void Draw()
-    {
         SpriteBatch spriteBatch = Main.spriteBatch;
 
         GraphicsDevice device = Main.graphics.GraphicsDevice;
 
-        var snapshot = new SpriteBatchSnapshot(spriteBatch);
-        using (spriteBatch.Scope())
-        {
-            spriteBatch.Begin(snapshot);
-            {
-                device.Textures[0] = MiscTextures.Bloom;
+        device.Textures[0] = MiscTextures.Bloom;
 
-                Winds.Draw(spriteBatch, device);
-            }
-            spriteBatch.End();
+        BackgroundWind.Draw(spriteBatch, device);
+
+        var snapshot = new SpriteBatchSnapshot(Main.spriteBatch);
+        Main.spriteBatch.Restart(in snapshot);
+    }
+
+    private static void DrawInfernoRings_ForegroundWind(On_Main.orig_DrawInfernoRings orig, Main self)
+    {
+        orig(self);
+
+        if (Main.gameMenu || !AerieSubworld.Active)
+        {
+            return;
         }
+
+        SpriteBatch spriteBatch = Main.spriteBatch;
+
+        GraphicsDevice device = Main.graphics.GraphicsDevice;
+
+        device.Textures[0] = MiscTextures.Bloom;
+
+        ForegroundWind.Draw(spriteBatch, device);
+
+        var snapshot = new SpriteBatchSnapshot(Main.spriteBatch);
+        Main.spriteBatch.Restart(in snapshot);
     }
 
     private static void UpdateDust_Wind(On_Dust.orig_UpdateDust orig)
@@ -194,14 +218,15 @@ public static class Wind
             return;
         }
 
-        Winds.Update();
+        BackgroundWind.Update();
+        ForegroundWind.Update();
 
         SpawnWind();
     }
 
     private static void SpawnWind()
     {
-        const float spawn_chance = 22f;
+        const float spawn_chance = 15f;
 
         float spawnChance = spawn_chance / MathF.Abs(Main.WindForVisuals);
 
@@ -228,7 +253,14 @@ public static class Wind
 
         Vector2 position = Main.rand.NextVector2FromRectangle(spawn);
 
-        Winds.Spawn(new(position, Main.WindForVisuals, Main.rand.NextBool(loop_chance)));
+        if (Main.rand.NextBool())
+        {
+            ForegroundWind.Spawn(new(position, Main.WindForVisuals, Main.rand.NextBool(loop_chance), true));
+        }
+        else
+        {
+            BackgroundWind.Spawn(new(position, Main.WindForVisuals, Main.rand.NextBool(loop_chance), false));
+        }
     }
 }
 
