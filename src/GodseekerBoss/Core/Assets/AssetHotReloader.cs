@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Terraria;
+using Terraria.Audio;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace GodseekerBoss.Core.Assets;
@@ -145,6 +147,8 @@ internal static class AssetReloader
         var wait = (Action?)getAssetWait?.Invoke(asset, []);
 
         wait?.Invoke();
+
+        SoundEngine.PlaySound(SoundID.ResearchComplete);
     }
 
     private static void ChangeContentSource()

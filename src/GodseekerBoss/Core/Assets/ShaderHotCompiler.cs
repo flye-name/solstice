@@ -3,6 +3,8 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Terraria.Audio;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace GodseekerBoss.Core.Assets;
@@ -137,6 +139,8 @@ public static class ShaderHotCompiler
         process.BeginErrorReadLine();
 
         process.WaitForExit();
+
+        SoundEngine.PlaySound(SoundID.Research);
 
         if (process.ExitCode == 0)
             return;
