@@ -17,9 +17,19 @@ namespace GodseekerBoss.Content.Aerie.Environment;
 public class AerieBackground : ModSurfaceBackgroundStyle
 {
     #region Edits
+    /*
+     * 1: 247, 177, 155 | 255, 218, 176
+     * 2: 202, 134, 199 | 255, 187, 182
+     * 3: 216, 105, 122 | 252, 156, 127
+     * 4: 231, 80, 14 | 177, 92, 99
+     * 5: 233, 151, 122 | 250, 201, 159
+     * 6: 236, 57, 93 | 191, 40, 106
+     * 7: 249, 203, 188 | 252, 162, 206
+    */
 
-    private static readonly Color far_fog_color = new(195, 154, 243);
-    private static readonly Color mid_fog_color = new(208, 189, 255);
+
+    // private static readonly Color far_fog_color = new(247, 177, 155);
+    // private static readonly Color mid_fog_color = new(255, 218, 176);
 
     [OnLoad]
     private static void Load()
@@ -43,6 +53,8 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
         if (AerieSubworld.Active)
         {
+            Color far_fog_color = new(247, 177, 155);
+
             DrawFog(Main.spriteBatch, far_fog_color);
         }
     }
@@ -53,6 +65,8 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
         if (AerieSubworld.Active)
         {
+            Color mid_fog_color = new(255, 218, 176);
+
             DrawFog(Main.spriteBatch, mid_fog_color);
         }
     }
