@@ -18,6 +18,8 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 {
     #region Edits
     /*
+     * Alt colors (respective to gradient alts) [TEMP]:
+     * 0: 195, 154, 243 | 208, 189, 255
      * 1: 247, 177, 155 | 255, 218, 176
      * 2: 202, 134, 199 | 255, 187, 182
      * 3: 216, 105, 122 | 252, 156, 127
@@ -27,13 +29,16 @@ public class AerieBackground : ModSurfaceBackgroundStyle
      * 7: 249, 203, 188 | 252, 162, 206
     */
 
-
-    // private static readonly Color far_fog_color = new(247, 177, 155);
-    // private static readonly Color mid_fog_color = new(255, 218, 176);
+    private static readonly Color far_fog_color = new(247, 177, 155);
+    private static readonly Color mid_fog_color = new(255, 218, 176);
 
     [OnLoad]
     private static void Load()
     {
+        IL_Main.DrawBG += DrawBG_RemoveSpaceOffset;
+
+        On_Main.UpdateAtmosphereTransparencyToSkyColor += UpdateAtmosphereTransparencyToSkyColor_HideSpace;
+
         On_Main.DrawSurfaceBG_BackMountainsStep1 += DrawSurfaceBG_BackMountainsStep1_Fog;
         On_Main.DrawSurfaceBG_BackMountainsStep2 += DrawSurfaceBG_BackMountainsStep2_Fog;
 
@@ -47,14 +52,50 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         On_Main.DrawStarsInBackground += DrawStarsInBackground_Sky;
     }
 
+    private static void DrawBG_RemoveSpaceOffset(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        // how do i explain this to my therapist
+
+        c.GotoNext(
+            MoveType.Before,
+            i => i.MatchStfld<Main>(nameof(Main.scAdj))
+        );
+
+        c.EmitDelegate(
+            static (float num) =>
+            {
+                if (AerieSubworld.Active)
+                {
+                    // inverse of the original calculation, with a few nitpicky changes
+                    // ---
+                    // float num = Math.Min(PlayerInput.RealScreenHeight, LogicCheckScreenHeight);
+                    // float num2 = screenPosition.Y + (float)(screenHeight / 2) - num / 2f;
+                    // scAdj = (float)(worldSurface * 16.0) / (num2 + num);
+                    // ---
+
+                    return 3f - (Main.screenPosition.Y + (Main.screenHeight / 2)) / (Main.worldSurface * 16f + 16f) * 2f;
+                }
+                return num;
+            }
+        );
+    }
+
+    private static void UpdateAtmosphereTransparencyToSkyColor_HideSpace(On_Main.orig_UpdateAtmosphereTransparencyToSkyColor orig)
+    {
+        if (!AerieSubworld.Active)
+        {
+            orig();
+        }
+    }
+
     private static void DrawSurfaceBG_BackMountainsStep1_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, double backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBGTopHack)
     {
         orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBGTopHack);
 
         if (AerieSubworld.Active)
         {
-            Color far_fog_color = new(247, 177, 155);
-
             DrawFog(Main.spriteBatch, far_fog_color);
         }
     }
@@ -65,8 +106,6 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
         if (AerieSubworld.Active)
         {
-            Color mid_fog_color = new(255, 218, 176);
-
             DrawFog(Main.spriteBatch, mid_fog_color);
         }
     }
@@ -151,7 +190,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         }
     }
 
-    private static void DrawSunAndMoon_HideSun(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Microsoft.Xna.Framework.Color moonColor, Microsoft.Xna.Framework.Color sunColor, float tempMushroomInfluence)
+    private static void DrawSunAndMoon_HideSun(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence)
     {
         if (!AerieSubworld.Active)
         {

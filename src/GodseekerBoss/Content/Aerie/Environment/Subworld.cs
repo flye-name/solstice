@@ -1,7 +1,10 @@
-﻿using SubworldLibrary;
+﻿using Daybreak.Common.Features.Hooks;
+using MonoMod.Cil;
+using SubworldLibrary;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Generation;
+using Terraria.GameContent.Skies;
 using Terraria.IO;
 using Terraria.ModLoader;
 using Terraria.WorldBuilding;
@@ -10,6 +13,65 @@ namespace GodseekerBoss.Content.Aerie.Environment;
 
 public class AerieSubworld : Subworld
 {
+    #region Edits
+    [OnLoad]
+    private static void Load()
+    {
+        On_NPC.UpdateNPC_UpdateGravity += UpdateNPC_UpdateGravity_RemoveSpaceGravity;
+
+        IL_Player.Update += Update_RemoveSpaceGravity;
+    }
+
+    private static void UpdateNPC_UpdateGravity_RemoveSpaceGravity(On_NPC.orig_UpdateNPC_UpdateGravity orig, NPC self)
+    {
+        self.GravityIgnoresSpace = true;
+
+        orig(self);
+    }
+
+    private static void Update_RemoveSpaceGravity(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        // gravity *= gravityMultiplier;
+        // ---
+        // ldarg.0
+        // ldarg.0
+        // ldfld float32 Terraria.Player::gravity
+        // ldloc.3 - gravityMultiplier
+        // ---
+        // take in gravityMultiplier and out 1 if in our subworld, else ret
+        // ---
+        // mul
+        // stfld float32 Terraria.Player::gravity
+
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchLdarg(out _),
+            i => i.MatchLdarg(out _),
+            i => i.MatchLdfld<Player>(nameof(Player.gravity))
+        );
+
+        c.GotoNext(
+            MoveType.Before,
+            i => i.MatchMul(),
+            i => i.MatchStfld<Player>(nameof(Player.gravity))
+        );
+
+        c.EmitDelegate(
+            static (float multiplier) =>
+            {
+                if (Active)
+                {
+                    return 1f;
+                }
+
+                return multiplier;
+            }
+        );
+    }
+    #endregion
+
     public static bool Active => SubworldSystem.IsActive<AerieSubworld>();
 
     public override int Width => 1000;
