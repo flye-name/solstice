@@ -75,7 +75,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
                     // scAdj = (float)(worldSurface * 16.0) / (num2 + num);
                     // ---
 
-                    return 3f - (Main.screenPosition.Y + (Main.screenHeight / 2)) / (Main.worldSurface * 16f + 16f) * 2f;
+                    return 2.75f - (Main.screenPosition.Y + (Main.screenHeight / 2)) / (Main.worldSurface * 16f + 16f) * 2.3f;
                 }
                 return num;
             }
@@ -115,9 +115,9 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         spriteBatch.End(out var snapshot);
         spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
         {
-            Vector2 size = new(Main.screenWidth, Main.screenHeight);
+            var size = MathF.Max(Main.screenWidth, Main.screenHeight);
 
-            var source = new Rectangle(0, Main.instance.bgTopY, (int)size.X, (int)size.Y);
+            var source = new Rectangle(0, Main.instance.bgTopY, (int)size, (int)size);
 
             MiscShaders.AerieFog.Parallax = (float)(Main.screenPosition.X * Main.instance.bgParallax) / Main.screenWidth;
 
