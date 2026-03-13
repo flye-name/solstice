@@ -31,8 +31,8 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
     private static readonly Color far_fog_color = new(247, 177, 155);
     private static readonly Color mid_fog_color = new(255, 218, 176);
-    private static readonly Color behind_tiles_fog_color = Color.Lerp(mid_fog_color, near_fog_color, 0.65f);
     private static readonly Color near_fog_color = new(255, 248, 227);
+    private static readonly Color behind_tiles_fog_color = Color.Lerp(mid_fog_color, near_fog_color, 0.65f);
 
     [OnLoad]
     private static void Load()
