@@ -123,6 +123,7 @@ public class AerieSubworld : Subworld
         // Lower cloud bounce [FIXME]
         if (Main.LocalPlayer.position.Y > (Main.maxTilesY * 16f) - 1200 && Main.LocalPlayer.velocity.Y >= 0)
         {
+            Main.LocalPlayer.wingTime = Main.LocalPlayer.wingTimeMax;
             Main.LocalPlayer.velocity.Y -= 1.2f;
         }
         else if (Main.LocalPlayer.position.Y > (Main.maxTilesY * 16f) - 1310 && Main.LocalPlayer.velocity.Y <= 0)
