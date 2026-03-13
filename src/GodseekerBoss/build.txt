@@ -1,5 +1,5 @@
 displayName = big godseeker elite mod
-author = Ebonfly, Lion8cake, Incattus, DannnDrawsThings, boredguy9, Maskano, Ralken, Zoey
+author = flye, Lion8cake, Incattus, DannnDrawsThings, boredguy9, Maskano, Ralken, Zoey, Demi, Darkmango, Roton
 version = 0.1
 
 modReferences = Daybreak@2.3.0, SubworldLibrary@2.2.3.3
