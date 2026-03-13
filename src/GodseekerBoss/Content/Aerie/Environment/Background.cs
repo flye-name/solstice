@@ -206,6 +206,8 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
             Main.spriteBatch.Draw(BackgroundTextures.Sky, skyDest, Color.White);
 
+            Stars.DrawStars(Main.spriteBatch);
+
             Main.spriteBatch.End(out var snapshot);
             Main.spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearClamp, BlendState = BlendState.Additive });
             {
@@ -226,7 +228,6 @@ public class AerieBackground : ModSurfaceBackgroundStyle
             orig(self, sceneArea, artificial);
         }
     }
-
     #endregion
 
     public override void ModifyFarFades(float[] fades, float transitionSpeed)
