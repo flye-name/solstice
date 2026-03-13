@@ -1,11 +1,13 @@
 ﻿using Daybreak.Common.Features.Hooks;
 using Microsoft.Xna.Framework;
 using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
 using SubworldLibrary;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Terraria;
 using Terraria.GameContent.Generation;
 using Terraria.IO;
@@ -23,6 +25,56 @@ public class AerieSubworld : Subworld
         On_NPC.UpdateNPC_UpdateGravity += UpdateNPC_UpdateGravity_RemoveSpaceGravity;
 
         IL_Player.Update += Update_RemoveSpaceGravity;
+
+        //dev stuff, loading and saving worlds is saved right here in the godseeker repo
+        MethodInfo? SubworldSystem_LoadWorld = typeof(SubworldSystem).GetMethod("LoadWorld", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public | BindingFlags.Instance);
+        if (SubworldSystem_LoadWorld != null)
+        {
+            IL_LoadWorld = new ILHook(SubworldSystem_LoadWorld, IL_SubworldSystem_LoadWorld);
+            if (IL_LoadWorld != null)
+                IL_LoadWorld.Apply();
+        }
+        else
+            ModContent.GetInstance<GodseekerBoss>().Logger.Warn("Failed to load Subworld::LoadWorld il edit!");
+    }
+
+    [OnUnload]
+    private static void Unload()
+    {
+        if (IL_LoadWorld != null)
+            IL_LoadWorld.Dispose();
+    }
+
+    private static ILHook? IL_LoadWorld = null;
+
+    private static string AeriePath => Path.Combine(Program.SavePathShared, "ModSources", nameof(GodseekerBoss), "src", nameof(GodseekerBoss), "Subworld_Save", SubworldSystem.current.FileName + ".wld");
+
+    private static void IL_SubworldSystem_LoadWorld(ILContext il)
+    {
+        ILCursor c = new(il);
+
+        int inSubworld_varNum = -1;
+        int path_varNum = -1;
+
+        if (!c.TryGotoNext(MoveType.After, 
+            i => i.MatchLdloc(out inSubworld_varNum), 
+            i => i.MatchBrtrue(out _), 
+            i => i.MatchLdsfld<SubworldSystem>(nameof(SubworldSystem.main)), 
+            i => i.MatchCallvirt<FileData>("get_Path"), 
+            i => i.MatchBr(out _), 
+            i => i.MatchCall<SubworldSystem>("get_CurrentPath"),
+            i => i.MatchStloc(out path_varNum)))
+        {
+            ModContent.GetInstance<GodseekerBoss>().Logger.Debug("GodSeeker: Could not find Subworld Library's subworld file path variable!");
+            return;
+        }
+
+        c.EmitLdloca(path_varNum);
+        c.EmitLdloc(inSubworld_varNum);
+        c.EmitDelegate((ref string path, bool flag) =>
+        {
+            path = (flag ? (SubworldSystem.current.Name == nameof(AerieSubworld) ? AeriePath : SubworldSystem.CurrentPath) : SubworldSystem.main.Path);
+        });
     }
 
     private static void UpdateNPC_UpdateGravity_RemoveSpaceGravity(On_NPC.orig_UpdateNPC_UpdateGravity orig, NPC self)

@@ -9,7 +9,7 @@
 
 	<!-- Publicizer -->
 	<ItemGroup>
-		<Publicize Include="tModLoader;ReLogic;FNA" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
+		<Publicize Include="tModLoader;ReLogic;FNA;SubworldLibrary" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
 	</ItemGroup>
 	
 	<!-- References -->
