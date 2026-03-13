@@ -4,9 +4,10 @@ using MonoMod.Cil;
 using SubworldLibrary;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using Terraria;
 using Terraria.GameContent.Generation;
-using Terraria.GameContent.Skies;
 using Terraria.IO;
 using Terraria.ModLoader;
 using Terraria.WorldBuilding;
@@ -132,17 +133,41 @@ public class AerieSubworld : Subworld
 
     public override bool ShouldSave => true;
 
-    private sealed class DisableSpawns : GlobalNPC
+    [GlobalNPCHooks.EditSpawnPool]
+    private static void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
     {
-        public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
+        if (Active)
         {
-            if (Active)
+            foreach (int index in pool.Keys)
             {
-                foreach (int index in pool.Keys)
-                {
-                    pool[index] = 0f;
-                }
+                pool[index] = 0f;
             }
+        }
+    }
+
+    private static readonly InfoDisplay[] hiddenInfo =
+    [
+        InfoDisplay.Watches,
+        InfoDisplay.WeatherRadio,
+        InfoDisplay.Compass,
+        InfoDisplay.DepthMeter,
+        InfoDisplay.Sextant
+    ];
+
+    [GlobalInfoDisplayHooks.ModifyDisplayParameters]
+    private static void HideInfoAccs(
+        InfoDisplay currentDisplay,
+        ref string displayValue,
+        ref string displayName,
+        ref Color displayColor,
+        ref Color displayShadowColor
+    )
+    {
+        if (Active && hiddenInfo.Contains(currentDisplay))
+        {
+            displayValue = "???";
+
+            displayColor = new Color(100, 100, 100, Main.mouseTextColor);
         }
     }
 }
