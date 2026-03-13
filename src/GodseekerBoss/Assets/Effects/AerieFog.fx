@@ -60,8 +60,10 @@ float4 Fog(float4 sampleColor : COLOR0, float2 uv : TEXCOORD0, float2 screenCoor
 
     float4 color = cloudNoise(coords);
     
-    color += (bayer[bayeruv.x][bayeruv.y]) / steps;
-    color = floor(color.a * steps) / steps;
+    float4 posterized = color + (bayer[bayeruv.x][bayeruv.y]) / steps;
+    posterized = floor(posterized.a * steps) / steps;
+    
+    color = lerp(color, posterized, 1 - color.a);
     
     color *= sampleColor;
     
