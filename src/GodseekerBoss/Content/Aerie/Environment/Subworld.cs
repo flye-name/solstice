@@ -1,6 +1,8 @@
 ﻿using Daybreak.Common.Features.Hooks;
+using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using SubworldLibrary;
+using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.Generation;
@@ -116,6 +118,16 @@ public class AerieSubworld : Subworld
         Main.eclipse = false;
         Main.windSpeedTarget = -1f;
         Main.windSpeedCurrent = -1f;
+
+        // Lower cloud bounce [FIXME]
+        if (Main.LocalPlayer.position.Y > (Main.maxTilesY * 16f) - 1200 && Main.LocalPlayer.velocity.Y >= 0)
+        {
+            Main.LocalPlayer.velocity.Y -= 1.2f;
+        }
+        else if (Main.LocalPlayer.position.Y > (Main.maxTilesY * 16f) - 1310 && Main.LocalPlayer.velocity.Y <= 0)
+        {
+            Main.LocalPlayer.velocity.Y -= 1f;
+        }
     }
 
     public override bool ShouldSave => true;

@@ -31,6 +31,8 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
     private static readonly Color far_fog_color = new(247, 177, 155);
     private static readonly Color mid_fog_color = new(255, 218, 176);
+    private static readonly Color behind_tiles_fog_color = Color.Lerp(mid_fog_color, near_fog_color, 0.65f);
+    private static readonly Color near_fog_color = new(255, 248, 227);
 
     [OnLoad]
     private static void Load()
@@ -50,6 +52,47 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         On_Main.DrawSunAndMoon += DrawSunAndMoon_HideSun;
 
         On_Main.DrawStarsInBackground += DrawStarsInBackground_Sky;
+    }
+
+    [ModSystemHooks.PostSetupContent]
+    private static void PostLoad()
+    {
+        // Should be loaded after main loading is complete to render above wind.
+        On_Main.DrawBackgroundBlackFill += DrawBackgroundBlackFill_Fog;
+
+        On_Main.DrawInfernoRings += DrawInfernoRings_Fog;
+    }
+
+    private static void DrawBackgroundBlackFill_Fog(On_Main.orig_DrawBackgroundBlackFill orig, Main self)
+    {
+        orig(self);
+
+        if (AerieSubworld.Active)
+        {
+            const float parallax = 0.88f;
+
+            float top = Main.maxTilesY * 16f + 16f - (Main.screenPosition.Y + Main.screenHeight + 900);
+
+            top *= parallax;
+
+            DrawFog(Main.spriteBatch, behind_tiles_fog_color, (int)top, parallax);
+        }
+    }
+
+    private static void DrawInfernoRings_Fog(On_Main.orig_DrawInfernoRings orig, Main self)
+    {
+        orig(self);
+
+        if (AerieSubworld.Active)
+        {
+            const float parallax = 1.12f;
+
+            float top = Main.maxTilesY * 16f + 16f - (Main.screenPosition.Y + Main.screenHeight + 760);
+
+            top *= parallax;
+
+            DrawFog(Main.spriteBatch, near_fog_color, (int)top, parallax);
+        }
     }
 
     private static void DrawBG_RemoveSpaceOffset(ILContext il)
@@ -110,18 +153,27 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         }
     }
 
-    private static void DrawFog(SpriteBatch spriteBatch, Color color)
+    private static void DrawFog(SpriteBatch spriteBatch, Color color, int top = -1, float parallax = -1)
     {
+        if (top == -1)
+        {
+            top = Main.instance.bgTopY;
+        }
+        if (parallax == -1)
+        {
+            parallax = (float)Main.instance.bgParallax;
+        }
+
         spriteBatch.End(out var snapshot);
         spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
         {
             var size = MathF.Max(Main.screenWidth, Main.screenHeight);
 
-            var source = new Rectangle(0, Main.instance.bgTopY, (int)size, (int)size);
+            var source = new Rectangle(0, (int)MathF.Max(top, Main.screenHeight - size), (int)size, (int)size);
 
-            MiscShaders.AerieFog.Parallax = (float)(Main.screenPosition.X * Main.instance.bgParallax) / Main.screenWidth;
+            MiscShaders.AerieFog.Parallax = (float)(Main.screenPosition.X * parallax) / Main.screenWidth;
 
-            MiscShaders.AerieFog.Time = Main.GlobalTimeWrappedHourly * 0.05f * ((float)Main.instance.bgParallax + 1f);
+            MiscShaders.AerieFog.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f);
 
             MiscShaders.AerieFog.Source = new Vector4(source.X, source.Y, source.Width, source.Height);
 
