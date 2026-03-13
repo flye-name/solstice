@@ -24,7 +24,10 @@ public class AerieSubworld : Subworld
 
     private static void UpdateNPC_UpdateGravity_RemoveSpaceGravity(On_NPC.orig_UpdateNPC_UpdateGravity orig, NPC self)
     {
-        self.GravityIgnoresSpace = true;
+        if (Active)
+        {
+            self.GravityIgnoresSpace = true;
+        }
 
         orig(self);
     }
