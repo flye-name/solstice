@@ -164,6 +164,11 @@ public class AerieBackground : ModSurfaceBackgroundStyle
             parallax = (float)Main.instance.bgParallax;
         }
 
+        if (top > Main.screenHeight)
+        {
+            return;
+        }
+
         spriteBatch.End(out var snapshot);
         spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
         {
