@@ -106,21 +106,6 @@ public class AerieSubworld : Subworld
         c.MarkLabel(jumpRetTarget);
     }
 
-    private static void button_OnUpdate_RemoveLockedTooltip(ILContext il)
-    {
-        throw new NotImplementedException();
-    }
-
-    private static void ToggleWeatherCategory_DisablePowers(On_UICreativePowersMenu.orig_ToggleWeatherCategory orig, UICreativePowersMenu self, int option)
-    {
-        if (Active)
-        {
-            return;
-        }
-
-        orig(self, option);
-    }
-
     private static void UpdateNPC_UpdateGravity_RemoveSpaceGravity(On_NPC.orig_UpdateNPC_UpdateGravity orig, NPC self)
     {
         if (Active)
