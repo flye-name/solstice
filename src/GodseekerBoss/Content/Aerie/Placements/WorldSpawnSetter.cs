@@ -2,8 +2,9 @@
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace GodseekerBoss.Content;
-public class WorldSpawnSetter : ModItem
+namespace GodseekerBoss.Content.Aerie.Placements;
+
+public sealed class WorldSpawnSetter : ModItem
 {
     public override void SetDefaults()
     {

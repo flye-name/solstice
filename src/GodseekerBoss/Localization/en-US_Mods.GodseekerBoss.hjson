@@ -13,6 +13,11 @@ Items: {
 		DisplayName: World Spawn Setter
 		Tooltip: ""
 	}
+
+	GodspeedPainting: {
+		DisplayName: Godspeed
+		Tooltip: "'D. Watkins'"
+	}
 }
 
 Biomes: {

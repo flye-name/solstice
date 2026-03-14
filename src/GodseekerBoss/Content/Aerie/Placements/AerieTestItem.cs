@@ -4,9 +4,9 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace GodseekerBoss.Content;
+namespace GodseekerBoss.Content.Aerie.Placements;
 
-public class AerieTestItem : ModItem
+public sealed class AerieTestItem : ModItem
 {
     public override void SetDefaults()
     {

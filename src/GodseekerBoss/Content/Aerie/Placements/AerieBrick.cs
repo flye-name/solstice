@@ -4,9 +4,9 @@ using Terraria.ModLoader;
 using Terraria;
 using Microsoft.Xna.Framework;
 
-namespace GodseekerBoss.Content;
+namespace GodseekerBoss.Content.Aerie.Placements;
 
-public class AerieBrick : ModItem
+public sealed class AerieBrick : ModItem
 {
     public override void SetStaticDefaults()
     {
@@ -28,7 +28,7 @@ public class AerieBrick : ModItem
     }
 }
 
-public class AerieBrickTile : ModTile
+public sealed class AerieBrickTile : ModTile
 {
     public override void SetStaticDefaults()
     {
