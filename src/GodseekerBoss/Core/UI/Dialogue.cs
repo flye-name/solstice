@@ -12,7 +12,7 @@ namespace GodseekerBoss.Core.UI;
 [Autoload(Side = ModSide.Client)]
 public class Dialogue : ModSystem
 {
-    public static DialogueObject[] DialogueObjects = new DialogueObject[15];
+    public static readonly DialogueObject[] DialogueObjects = new DialogueObject[5];
     public override void OnWorldLoad()
     {
         for (int i = 0; i < DialogueObjects.Length; i++) 
@@ -54,8 +54,10 @@ public class Dialogue : ModSystem
         }, InterfaceScaleType.UI));
     }
 
-    public override void PostUpdateEverything()
+    public override void PostUpdateDusts()
     {
+        if (Main.gameInactive) return;
+        
         for (int i = 0; i < DialogueObjects.Length; i++)
         {
             if (DialogueObjects[i] is null || (DialogueObjects[i].Data.LifetimeAfterCompletion <= 0 && DialogueObjects[i].Data.Text.Length > 0))  

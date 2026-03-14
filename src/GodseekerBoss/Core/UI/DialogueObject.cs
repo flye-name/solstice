@@ -18,10 +18,10 @@ public struct DialogueData
     
     public Color BorderColor = Color.Black;
     public Color Color;
-    public Color[] Colors;
+    public readonly Color[] Colors;
 
     public float Scale = .6f;
-    public float[] Scales;
+    public readonly float[] Scales;
     
     public int LifetimeAfterCompletion = 150;
     
@@ -136,10 +136,10 @@ public class DialogueObject
             float alpha = Data.Colors[i].A / 255f;
             
             var charData = font.GetCharacterData(Data.Text[i]);
-            position -= new Vector2((charData.Kerning.X) * Data.Scale * 0.9f, 0);
+            position -= new Vector2(charData.Kerning.X * Data.Scale * 0.9f, 0);
             
             if (Data.Text[i] == 'j') // TODO: check other characters that might look off
-                position += new Vector2((charData.Kerning.X) * Data.Scale * 1.2f, 0);
+                position += new Vector2(charData.Kerning.X * Data.Scale * 1.2f, 0);
             
             ChatManager.DrawColorCodedStringShadow(Main.spriteBatch, font, Data.Text[i].ToString(), position, Data.BorderColor * alpha, 0, origin, Data.Scales[i] * Vector2.One);
             Vector2 newPosition = ChatManager.DrawColorCodedString(Main.spriteBatch, font, Data.Text[i].ToString(), position, Data.Colors[i], 0, origin, Data.Scales[i] * Vector2.One);
