@@ -1,16 +1,15 @@
 ﻿using Daybreak.Common.Features.Hooks;
+using Microsoft.Xna.Framework;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Terraria.Audio;
-using Terraria.ID;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace GodseekerBoss.Core.Assets;
 
 #if DEBUG
-
 [Autoload(Side = ModSide.Client)]
 public static class ShaderHotCompiler
 {
@@ -54,7 +53,9 @@ public static class ShaderHotCompiler
             effectWatcher = new(modSource);
 
             foreach (string e in effect_extensions)
+            {
                 effectWatcher.Filters.Add($"*{e}");
+            }
 
             effectWatcher.Changed += EffectChanged;
 
@@ -65,7 +66,9 @@ public static class ShaderHotCompiler
         }
         catch (Exception e)
         {
-            mod.Logger.Warn($"Unable to load Shader Hot-Compiler! - {e}");
+            mod.Logger.Warn(
+                $"Unable to load Effect Compiler:\n{e.GetType().Name!}\n{e.Message}" +
+                $"\nThis warning should not be present for mod consumers!");
         }
     }
 
@@ -78,7 +81,9 @@ public static class ShaderHotCompiler
     private static void EffectChanged(object sender, FileSystemEventArgs e)
     {
         if (e.ChangeType.HasFlag(WatcherChangeTypes.Created))
+        {
             return;
+        }
 
         string effectPath = e.FullPath.Replace('\\', '/');
 
@@ -89,7 +94,11 @@ public static class ShaderHotCompiler
         if (e.ChangeType.HasFlag(WatcherChangeTypes.Deleted) ||
             e.ChangeType.HasFlag(WatcherChangeTypes.Renamed))
         {
-            mod.Logger.Warn($"Effect at {shortPath} was removed or renamed!");
+            string message = $"Unable to compile effect at '{shortPath},' effect was deleted or renamed!";
+
+            mod.Logger.Warn(message);
+            Main.NewText(message);
+
             return;
         }
 
@@ -140,12 +149,19 @@ public static class ShaderHotCompiler
 
         process.WaitForExit();
 
-        SoundEngine.PlaySound(SoundID.Research);
-
         if (process.ExitCode == 0)
+        {
             return;
+        }
 
-        mod.Logger.Warn($"Effect at {shortPath} could not be compiled! Exit code: {process.ExitCode}");
+        string message = $"Effect at \"{shortPath}\" could not be compiled!\nExit code: {process.ExitCode}";
+
+        mod.Logger.Warn(message);
+
+        if (!Main.gameMenu)
+        {
+            Main.NewText(message, Color.Red);
+        }
     }
 
     private static void HandleWineCompilation(ref string executable, ref string wineArgument, ref string effectPath, ref string outputEffect)
@@ -204,7 +220,14 @@ public static class ShaderHotCompiler
 
         if (string.IsNullOrEmpty(output))
         {
-            mod.Logger.Warn($"Error converting path \"{path}\" using WINE; {error}");
+            string message = $"Error converting path \"{path}\" using WINE:\n{error}";
+
+            mod.Logger.Warn(message);
+
+            if (!Main.gameMenu)
+            {
+                Main.NewText(message, Color.Red);
+            }
         }
 
         path = output.Trim();
@@ -224,8 +247,10 @@ public static class ShaderHotCompiler
             return;
         }
 
-        mod.Logger.Warn($"{shortPath}: {error}");
+        string message = $"{shortPath}: {error}";
+
+        mod.Logger.Warn(message);
+        Main.NewText(message);
     }
 }
-
 #endif

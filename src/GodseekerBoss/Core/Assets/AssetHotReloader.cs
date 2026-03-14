@@ -1,4 +1,5 @@
 ﻿using Daybreak.Common.Features.Hooks;
+using Microsoft.Xna.Framework;
 using ReLogic.Content;
 using ReLogic.Content.Sources;
 using ReLogic.Utilities;
@@ -8,14 +9,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Terraria;
-using Terraria.Audio;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace GodseekerBoss.Core.Assets;
 
 #if DEBUG
-
 // TODO: Prevent image premultiplication.
 [Autoload(Side = ModSide.Client)]
 internal static class AssetReloader
@@ -74,7 +72,9 @@ internal static class AssetReloader
         }
         catch (Exception e)
         {
-            mod.Logger.Warn($"Unable to load Asset Reloader! - {e}");
+            mod.Logger.Warn(
+                $"Unable to load Asset Reloader:\n{e.GetType().Name!}\n{e.Message}" +
+                $"\nThis warning should not be present for mod consumers!");
         }
     }
 
@@ -104,7 +104,14 @@ internal static class AssetReloader
         if (e.ChangeType.HasFlag(WatcherChangeTypes.Deleted) ||
             e.ChangeType.HasFlag(WatcherChangeTypes.Renamed))
         {
-            mod.Logger.Warn($"Asset at {assetPath} was removed or renamed!");
+            string message = $"Unable to reload asset at \"{assetPath},\" asset was deleted or renamed!";
+
+            mod.Logger.Warn(message);
+
+            if (!Main.gameMenu)
+            {
+                Main.NewText(message);
+            }
 
             return;
         }
@@ -124,12 +131,21 @@ internal static class AssetReloader
 
     private static void ReloadAsset(IAsset asset)
     {
-        lock (mod.Assets._requestLock)
+        try
         {
-            mod.Assets.ForceReloadAsset(asset, AssetRequestMode.ImmediateLoad);
-        }
+            lock (mod.Assets._requestLock)
+            {
+                mod.Assets.ForceReloadAsset(asset, AssetRequestMode.ImmediateLoad);
+            }
 
-        InvokeAssetWait(asset);
+            InvokeAssetWait(asset);
+        }
+        catch (Exception e)
+        {
+            string message = $"Unable to reload asset \"{asset.Name}\":\n{e.GetType().Name!}\n{e.Message}";
+
+            mod.Logger.Warn(message);
+        }
     }
 
     private static void InvokeAssetWait(IAsset asset)
@@ -147,8 +163,6 @@ internal static class AssetReloader
         var wait = (Action?)getAssetWait?.Invoke(asset, []);
 
         wait?.Invoke();
-
-        SoundEngine.PlaySound(SoundID.ResearchComplete);
     }
 
     private static void ChangeContentSource()
@@ -178,6 +192,8 @@ internal static class AssetReloader
             assetPaths = [];
         }
 
+        // Should not breakpoint the debugger.
+        [DebuggerNonUserCode]
         public override Stream OpenStream(string fullAssetName)
         {
             return File.OpenRead(Path.Combine(modSource, fullAssetName));
@@ -194,5 +210,4 @@ internal static class AssetReloader
         }
     }
 }
-
 #endif
