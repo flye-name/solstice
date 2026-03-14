@@ -1,15 +1,15 @@
 ﻿using Daybreak.Common.Features.Hooks;
 using Microsoft.Xna.Framework;
 using MonoMod.Cil;
-using MonoMod.RuntimeDetour;
 using SubworldLibrary;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using Terraria;
+using Terraria.GameContent.Creative;
 using Terraria.GameContent.Generation;
+using Terraria.GameContent.UI.States;
 using Terraria.IO;
 using Terraria.ModLoader;
 using Terraria.WorldBuilding;
@@ -19,12 +19,106 @@ namespace GodseekerBoss.Content.Aerie.Environment;
 public class AerieSubworld : Subworld
 {
     #region Edits
+    private static readonly Type[] disabledPowerTypes =
+    [
+        typeof(CreativePowers.StartDayImmediately),
+        typeof(CreativePowers.StartNightImmediately),
+        typeof(CreativePowers.StartNoonImmediately),
+        typeof(CreativePowers.StartMidnightImmediately),
+
+        typeof(CreativePowers.FreezeTime),
+        typeof(CreativePowers.ModifyTimeRate),
+
+        typeof(CreativePowers.FreezeWindDirectionAndStrength),
+        typeof(CreativePowers.ModifyWindDirectionAndStrength),
+
+        typeof(CreativePowers.FreezeRainPower),
+        typeof(CreativePowers.ModifyRainPower),
+
+        typeof(CreativePowers.StopBiomeSpreadPower),
+    ];
+
     [OnLoad]
     private static void Load()
     {
+        foreach (var type in disabledPowerTypes)
+        {
+            MonoModHooks.Modify(
+                type.GetMethod(
+                    nameof(ICreativePower.GetIsUnlocked),
+                    BindingFlags.Instance | BindingFlags.Public
+                ),
+                GetIsUnlocked_DisablePowers
+            );
+        }
+
+        // Re-JIT various methods that reference any disabled power's GetIsUnlocked impl.
+        IL_WorldGen.UpdateWorld_Inner += _ => { };
+        IL_UICreativePowersMenu.WeatherCategoryButtonClick += _ => { };
+        IL_UICreativePowersMenu.TimeCategoryButtonClick += _ => { };
+
+        On_CreativePowersHelper.IsAvailableForPlayer += IsAvailableForPlayer_DisablePowers;
+        On_CreativePowersHelper.AddUnlockTextIfNeeded += AddUnlockTextIfNeeded_HideUnused;
+
         On_NPC.UpdateNPC_UpdateGravity += UpdateNPC_UpdateGravity_RemoveSpaceGravity;
 
         IL_Player.Update += Update_RemoveSpaceGravity;
+    }
+
+    private static bool IsAvailableForPlayer_DisablePowers(On_CreativePowersHelper.orig_IsAvailableForPlayer orig, ICreativePower power, int playerIndex)
+    {
+        if (disabledPowerTypes.Contains(power.GetType()) && Active)
+        {
+            return false;
+        }
+
+        return orig(power, playerIndex);
+    }
+
+    private static void AddUnlockTextIfNeeded_HideUnused(On_CreativePowersHelper.orig_AddUnlockTextIfNeeded orig, ref string originalText, bool needed, string descriptionKey)
+    {
+        const string disabled_key = $"Mods.{nameof(GodseekerBoss)}.CreativePowers.DisabledInAerie";
+
+        // Not full-proof but should work well enough as it's rather unlikely other mods will use
+        // powers' unlock feature due to its unused/half implemented behaviour.
+        if (Active && !needed)
+        {
+            descriptionKey = disabled_key;
+        }
+
+        orig(ref originalText, needed, descriptionKey);
+    }
+
+    private static void GetIsUnlocked_DisablePowers(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        ILLabel jumpRetTarget = c.DefineLabel();
+
+        c.EmitDelegate(static () => Active);
+
+        c.EmitBrfalse(jumpRetTarget);
+
+        // false
+        c.EmitLdcI4(0);
+        c.EmitRet();
+
+        c.MarkLabel(jumpRetTarget);
+    }
+
+    private static void button_OnUpdate_RemoveLockedTooltip(ILContext il)
+    {
+        throw new NotImplementedException();
+    }
+
+    private static void ToggleWeatherCategory_DisablePowers(On_UICreativePowersMenu.orig_ToggleWeatherCategory orig, UICreativePowersMenu self, int option)
+    {
+        if (Active)
+        {
+            return;
+        }
+
+        orig(self, option);
     }
 
     private static void UpdateNPC_UpdateGravity_RemoveSpaceGravity(On_NPC.orig_UpdateNPC_UpdateGravity orig, NPC self)
