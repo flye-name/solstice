@@ -11,12 +11,5 @@
 	<ItemGroup>
 		<Publicize Include="tModLoader;ReLogic;FNA;SubworldLibrary" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
 	</ItemGroup>
-	
-	<!-- References -->
-	<ItemGroup>
-		<Reference Include="SubworldLibrary">
-			<HintPath>..\ModAssemblies\SubworldLibrary.dll</HintPath>
-		</Reference>
-	</ItemGroup>
 
 </Project>
