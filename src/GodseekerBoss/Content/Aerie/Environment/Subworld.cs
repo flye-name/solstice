@@ -11,6 +11,7 @@ using Terraria.GameContent.Creative;
 using Terraria.GameContent.Generation;
 using Terraria.GameContent.UI.States;
 using Terraria.IO;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.WorldBuilding;
 
@@ -41,6 +42,8 @@ public class AerieSubworld : Subworld
     [OnLoad]
     private static void Load()
     {
+        On_Player.DropTombstone += DropTombstone_DisableTombstones;
+
         foreach (var type in disabledPowerTypes)
         {
             MonoModHooks.Modify(
@@ -63,6 +66,16 @@ public class AerieSubworld : Subworld
         On_NPC.UpdateNPC_UpdateGravity += UpdateNPC_UpdateGravity_RemoveSpaceGravity;
 
         IL_Player.Update += Update_RemoveSpaceGravity;
+    }
+
+    private static void DropTombstone_DisableTombstones(On_Player.orig_DropTombstone orig, Player self, long coinsOwned, NetworkText deathText, int hitDirection)
+    {
+        if (Active)
+        {
+            return;
+        }
+
+        orig(self, coinsOwned, deathText, hitDirection);
     }
 
     private static bool IsAvailableForPlayer_DisablePowers(On_CreativePowersHelper.orig_IsAvailableForPlayer orig, ICreativePower power, int playerIndex)
