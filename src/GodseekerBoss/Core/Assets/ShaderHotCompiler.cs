@@ -31,7 +31,7 @@ public static class ShaderHotCompiler
 
     private static string modSource = "";
 
-    private readonly static Mod mod = ModContent.GetInstance<GodseekerBoss>();
+    private static readonly Mod mod = ModContent.GetInstance<GodseekerBoss>();
 
     [OnLoad]
     private static void Load()
@@ -50,7 +50,7 @@ public static class ShaderHotCompiler
 
             fxcPath = paths[0].Replace('\\', '/');
 
-            effectWatcher = new(modSource);
+            effectWatcher = new FileSystemWatcher(modSource);
 
             foreach (string e in effect_extensions)
             {
@@ -68,7 +68,8 @@ public static class ShaderHotCompiler
         {
             mod.Logger.Warn(
                 $"Unable to load Effect Compiler:\n{e.GetType().Name!}\n{e.Message}" +
-                $"\nThis warning should not be present for mod consumers!");
+                $"\nThis warning should not be present for mod consumers!"
+            );
         }
     }
 
@@ -112,7 +113,7 @@ public static class ShaderHotCompiler
 
     private static async Task CompileShaderTask(string executable, string effectPath, string shortPath)
     {
-        // Prevent alledged issues with temp files.
+        // Gives time for Visual Studio to move temp files.
         await Task.Delay(10);
 
         string wineArgument = "";
@@ -147,7 +148,7 @@ public static class ShaderHotCompiler
 
         process.BeginErrorReadLine();
 
-        process.WaitForExit();
+        await process.WaitForExitAsync();
 
         if (process.ExitCode == 0)
         {

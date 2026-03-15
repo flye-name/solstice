@@ -37,7 +37,7 @@ public sealed class AerieBrickTile : ModTile
         Main.tileBlockLight[Type] = true;
         Main.tileLighted[Type] = false;
         AddMapEntry(new Color(138, 158, 168));
-        DustType = -1; //Add dusts
+        DustType = -1;
         HitSound = SoundID.Tink;
     }
 

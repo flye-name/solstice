@@ -40,7 +40,7 @@ public class AerieSubworld : Subworld
     ];
 
     [OnLoad]
-    private static void Load()
+    private static new void Load()
     {
         On_Player.DropTombstone += DropTombstone_DisableTombstones;
 
@@ -140,7 +140,7 @@ public class AerieSubworld : Subworld
         // ldfld float32 Terraria.Player::gravity
         // ldloc.3 - gravityMultiplier
         // ---
-        // take in gravityMultiplier and out 1 if in our subworld, else ret
+        // Take in gravityMultiplier and out 1 if in our subworld, else ret.
         // ---
         // mul
         // stfld float32 Terraria.Player::gravity
@@ -178,20 +178,15 @@ public class AerieSubworld : Subworld
 
     public override int Height => 400;
 
-    public override List<GenPass> Tasks => new List<GenPass>() 
-    {
-        new PassLegacy("Aerie Settings", new WorldGenLegacyMethod(AerieSubworldSettings))
-    };
+    public override List<GenPass> Tasks =>
+    [
+        new PassLegacy("Aerie Settings", AerieSubworldSettings)
+    ];
 
-    private static void AerieSubworldSettings(GenerationProgress progres, GameConfiguration configurations)
+    private static void AerieSubworldSettings(GenerationProgress progress, GameConfiguration configurations)
     {
         Main.worldSurface = Main.maxTilesY;
         Main.rockLayer = Main.maxTilesY + 42;
-    }
-
-    public override void SetStaticDefaults()
-    {
-            
     }
 
     public override void OnLoad()
@@ -202,19 +197,24 @@ public class AerieSubworld : Subworld
     public override void Update()
     {
         Main.cloudAlpha = 0f;
-        Main.raining = false;
         Main.cloudBGActive = 0f;
-        for (int i = 0; i < Main.cloud.Length; i++)
+
+        foreach (Cloud cloud in Main.cloud)
         {
-            Main.cloud[i].active = false;
+            cloud.active = false;
         }
+
+        Main.raining = false;
+
         Main.time = 27000;
         Main.dayTime = true;
+
         Main.eclipse = false;
+
         Main.windSpeedTarget = -1f;
         Main.windSpeedCurrent = -1f;
 
-        // Lower cloud bounce [FIXME]
+        // TODO: Proper logic lower cloud bouncing.
         if (Main.LocalPlayer.position.Y > (Main.maxTilesY * 16f) - 1200 && Main.LocalPlayer.velocity.Y >= 0)
         {
             Main.LocalPlayer.wingTime = Main.LocalPlayer.wingTimeMax;
@@ -231,12 +231,14 @@ public class AerieSubworld : Subworld
     [GlobalNPCHooks.EditSpawnPool]
     private static void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
     {
-        if (Active)
+        if (!Active)
         {
-            foreach (int index in pool.Keys)
-            {
-                pool[index] = 0f;
-            }
+            return;
+        }
+
+        foreach (int index in pool.Keys)
+        {
+            pool[index] = 0f;
         }
     }
 
@@ -258,11 +260,13 @@ public class AerieSubworld : Subworld
         ref Color displayShadowColor
     )
     {
-        if (Active && hiddenInfo.Contains(currentDisplay))
+        if (!Active || !hiddenInfo.Contains(currentDisplay))
         {
-            displayValue = "???";
-
-            displayColor = new Color(100, 100, 100, Main.mouseTextColor);
+            return;
         }
+
+        displayValue = "???";
+
+        displayColor = new Color(100, 100, 100, Main.mouseTextColor);
     }
 }

@@ -24,12 +24,18 @@ public sealed class AerieTestItem : ModItem
 
     public override bool? UseItem(Player player)
     {
-        if (player.whoAmI == Main.myPlayer)
+        if (player.whoAmI != Main.myPlayer)
         {
-            if (!SubworldSystem.IsActive<AerieSubworld>())
-                SubworldSystem.Enter<AerieSubworld>();
-            else
-                SubworldSystem.Exit();
+            return true;
+        }
+
+        if (!SubworldSystem.IsActive<AerieSubworld>())
+        {
+            SubworldSystem.Enter<AerieSubworld>();
+        }
+        else
+        {
+            SubworldSystem.Exit();
         }
 
         return true;

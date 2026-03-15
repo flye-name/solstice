@@ -24,11 +24,11 @@ public static class Stars
         {
             var position = RandomPoint(Main.rand);
 
-            var scale = Main.rand.NextFloat(0.1f, 1f);
+            float scale = Main.rand.NextFloat(0.1f, 1f);
 
-            var phase = Main.rand.NextFloat() * MathF.Tau;
+            float phase = Main.rand.NextFloat() * MathF.Tau;
 
-            stars[i] = new(position, scale, phase);
+            stars[i] = new Star(position, scale, phase);
         }
     }
 
@@ -44,7 +44,7 @@ public static class Stars
         float y = MathF.Sin(phi) * MathF.Sin(theta);
         float z = MathF.Cos(phi);
 
-        return new(x, y, z);
+        return new Vector3(x, y, z);
     }
 
     public static void DrawStars(SpriteBatch spriteBatch)
@@ -82,11 +82,11 @@ public static class Stars
                 continue;
             }
 
-            var twinkle = (MathF.Sin(star.Phase + (Main.GlobalTimeWrappedHourly * 2.3f)) + 1) * 0.5f;
+            float twinkle = (MathF.Sin(star.Phase + (Main.GlobalTimeWrappedHourly * 2.3f)) + 1) * 0.5f;
 
-            var fade = 1f - MathF.Pow(position.Y / Main.screenHeight, 2f);
+            float fade = 1f - MathF.Pow(position.Y / Main.screenHeight, 2f);
 
-            var scale = MathF.Max(star.Scale * star_max_scale, star_min_scale) * fade * twinkle;
+            float scale = MathF.Max(star.Scale * star_max_scale, star_min_scale) * fade * twinkle;
 
             var color = Color.White * star_alpha;
             color.A = 0;

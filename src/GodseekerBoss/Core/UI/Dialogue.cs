@@ -1,9 +1,5 @@
-using Microsoft.Xna.Framework;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
-using Terraria.Audio;
-using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -12,58 +8,81 @@ namespace GodseekerBoss.Core.UI;
 [Autoload(Side = ModSide.Client)]
 public class Dialogue : ModSystem
 {
-    public static readonly DialogueObject[] DialogueObjects = new DialogueObject[5];
+    private static readonly DialogueObject[] dialogue = new DialogueObject[5];
+
     public override void OnWorldLoad()
     {
-        for (int i = 0; i < DialogueObjects.Length; i++) 
-            DialogueObjects[i] = DialogueObject.Empty;
+        for (int i = 0; i < dialogue.Length; i++)
+        {
+            dialogue[i] = DialogueObject.Empty;
+        }
     }
 
     public static DialogueObject NewDialogue(DialogueData data, bool screenspace = false)
     {
         int index = 0;
 
-        while (DialogueObjects[index].Data.LifetimeAfterCompletion > 0 && index < DialogueObjects.Length - 1)
+        while (dialogue[index].Data.LifetimeAfterCompletion > 0 && index < dialogue.Length - 1)
+        {
             index++;
-        
-        DialogueObjects[index] = new DialogueObject(data);
-        DialogueObjects[index].Screenspace = screenspace;
-        
-        return DialogueObjects[index];
+        }
+
+        dialogue[index] = new DialogueObject(data) { Screenspace = screenspace };
+
+        return dialogue[index];
     }
 
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
     {
         int textIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: MP Player Names"));
-        layers.Insert(textIndex, new LegacyGameInterfaceLayer("Godseeker: Dialogue", () =>
-        {
-            for (int i = 0; i < DialogueObjects.Length; i++)
-                if (!DialogueObjects[i].Screenspace)
-                    DialogueObjects[i].Draw();
 
-            return true;
-        }));
+        layers.Insert(textIndex, new LegacyGameInterfaceLayer("Godseeker: Dialogue",
+            () =>
+            {
+                foreach (DialogueObject t in dialogue)
+                {
+                    if (!t.Screenspace)
+                    {
+                        t.Draw();
+                    }
+                }
+
+                return true;
+            })
+        );
         
-        layers.Insert(textIndex, new LegacyGameInterfaceLayer("Godseeker: DialogueUI", () =>
-        {
-            for (int i = 0; i < DialogueObjects.Length; i++)
-                if (DialogueObjects[i].Screenspace)
-                    DialogueObjects[i].Draw();
+        layers.Insert(textIndex, new LegacyGameInterfaceLayer("Godseeker: DialogueUI",
+            () =>
+            {
+                foreach (DialogueObject dialog in dialogue)
+                {
+                    if (dialog.Screenspace)
+                    {
+                        dialog.Draw();
+                    }
+                }
 
-            return true;
-        }, InterfaceScaleType.UI));
+                return true;
+            },
+            InterfaceScaleType.UI)
+        );
     }
 
     public override void PostUpdateDusts()
     {
-        if (Main.gameInactive) return;
-        
-        for (int i = 0; i < DialogueObjects.Length; i++)
+        if (Main.gameInactive)
         {
-            if (DialogueObjects[i] is null || (DialogueObjects[i].Data.LifetimeAfterCompletion <= 0 && DialogueObjects[i].Data.Text.Length > 0))  
-                DialogueObjects[i] = DialogueObject.Empty;
+            return;
+        }
+        
+        for (int i = 0; i < dialogue.Length; i++)
+        {
+            if (dialogue[i].Data.LifetimeAfterCompletion <= 0 && dialogue[i].Data.Text.Length > 0)
+            {
+                dialogue[i] = DialogueObject.Empty;
+            }
             
-            DialogueObjects[i].Update();
+            dialogue[i].Update();
         }
     }
 }

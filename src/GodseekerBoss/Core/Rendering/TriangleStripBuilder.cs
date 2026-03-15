@@ -5,8 +5,7 @@ using System.Collections.Generic;
 
 namespace GodseekerBoss.Core.Rendering;
 
-// Watered down version of Vermin/Syrup's triangle strip implementation;
-// may be potentially obsolete if rendering is merged into DAYBREAK?
+// Watered down version of Vermin/Syrup's triangle strip implementation in Cataphract.
 public enum StripCurveType : byte
 {
     Linear,
@@ -196,8 +195,7 @@ public static class TriangleStripBuilder
         return vertices;
     }
 
-    #region Path Evaluation
-
+#region Path Evaluation
     private static IReadOnlyList<Vector3> RemoveDegenerates(IReadOnlyList<Vector3> path)
     {
         if (path.Count < 2)
@@ -214,7 +212,9 @@ public static class TriangleStripBuilder
         for (int i = 1; i < path.Count; i++)
         {
             if (Vector3.DistanceSquared(last, path[i]) <= epsilon)
+            {
                 continue;
+            }
 
             last = path[i];
             result.Add(last);
@@ -222,7 +222,7 @@ public static class TriangleStripBuilder
 
         if (result.Count == 1)
         {
-            result.Add(path[path.Count - 1]);
+            result.Add(path[^1]);
         }
 
         return result;
@@ -249,11 +249,9 @@ public static class TriangleStripBuilder
 
         return progress;
     }
+#endregion
 
-    #endregion
-
-    #region Curve Evaluation
-
+#region Curve Evaluation
     private static IReadOnlyList<Vector3> SmoothPath(IReadOnlyList<Vector3> path, int subdivisions, StripCurveType curveType)
     {
         if (subdivisions <= 0 || path.Count < 2)
@@ -309,10 +307,10 @@ public static class TriangleStripBuilder
 
         float inv = 1f - t;
 
-        return inv * inv * inv * p1
-             + 3f * inv * inv * t * c1
-             + 3f * inv * t * t * c2
-             + t * t * t * p2;
+        return (inv * inv * inv * p1)
+             + (3f * inv * inv * t * c1)
+             + (3f * inv * t * t * c2)
+             + (t * t * t * p2);
     }
 
     private static Vector3 Hermite(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
@@ -322,8 +320,7 @@ public static class TriangleStripBuilder
 
         return Vector3.Hermite(p1, tan1, p2, tan2, t);
     }
-
-    #endregion
+#endregion
 
     private static Vector3 FindPerpendicular(Vector3 vector)
     {
@@ -372,7 +369,9 @@ public static class TriangleStripBuilder
         float sumLenSq = sum.LengthSquared();
 
         if (sumLenSq < 1e-4f)
+        {
             return nextNormal * halfWidth;
+        }
 
         Vector3 miter = sum / MathF.Sqrt(sumLenSq);
 
@@ -380,13 +379,15 @@ public static class TriangleStripBuilder
         float absDenom = MathF.Abs(denom);
 
         if (absDenom <= 1e-3f)
+        {
             return nextNormal * halfWidth;
+        }
 
         float scale = halfWidth / denom;
 
-        const float MiterLimit = 4f;
+        const float miter_limit = 4f;
 
-        float maxScale = halfWidth * MiterLimit;
+        float maxScale = halfWidth * miter_limit;
 
         if (MathF.Abs(scale) > maxScale)
         {

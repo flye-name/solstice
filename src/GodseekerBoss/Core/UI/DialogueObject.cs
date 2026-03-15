@@ -1,11 +1,8 @@
 using Microsoft.Xna.Framework;
 using ReLogic.Graphics;
-using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
-using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
@@ -48,15 +45,18 @@ public struct DialogueData
 [Autoload(Side = ModSide.Client)]
 public class DialogueObject
 {
-    public static readonly DialogueObject Empty = new DialogueObject(new DialogueData("", Vector2.Zero, Color.White) with { LifetimeAfterCompletion =  0 });
+    public static readonly DialogueObject Empty = new(new DialogueData("", Vector2.Zero, Color.White) { LifetimeAfterCompletion =  0 });
     
     public delegate void End(DialogueObject dialogue);
-    public event End OnEnd;
+    public event End? OnEnd;
     
     public DialogueData BaseData, Data;
+
     public int HighlightedCharacterIndex = -1;
     public int Delay;
+
     public bool Screenspace;
+
     public DialogueObject(DialogueData data)
     {
         BaseData = data;
@@ -66,83 +66,121 @@ public class DialogueObject
 
     public void Update()
     {
-        if (Data.LifetimeAfterCompletion <= 0) return;
+        if (Data.LifetimeAfterCompletion <= 0)
+        {
+            return;
+        }
 
         Delay--;
         if (Main.ambientCounter % Data.CharacterInterval == 0 && HighlightedCharacterIndex <= BaseData.Text.Length && Delay <= 0)
         {
             HighlightedCharacterIndex++;
             Data.Colors[HighlightedCharacterIndex] = Color.White;
-            Data.Text = BaseData.Text.Substring(0, HighlightedCharacterIndex + 1);
+            Data.Text = BaseData.Text[..(HighlightedCharacterIndex + 1)];
 
             SetDelays();
         }
 
-        if (Data.CharacterSound.HasValue && Main.ambientCounter % Data.SoundInterval == 0 && BaseData.Text[HighlightedCharacterIndex] != ' ' && Delay <= 0)
+        if (Data.CharacterSound.HasValue &&
+            Main.ambientCounter % Data.SoundInterval == 0 &&
+            BaseData.Text[HighlightedCharacterIndex] != ' ' &&
+            Delay <= 0)
+        {
             SoundEngine.PlaySound(Data.CharacterSound.Value, Data.Position);
+        }
 
         for (int i = 0; i < BaseData.Text.Length; i++)
         {
-            if (i >= HighlightedCharacterIndex) continue;
+            if (i >= HighlightedCharacterIndex)
+            {
+                continue;
+            }
                 
             Data.Colors[i] = Color.Lerp(Data.Colors[i], BaseData.Color, 0.1f);
             Data.Scales[i] = MathHelper.Lerp(Data.Scales[i], BaseData.Scale, 0.2f);
         }
 
         if (HighlightedCharacterIndex > BaseData.Text.Length)
+        {
             FadeOut();
+        }
     }
 
-    void SetDelays()
+    private void SetDelays()
     {
         char character = BaseData.Text[HighlightedCharacterIndex];
-        if (character == ' ')
-            Delay = 3;
-            
-        if (character == ',')
-            Delay = 8;
-            
-        if (character == '.')
-            Delay = 30;
-            
-        // TODO: chat tag for specific delays
+
+        // TODO: Chat tags for specific delays.
+        Delay = character switch
+        {
+            ' ' => 3,
+            ',' => 8,
+            '.' => 30,
+            _ => Delay
+        };
     }
-    
-    void FadeOut()
+
+    private void FadeOut()
     {
         Data.LifetimeAfterCompletion--;
             
         if (Data.LifetimeAfterCompletion == Data.EndTriggerTime)
-            OnEnd?.Invoke(this);
-
-        if (Data.LifetimeAfterCompletion < BaseData.LifetimeAfterCompletion / 2f)
         {
-            float progress = Utils.GetLerpValue(0, BaseData.LifetimeAfterCompletion / 2f, Data.LifetimeAfterCompletion);
+            OnEnd?.Invoke(this);
+        }
 
-            for (int i = 0; i < BaseData.Text.Length; i++)
-                Data.Colors[i] = BaseData.Colors[i] * progress;
+        if (!(Data.LifetimeAfterCompletion < BaseData.LifetimeAfterCompletion / 2f))
+        {
+            return;
+        }
+
+        float progress = Utils.GetLerpValue(0, BaseData.LifetimeAfterCompletion / 2f, Data.LifetimeAfterCompletion);
+
+        for (int i = 0; i < BaseData.Text.Length; i++)
+        {
+            Data.Colors[i] = BaseData.Colors[i] * progress;
         }
     }
 
-    public void Draw() // TODO: multiline
+    public void Draw() // TODO: Multiline dialogues.
     {
-        if (Data.Text.Length <= 0 || Data.LifetimeAfterCompletion <= 0) return;
+        if (Data.Text.Length <= 0 || Data.LifetimeAfterCompletion <= 0)
+        {
+            return;
+        }
 
         DynamicSpriteFont font = FontAssets.DeathText.Value;
-        Vector2 position = Data.Position - font.MeasureString(Data.Text) with { Y = 0 } * 0.5f * Data.Scale - (Screenspace ? Vector2.Zero : Main.screenPosition);
+
+        Vector2 position = Data.Position;
+
+        position.X -= font.MeasureString(Data.Text).X * 0.5f * Data.Scale;
+
+        position -= Screenspace ? Vector2.Zero : Main.screenPosition;
+
         Vector2 origin = font.MeasureString(" ") * 0.5f;
+
         for (int i = 0; i < Data.Text.Length; i++)
         {   
-            float alpha = Data.Colors[i].A / 255f;
-            
             var charData = font.GetCharacterData(Data.Text[i]);
             position -= new Vector2(charData.Kerning.X * Data.Scale * 0.9f, 0);
-            
-            if (Data.Text[i] == 'j') // TODO: check other characters that might look off
+
+            // TODO: Better impl for manual kerning.
+            if (Data.Text[i] == 'j')
+            {
                 position += new Vector2(charData.Kerning.X * Data.Scale * 1.2f, 0);
+            }
             
-            ChatManager.DrawColorCodedStringShadow(Main.spriteBatch, font, Data.Text[i].ToString(), position, Data.BorderColor * alpha, 0, origin, Data.Scales[i] * Vector2.One);
-            Vector2 newPosition = ChatManager.DrawColorCodedString(Main.spriteBatch, font, Data.Text[i].ToString(), position, Data.Colors[i], 0, origin, Data.Scales[i] * Vector2.One);
+            Vector2 newPosition = ChatManager.DrawColorCodedStringWithShadow(
+                Main.spriteBatch,
+                font,
+                Data.Text[i].ToString(),
+                position,
+                Data.Colors[i],
+                Data.BorderColor,
+                0,
+                origin,
+                Data.Scales[i] * Vector2.One
+            );
             
             position.X = newPosition.X;
         }

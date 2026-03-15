@@ -16,26 +16,14 @@ namespace GodseekerBoss.Content.Aerie.Environment;
 
 public class AerieBackground : ModSurfaceBackgroundStyle
 {
-    #region Edits
-    /*
-     * Alt colors (respective to gradient alts) [TEMP]:
-     * 0: 195, 154, 243 | 208, 189, 255
-     * 1: 247, 177, 155 | 255, 218, 176
-     * 2: 202, 134, 199 | 255, 187, 182
-     * 3: 216, 105, 122 | 252, 156, 127
-     * 4: 231, 80, 14 | 177, 92, 99
-     * 5: 233, 151, 122 | 250, 201, 159
-     * 6: 236, 57, 93 | 191, 40, 106
-     * 7: 249, 203, 188 | 252, 162, 206
-    */
-
+#region Edits
     private static readonly Color far_fog_color = new(247, 177, 155);
     private static readonly Color mid_fog_color = new(255, 218, 176);
     private static readonly Color near_fog_color = new(255, 248, 227);
     private static readonly Color behind_tiles_fog_color = Color.Lerp(mid_fog_color, near_fog_color, 0.65f);
 
     [OnLoad]
-    private static void Load()
+    private static new void Load()
     {
         IL_Main.DrawBG += DrawBG_RemoveSpaceOffset;
 
@@ -67,39 +55,43 @@ public class AerieBackground : ModSurfaceBackgroundStyle
     {
         orig(self);
 
-        if (AerieSubworld.Active)
+        if (!AerieSubworld.Active)
         {
-            const float parallax = 0.88f;
-
-            float top = Main.maxTilesY * 16f + 16f - (Main.screenPosition.Y + Main.screenHeight + 900);
-
-            top *= parallax;
-
-            DrawFog(Main.spriteBatch, behind_tiles_fog_color, (int)top, parallax);
+            return;
         }
+
+        const float parallax = 0.88f;
+
+        float top = (Main.maxTilesY * 16f) + 16f - (Main.screenPosition.Y + Main.screenHeight + 900);
+
+        top *= parallax;
+
+        DrawFog(Main.spriteBatch, behind_tiles_fog_color, (int)top, parallax);
     }
 
     private static void DrawInfernoRings_Fog(On_Main.orig_DrawInfernoRings orig, Main self)
     {
         orig(self);
 
-        if (AerieSubworld.Active)
+        if (!AerieSubworld.Active)
         {
-            const float parallax = 1.12f;
-
-            float top = Main.maxTilesY * 16f + 16f - (Main.screenPosition.Y + Main.screenHeight + 760);
-
-            top *= parallax;
-
-            DrawFog(Main.spriteBatch, near_fog_color, (int)top, parallax);
+            return;
         }
+
+        const float parallax = 1.12f;
+
+        float top = (Main.maxTilesY * 16f) + 16f - (Main.screenHeight + 760);
+
+        top -= Main.screenPosition.Y;
+
+        top *= parallax;
+
+        DrawFog(Main.spriteBatch, near_fog_color, (int)top, parallax);
     }
 
     private static void DrawBG_RemoveSpaceOffset(ILContext il)
     {
         var c = new ILCursor(il);
-
-        // how do i explain this to my therapist
 
         c.GotoNext(
             MoveType.Before,
@@ -118,7 +110,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
                     // scAdj = (float)(worldSurface * 16.0) / (num2 + num);
                     // ---
 
-                    return 2.75f - (Main.screenPosition.Y + (Main.screenHeight / 2)) / (Main.worldSurface * 16f + 16f) * 2.3f;
+                    return 2.75f - (Main.screenPosition.Y + (Main.screenHeight * 0.5f)) / ((Main.worldSurface * 16f) + 16f) * 2.3f;
                 }
                 return num;
             }
@@ -159,7 +151,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         {
             top = Main.instance.bgTopY;
         }
-        if (parallax == -1)
+        if (parallax < 0f)
         {
             parallax = (float)Main.instance.bgParallax;
         }
@@ -171,12 +163,12 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
         spriteBatch.End(out var snapshot);
         spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
-        {
-            var size = MathF.Max(Main.screenWidth, Main.screenHeight);
+        { 
+            float size = MathF.Max(Main.screenWidth, Main.screenHeight);
 
             var source = new Rectangle(0, (int)MathF.Max(top, Main.screenHeight - size), (int)size, (int)size);
 
-            MiscShaders.AerieFog.Parallax = (float)(Main.screenPosition.X * parallax) / Main.screenWidth;
+            MiscShaders.AerieFog.Parallax = (Main.screenPosition.X * parallax) / Main.screenWidth;
 
             MiscShaders.AerieFog.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f);
 
@@ -227,24 +219,17 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         }
     }
 
-    // Probs useless since objects should spawn with 0 opacity anyways, but still here to ensure that if objects spawn anyways, they are faded out and not instantly disabled
     private static void UpdateOpacity_HideSkyEntities(On_AmbientSky.FadingSkyEntity.orig_UpdateOpacity orig, object self, int frameCount)
     {
-        if (AerieSubworld.Active)
+        if (AerieSubworld.Active && ((AmbientSky.FadingSkyEntity)self).Opacity > 0)
         {
-            if (((AmbientSky.FadingSkyEntity)self).Opacity > 0)
-            {
-                ((AmbientSky.FadingSkyEntity)self).Opacity--;
-            }
-            else
-            {
-                orig(self, frameCount);
-            }
+            ((AmbientSky.FadingSkyEntity)self).Opacity--;
+
+            return;
         }
-        else
-        {
-            orig(self, frameCount);
-        }
+
+        orig(self, frameCount);
+
     }
 
     private static void DrawSunAndMoon_HideSun(On_Main.orig_DrawSunAndMoon orig, Main self, Main.SceneArea sceneArea, Color moonColor, Color sunColor, float tempMushroomInfluence)
@@ -285,7 +270,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
             orig(self, sceneArea, artificial);
         }
     }
-    #endregion
+#endregion
 
     public override void ModifyFarFades(float[] fades, float transitionSpeed)
     {

@@ -1,5 +1,4 @@
 ﻿using Daybreak.Common.Features.Hooks;
-using Microsoft.Xna.Framework;
 using ReLogic.Content;
 using ReLogic.Content.Sources;
 using ReLogic.Utilities;
@@ -10,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.ModLoader;
+// ReSharper disable MemberHidesStaticFromOuterClass
 
 namespace GodseekerBoss.Core.Assets;
 
@@ -34,7 +34,7 @@ internal static class AssetReloader
 
     private static LocalAssetSource? assetSource;
 
-    private readonly static Mod mod = ModContent.GetInstance<GodseekerBoss>();
+    private static readonly Mod mod = ModContent.GetInstance<GodseekerBoss>();
 
     [OnLoad]
     private static void Load()
@@ -45,7 +45,7 @@ internal static class AssetReloader
 
             if (!Directory.Exists(modSource))
             {
-                throw new DirectoryNotFoundException("Mod source directory does not exsist!");
+                throw new DirectoryNotFoundException("Mod source directory does not exist!");
             }
 
             assetSource = new LocalAssetSource(modSource);
@@ -56,7 +56,7 @@ internal static class AssetReloader
 
             string[] extensions = assetReaderCollection.GetSupportedExtensions();
 
-            assetWatcher = new(modSource);
+            assetWatcher = new FileSystemWatcher(modSource);
 
             foreach (string e in extensions)
             {
@@ -81,11 +81,8 @@ internal static class AssetReloader
     [OnUnload]
     private static void Unload()
     {
-        if (assetWatcher is not null)
-        {
-            assetWatcher.EnableRaisingEvents = false;
-            assetWatcher.Dispose();
-        }
+        assetWatcher?.EnableRaisingEvents = false;
+        assetWatcher?.Dispose();
     }
 
     private static void AssetChanged(object sender, FileSystemEventArgs e)
@@ -185,7 +182,7 @@ internal static class AssetReloader
             set => SetAssetNames(value);
         }
 
-        public LocalAssetSource(string modSource) : base()
+        public LocalAssetSource(string modSource)
         {
             this.modSource = modSource;
 

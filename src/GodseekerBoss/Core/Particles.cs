@@ -6,11 +6,11 @@ namespace GodseekerBoss.Core;
 
 public interface IParticle
 {
-    public bool IsActive { get; set; }
+    bool IsActive { get; set; }
 
-    public void Update();
+    void Update();
 
-    public void Draw(SpriteBatch spriteBatch, GraphicsDevice device);
+    void Draw(SpriteBatch spriteBatch, GraphicsDevice device);
 }
 
 public class ParticleHandler<T> where T : struct, IParticle
@@ -39,9 +39,9 @@ public class ParticleHandler<T> where T : struct, IParticle
     {
         ReadOnlySpan<T> activeParticles = [.. Particles.Where(p => p.IsActive)];
 
-        for (int i = 0; i < activeParticles.Length; i++)
+        foreach (T tParticle in activeParticles)
         {
-            activeParticles[i].Draw(spriteBatch, device);
+            tParticle.Draw(spriteBatch, device);
         }
     }
 

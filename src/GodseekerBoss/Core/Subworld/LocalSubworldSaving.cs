@@ -28,19 +28,19 @@ internal static class LocalSubworldSaving
     {
         ILCursor c = new(il);
 
-        int inSubworld_varNum = -1;
-        int path_varNum = -1;
+        int inSubworldIndex = -1; // loc
+        int pathIndex = -1; // loc
 
         if (
             !c.TryGotoNext(
                 MoveType.After,
-                i => i.MatchLdloc(out inSubworld_varNum),
+                i => i.MatchLdloc(out inSubworldIndex),
                 i => i.MatchBrtrue(out _),
                 i => i.MatchLdsfld<SubworldSystem>(nameof(SubworldSystem.main)),
                 i => i.MatchCallvirt<FileData>($"get_{nameof(FileData.Path)}"),
                 i => i.MatchBr(out _),
                 i => i.MatchCall<SubworldSystem>($"get_{nameof(SubworldSystem.CurrentPath)}"),
-                i => i.MatchStloc(out path_varNum)
+                i => i.MatchStloc(out pathIndex)
             )
         )
         {
@@ -48,8 +48,8 @@ internal static class LocalSubworldSaving
             return;
         }
 
-        c.EmitLdloca(path_varNum);
-        c.EmitLdloc(inSubworld_varNum);
+        c.EmitLdloca(pathIndex);
+        c.EmitLdloc(inSubworldIndex);
 
         c.EmitDelegate(
             static (ref string path, bool flag) =>
