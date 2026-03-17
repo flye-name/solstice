@@ -60,7 +60,6 @@ public class AerieSubworld : Subworld
         IL_UICreativePowersMenu.WeatherCategoryButtonClick += _ => { };
         IL_UICreativePowersMenu.TimeCategoryButtonClick += _ => { };
 
-        On_CreativePowersHelper.IsAvailableForPlayer += IsAvailableForPlayer_DisablePowers;
         On_CreativePowersHelper.AddUnlockTextIfNeeded += AddUnlockTextIfNeeded_HideUnused;
 
         On_NPC.UpdateNPC_UpdateGravity += UpdateNPC_UpdateGravity_RemoveSpaceGravity;
@@ -76,16 +75,6 @@ public class AerieSubworld : Subworld
         }
 
         orig(self, coinsOwned, deathText, hitDirection);
-    }
-
-    private static bool IsAvailableForPlayer_DisablePowers(On_CreativePowersHelper.orig_IsAvailableForPlayer orig, ICreativePower power, int playerIndex)
-    {
-        if (disabledPowerTypes.Contains(power.GetType()) && Active)
-        {
-            return false;
-        }
-
-        return orig(power, playerIndex);
     }
 
     private static void AddUnlockTextIfNeeded_HideUnused(On_CreativePowersHelper.orig_AddUnlockTextIfNeeded orig, ref string originalText, bool needed, string descriptionKey)
@@ -112,7 +101,6 @@ public class AerieSubworld : Subworld
 
         c.EmitBrfalse(jumpRetTarget);
 
-        // false
         c.EmitLdcI4(0);
         c.EmitRet();
 
@@ -214,7 +202,7 @@ public class AerieSubworld : Subworld
         Main.windSpeedTarget = -1f;
         Main.windSpeedCurrent = -1f;
 
-        // TODO: Proper logic lower cloud bouncing.
+        // TODO: Proper lower cloud bouncing.
         if (Main.LocalPlayer.position.Y > (Main.maxTilesY * 16f) - 1200 && Main.LocalPlayer.velocity.Y >= 0)
         {
             Main.LocalPlayer.wingTime = Main.LocalPlayer.wingTimeMax;
