@@ -19,13 +19,13 @@ Items: {
 		Tooltip: "'D. Watkins'"
 	}
 
-	AerieTallGrassFlowerSeeds: {
-		DisplayName: Aerie Tall Moss Flower Seeds
+	TallAerieGrassFlowerSeeds: {
+		DisplayName: Tall Aerie Moss Flower Seeds
 		Tooltip: ""
 	}
 
-	AerieTallGrassSeeds: {
-		DisplayName: Aerie Tall Moss Seeds
+	TallAerieGrassSeeds: {
+		DisplayName: Tall Aerie Moss Seeds
 		Tooltip: ""
 	}
 
