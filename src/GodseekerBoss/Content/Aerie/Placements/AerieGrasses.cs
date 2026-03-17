@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Daybreak.Common.Features.Hooks;
+using Microsoft.Xna.Framework;
+using MonoMod.Cil;
+using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
@@ -29,7 +32,6 @@ public class AerieGrassSeeds : ModItem
     public override void SetDefaults()
     {
         Item.DefaultToPlaceableTile(ModContent.TileType<AerieBrickGrassTile>());
-        Item.value = Item.sellPrice(silver: 5);
     }
 
     public override bool? UseItem(Player player)
@@ -69,6 +71,7 @@ public class AerieTallGrassSeeds : ModItem
         Item.value = Item.sellPrice(silver: 5);
         // Vanilla flower seeds don't have auto-reuse.
         Item.autoReuse = false;
+        Item.useTime = Item.useAnimation;
     }
 }
 
@@ -78,17 +81,95 @@ public sealed class AerieTallGrassFlowerSeeds : AerieTallGrassSeeds
     {
         base.SetDefaults();
 
-        Item.DefaultToPlaceableTile(ModContent.TileType<AerieTallGrassTile>(), 7);
+        Item.placeStyle = 1;
     }
 }
 
 public sealed class AerieTallGrassTile : ModTile
 {
+    [OnLoad]
+    private static new void Load()
+    {
+        // CanPlace does not account for alternate TileObjectData's RandomStyleRange nor
+        // SpecificRandomStyles -- although irrelevant since this tile does not use it --
+        // unlike GetTileData(Tile) which does for some unknown reason.
+        // Additionally, I cannot understand the logic TileObject.CanPlace uses to find
+        // the tiles alternate TileObjectData, so I use my own (this is a hack, I am not
+        // nearly talented enough to correctly do this.)
+        IL_TileObject.CanPlace += CanPlace_UseCorrectTileObjectDataForRandomStyles;
+    }
+
+    private static void CanPlace_UseCorrectTileObjectDataForRandomStyles(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        int typeIndex = -1; // arg
+        int styleIndex = -1; // arg
+
+        int tileDataIndex = -1; // loc
+
+        c.GotoNext(
+            i => i.MatchCall<TileObjectData>(nameof(TileObjectData.GetTileData)),
+            i => i.MatchStloc(out tileDataIndex)
+        );
+
+        c.GotoPrev(
+            i => i.MatchLdarg(out typeIndex), // type
+            i => i.MatchLdarg(out styleIndex) // style
+        );
+
+        while (c.TryGotoNext(
+                   MoveType.After,
+                   i => i.MatchLdloc(tileDataIndex),
+                   i => i.MatchCallvirt<TileObjectData>($"get_{nameof(TileObjectData.RandomStyleRange)}")
+               ))
+        {
+            c.EmitLdarg(typeIndex);
+            c.EmitLdarg(styleIndex);
+
+            c.EmitDelegate(
+                static (int randomStyleRange, int type, int style) =>
+                {
+                    if (type != ModContent.TileType<AerieTallGrassTile>())
+                    {
+                        return randomStyleRange;
+                    }
+
+                    TileObjectData alternateTileData = GetAlternateTileObjectData(type, style);
+
+                    return alternateTileData.RandomStyleRange;
+                }
+            );
+        }
+    }
+
+    private static TileObjectData GetAlternateTileObjectData(int type, int style)
+    {
+        TileObjectData tileObjectData = TileObjectData._data[type];
+
+        // TODO: SubTile support (no)
+
+        if (tileObjectData._alternates == null)
+        {
+            return tileObjectData;
+        }
+
+        foreach (TileObjectData data in tileObjectData.Alternates)
+        {
+            if (data != null &&
+                style >= data.Style &&
+                style <= data.Style + data.RandomStyleRange)
+            {
+                return data;
+            }
+        }
+        return tileObjectData;
+    }
+
     public override void SetStaticDefaults()
     {
-        RegisterItemDrop(0, 0, 7);
+        RegisterItemDrop(0, 0, 1);
 
-        Main.tileShine[Type] = 9000;
         Main.tileFrameImportant[Type] = true;
         Main.tileCut[Type] = true;
         Main.tileSolid[Type] = false;
@@ -101,11 +182,14 @@ public sealed class AerieTallGrassTile : ModTile
         TileObjectData.newTile.LavaDeath = true;
         TileObjectData.newTile.StyleHorizontal = true;
         TileObjectData.newTile.RandomStyleRange = 7;
-        TileObjectData.addTile(Type);
+        TileObjectData.newTile.StyleMultiplier = 7;
 
         TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
         TileObjectData.newAlternate.RandomStyleRange = 3;
-        TileObjectData.addAlternate(7);
+        TileObjectData.newAlternate.StyleMultiplier = 3;
+        TileObjectData.addAlternate(1);
+
+        TileObjectData.addTile(Type);
 
         TileID.Sets.TileCutIgnore.Regrowth[Type] = true;
         TileID.Sets.ReplaceTileBreakUp[Type] = true;
@@ -123,5 +207,13 @@ public sealed class AerieTallGrassTile : ModTile
     {
         WorldGen.PlantCheck(i, j);
         return false;
+    }
+
+    public override void PlaceInWorld(int i, int j, Item item)
+    {
+        // Vanilla flower seeds change random style after each placement.
+        TileObjectPreviewData.randomCache.Reset();
+
+        TileObject.CanPlace(i, j, Type, item.placeStyle, Main.LocalPlayer.direction, out _, onlyCheck: true);
     }
 }

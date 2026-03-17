@@ -37,6 +37,7 @@ public class AerieBrickTile : ModTile
         Main.tileBlockLight[Type] = true;
         Main.tileLighted[Type] = false;
         Main.tileBrick[Type] = true;
+        TileID.Sets.ChecksForMerge[Type] = true;
 
         AddMapEntry(new Color(138, 158, 168));
 
@@ -61,10 +62,18 @@ public sealed class AerieBrickGrassTile : AerieBrickTile
 
         RegisterItemDrop(ModContent.ItemType<AerieBrick>(), 0);
 
+        TileID.Sets.ChecksForMerge[Type] = true;
+        Main.tileMerge[Type][ModContent.TileType<AerieBrickTile>()] = true;
+        Main.tileMerge[ModContent.TileType<AerieBrickTile>()][Type] = true;
+
         TileID.Sets.Grass[Type] = true;
         TileID.Sets.GrassSpecial[Type] = true;
+        TileID.Sets.SpreadOverground[Type] = true;
+        TileID.Sets.SpreadUnderground[Type] = true;
         TileID.Sets.ResetsHalfBrickPlacementAttempt[Type] = true;
         TileID.Sets.DoesntPlaceWithTileReplacement[Type] = true;
+
+        HitSound = SoundID.Dig;
     }
 
     public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
