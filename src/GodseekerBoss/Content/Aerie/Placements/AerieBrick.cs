@@ -28,7 +28,7 @@ public sealed class AerieBrick : ModItem
     }
 }
 
-public sealed class AerieBrickTile : ModTile
+public class AerieBrickTile : ModTile
 {
     public override void SetStaticDefaults()
     {
@@ -36,7 +36,10 @@ public sealed class AerieBrickTile : ModTile
         Main.tileMergeDirt[Type] = true;
         Main.tileBlockLight[Type] = true;
         Main.tileLighted[Type] = false;
+        Main.tileBrick[Type] = true;
+
         AddMapEntry(new Color(138, 158, 168));
+
         DustType = -1;
         HitSound = SoundID.Tink;
     }
@@ -46,6 +49,29 @@ public sealed class AerieBrickTile : ModTile
         if (j % 2 == 0)
         {
             tileFrameY += 270;
+        }
+    }
+}
+
+public sealed class AerieBrickGrassTile : AerieBrickTile
+{
+    public override void SetStaticDefaults()
+    {
+        base.SetStaticDefaults();
+
+        RegisterItemDrop(ModContent.ItemType<AerieBrick>(), 0);
+
+        TileID.Sets.Grass[Type] = true;
+        TileID.Sets.GrassSpecial[Type] = true;
+        TileID.Sets.ResetsHalfBrickPlacementAttempt[Type] = true;
+        TileID.Sets.DoesntPlaceWithTileReplacement[Type] = true;
+    }
+
+    public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
+    {
+        if (fail && !effectOnly)
+        {
+            Main.tile[i, j].TileType = (ushort)ModContent.TileType<AerieBrickTile>();
         }
     }
 }

@@ -18,6 +18,21 @@ Items: {
 		DisplayName: Godspeed
 		Tooltip: "'D. Watkins'"
 	}
+
+	AerieTallGrassFlowerSeeds: {
+		DisplayName: Aerie Tall Moss Flower Seeds
+		Tooltip: ""
+	}
+
+	AerieTallGrassSeeds: {
+		DisplayName: Aerie Tall Moss Seeds
+		Tooltip: ""
+	}
+
+	AerieGrassSeeds: {
+		DisplayName: Aerie Grass Seeds
+		Tooltip: ""
+	}
 }
 
 Biomes: {
