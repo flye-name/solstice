@@ -1,5 +1,6 @@
 ﻿using GodseekerBoss.Common.IDs;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
@@ -140,6 +141,14 @@ public sealed class Tall1x1AerieGrassTile : ModTile
 
         TileObject.CanPlace(i, j, Type, item.placeStyle, Main.LocalPlayer.direction, out _, onlyCheck: true);
     }
+
+    public override void SetSpriteEffects(int i, int j, ref SpriteEffects spriteEffects)
+    {
+        if (i % 2 == 0)
+        {
+            spriteEffects = SpriteEffects.FlipHorizontally;
+        }
+    }
 }
 
 public sealed class Tall1x2AerieGrassTile : ModTile
@@ -189,6 +198,14 @@ public sealed class Tall1x2AerieGrassTile : ModTile
     {
         WorldGen.PlantCheck(i, j);
         return false;
+    }
+
+    public override void SetSpriteEffects(int i, int j, ref SpriteEffects spriteEffects)
+    {
+        if (i % 2 == 0)
+        {
+            spriteEffects = SpriteEffects.FlipHorizontally;
+        }
     }
 }
 
