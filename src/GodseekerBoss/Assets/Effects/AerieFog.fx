@@ -52,7 +52,8 @@ float4 Fog(float4 sampleColor : COLOR0, float2 uv : TEXCOORD0, float2 screenCoor
 {
     float2 bayeruv = frac((screenCoords.xy + float2(floor(source.z * parallax / 2) * 2, 0)) / 4) * 4;
     
-    float2 coords = (screenCoords - source.xy) / max(source.z, source.w);
+    float2 coords = uv;
+    coords.y *= source.w / source.z;
     
     coords.x += parallax;
     

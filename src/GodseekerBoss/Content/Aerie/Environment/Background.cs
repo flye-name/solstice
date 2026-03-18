@@ -66,7 +66,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
         top *= parallax;
 
-        DrawFog(Main.spriteBatch, behind_tiles_fog_color, (int)top, parallax);
+        DrawFog(Main.spriteBatch, behind_tiles_fog_color, (int)top, parallax, true);
     }
 
     private static void DrawInfernoRings_Fog(On_Main.orig_DrawInfernoRings orig, Main self)
@@ -86,7 +86,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
         top *= parallax;
 
-        DrawFog(Main.spriteBatch, near_fog_color, (int)top, parallax);
+        DrawFog(Main.spriteBatch, near_fog_color, (int)top, parallax, true);
     }
 
     private static void DrawBG_RemoveSpaceOffset(ILContext il)
@@ -145,7 +145,7 @@ public class AerieBackground : ModSurfaceBackgroundStyle
         }
     }
 
-    private static void DrawFog(SpriteBatch spriteBatch, Color color, int top = -1, float parallax = -1)
+    private static void DrawFog(SpriteBatch spriteBatch, Color color, int top = -1, float parallax = -1, bool useZoom = false)
     {
         if (top == -1)
         {
@@ -161,6 +161,8 @@ public class AerieBackground : ModSurfaceBackgroundStyle
             return;
         }
 
+        var zoom = useZoom ? Main.GameViewMatrix.Zoom : new Vector2(1f);
+
         spriteBatch.End(out var snapshot);
         spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
         { 
@@ -168,11 +170,13 @@ public class AerieBackground : ModSurfaceBackgroundStyle
 
             var source = new Rectangle(0, (int)MathF.Max(top, Main.screenHeight - size), (int)size, (int)size);
 
-            MiscShaders.AerieFog.Parallax = (Main.screenPosition.X * parallax) / Main.screenWidth;
+            MiscShaders.AerieFog.Parallax = Main.screenPosition.X * parallax / Main.screenWidth;
 
             MiscShaders.AerieFog.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f);
 
-            MiscShaders.AerieFog.Source = new Vector4(source.X, source.Y, source.Width, source.Height);
+            var shaderSource = Utils.CenteredRectangle(source.Center(), source.Size() * zoom);
+
+            MiscShaders.AerieFog.Source = new Vector4(shaderSource.X, shaderSource.Y, shaderSource.Width, shaderSource.Height);
 
             MiscShaders.AerieFog.Apply();
 
