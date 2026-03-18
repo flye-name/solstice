@@ -38,6 +38,12 @@ public static class GodseekerItemSets
     [OnLoad]
     private static void Load()
     {
+        // Replicate vanilla tile replacement behavior (similar to moss and grass seeds) with
+        // any tiles.
+        // TODO:
+        // - HitSound options
+        // - Better impl that integrates with vanilla moss replacement correctly
+
         // tMod hooks do not support non-publicized types.
         MonoModHooks.Add(
             typeof(SmartCursorHelper).GetMethod(
