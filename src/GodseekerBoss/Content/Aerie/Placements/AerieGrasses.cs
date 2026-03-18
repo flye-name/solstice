@@ -1,5 +1,4 @@
 ﻿using GodseekerBoss.Common.IDs;
-using GodseekerBoss.Content.Aerie.Misc;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -15,8 +14,39 @@ using Terraria.ObjectData;
 
 namespace GodseekerBoss.Content.Aerie.Placements;
 
+public sealed class AerieGrassDust : ModDust
+{
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieGrassDust.Key;
+
+    public override void OnSpawn(Dust dust)
+    {
+        dust.frame = new Rectangle(0, Main.rand.Next(3) * 12, 12, 12);
+    }
+
+    public override bool Update(Dust dust)
+    {
+        dust.velocity.X += Main.WindForVisuals * 0.043f;
+        dust.velocity.Y += 0.065f;
+
+        dust.position += dust.velocity;
+
+        dust.rotation += dust.velocity.X * 0.1f;
+
+        dust.scale *= 0.98f;
+
+        if (dust.scale < 0.05f)
+        {
+            dust.active = false;
+        }
+
+        return false;
+    }
+}
+
 public class AerieGrassSeeds : ModItem
 {
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieGrassSeeds.Key;
+
     private static readonly Dictionary<int, int> grass_replacements = new()
     {
         {ModContent.TileType<AerieBrickTile>(), ModContent.TileType<AerieBrickGrassTile>()},
@@ -41,6 +71,8 @@ public class AerieGrassSeeds : ModItem
 #region Tall Grass
 public class TallAerieGrassSeeds : ModItem
 {
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.TallAerieGrassSeeds.Key;
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 25;
@@ -58,6 +90,8 @@ public class TallAerieGrassSeeds : ModItem
 
 public sealed class TallAerieGrassFlowerSeeds : TallAerieGrassSeeds
 {
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.TallAerieGrassFlowerSeeds.Key;
+
     public override void SetDefaults()
     {
         base.SetDefaults();
@@ -68,7 +102,7 @@ public sealed class TallAerieGrassFlowerSeeds : TallAerieGrassSeeds
 
 public sealed class Tall1x1AerieGrassTile : ModTile
 {
-    public override string Texture => GeneratedAssets.Content.Aerie.Placements.Textures.TallAerieGrassTile.Key;
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.TallAerieGrassTile.Key;
 
     public override void SetStaticDefaults()
     {
@@ -147,7 +181,7 @@ public sealed class Tall1x1AerieGrassTile : ModTile
 
 public sealed class Tall1x2AerieGrassTile : ModTile
 {
-    public override string Texture => GeneratedAssets.Content.Aerie.Placements.Textures.TallerAerieGrassTile.Key;
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.TallerAerieGrassTile.Key;
 
     public override void SetStaticDefaults()
     {

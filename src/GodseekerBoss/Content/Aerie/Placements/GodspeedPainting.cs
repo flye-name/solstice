@@ -11,6 +11,8 @@ namespace GodseekerBoss.Content.Aerie.Placements;
 
 public sealed class GodspeedPainting : ModItem
 {
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.GodspeedPainting.Key;
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 1;
@@ -33,6 +35,8 @@ public sealed class GodspeedPainting : ModItem
 
 public sealed class GodspeedPaintingTile : ModTile
 {
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.GodspeedPaintingTile.Key;
+
     public override void SetStaticDefaults()
     {
         Main.tileFrameImportant[Type] = true;

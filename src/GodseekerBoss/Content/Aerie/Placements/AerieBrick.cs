@@ -1,5 +1,4 @@
 ﻿using GodseekerBoss.Common.IDs;
-using GodseekerBoss.Content.Aerie.Misc;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.Creative;
@@ -10,6 +9,8 @@ namespace GodseekerBoss.Content.Aerie.Placements;
 
 public sealed class AerieBrick : ModItem
 {
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieBrick.Key;
+
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 100;
@@ -32,6 +33,8 @@ public sealed class AerieBrick : ModItem
 
 public class AerieBrickTile : ModTile
 {
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieBrickTile.Key;
+
     public override void SetStaticDefaults()
     {
         Main.tileSolid[Type] = true;
@@ -58,6 +61,8 @@ public class AerieBrickTile : ModTile
 
 public sealed class AerieBrickGrassTile : AerieBrickTile
 {
+    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieBrickGrassTile.Key;
+
     public override void SetStaticDefaults()
     {
         base.SetStaticDefaults();

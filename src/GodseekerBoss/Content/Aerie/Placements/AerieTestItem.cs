@@ -8,6 +8,8 @@ namespace GodseekerBoss.Content.Aerie.Placements;
 
 public sealed class AerieTestItem : ModItem
 {
+    public override string Texture => GeneratedAssets.Assets.Images.Textures.TestItem.Key;
+
     public override void SetDefaults()
     {
         Item.width = 20;
