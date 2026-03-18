@@ -1,9 +1,10 @@
 ﻿using GodseekerBoss.Common.IDs;
+using GodseekerBoss.Content.Aerie.Misc;
+using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria;
-using Microsoft.Xna.Framework;
 
 namespace GodseekerBoss.Content.Aerie.Placements;
 
@@ -73,5 +74,12 @@ public sealed class AerieBrickGrassTile : AerieBrickTile
         GodseekerTileSets.SwapToOnFailedHit[Type] = ModContent.TileType<AerieBrickTile>();
 
         HitSound = SoundID.Dig;
+
+        DustType = ModContent.DustType<AerieGrassDust>();
+    }
+
+    public override void NumDust(int i, int j, bool fail, ref int num)
+    {
+        num = fail ? 3 : 6;
     }
 }

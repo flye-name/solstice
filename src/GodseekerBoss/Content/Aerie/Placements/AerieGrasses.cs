@@ -1,4 +1,5 @@
 ﻿using GodseekerBoss.Common.IDs;
+using GodseekerBoss.Content.Aerie.Misc;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -104,7 +105,7 @@ public sealed class Tall1x1AerieGrassTile : ModTile
         GodseekerTileSets.UseAlternateTileObjectDataRandomStyles[Type] = true;
 
         AddMapEntry(new Color(185, 168, 72));
-        // DustType = ModContent.DustType<AerieGrassDust>();
+        DustType = ModContent.DustType<AerieGrassDust>();
         HitSound = SoundID.Grass;
     }
 
@@ -136,6 +137,11 @@ public sealed class Tall1x1AerieGrassTile : ModTile
     public override bool CanPlace(int i, int j)
     {
         return TallAerieGrassHelper.CanPlaceAerieGrass(i, j);
+    }
+
+    public override void NumDust(int i, int j, bool fail, ref int num)
+    {
+        num = 1;
     }
 }
 
@@ -180,7 +186,7 @@ public sealed class Tall1x2AerieGrassTile : ModTile
         GodseekerTileSets.UseAlternateTileObjectDataRandomStyles[Type] = true;
 
         AddMapEntry(new Color(185, 168, 72));
-        // DustType = ModContent.DustType<AerieGrassDust>();
+        DustType = ModContent.DustType<AerieGrassDust>();
         HitSound = SoundID.Grass;
     }
 
@@ -203,6 +209,11 @@ public sealed class Tall1x2AerieGrassTile : ModTile
     public override bool CanPlace(int i, int j)
     {
         return TallAerieGrassHelper.CanPlaceAerieGrass(i, j);
+    }
+
+    public override void NumDust(int i, int j, bool fail, ref int num)
+    {
+        num = 2;
     }
 }
 
