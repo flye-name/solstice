@@ -139,8 +139,8 @@ public record struct WindParticle : IParticle
         VertexPositionColorTexture[] vertices =
             TriangleStripBuilder.BuildPath(positions,
             t => MathF.Sin(t * MathHelper.Pi) * brightness * width,
-            t => color,
-            smoothingSubdivisions: 1);
+            _ => color,
+            smoothingSubdivisions: 2);
 
         if (vertices.Length > 3)
         {
