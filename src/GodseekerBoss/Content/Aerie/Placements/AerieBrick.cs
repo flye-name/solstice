@@ -71,7 +71,7 @@ public sealed class AerieBrickGrassTile : AerieBrickTile
         Main.tileMerge[Type][ModContent.TileType<AerieBrickTile>()] = true;
         Main.tileMerge[ModContent.TileType<AerieBrickTile>()][Type] = true;
 
-        GodseekerTileSets.SwapToOnFailedHit[Type] = ModContent.TileType<AerieBrickTile>();
+        GodseekerTileSets.TransformToOnHit[Type] = ModContent.TileType<AerieBrickTile>();
 
         HitSound = SoundID.Dig;
 
