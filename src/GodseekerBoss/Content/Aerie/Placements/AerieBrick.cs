@@ -1,4 +1,5 @@
-﻿using Terraria.GameContent.Creative;
+﻿using GodseekerBoss.Common.IDs;
+using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria;
@@ -63,24 +64,14 @@ public sealed class AerieBrickGrassTile : AerieBrickTile
         RegisterItemDrop(ModContent.ItemType<AerieBrick>(), 0);
 
         TileID.Sets.ChecksForMerge[Type] = true;
-        Main.tileMerge[Type][ModContent.TileType<AerieBrickTile>()] = true;
-        Main.tileMerge[ModContent.TileType<AerieBrickTile>()][Type] = true;
-
-        TileID.Sets.Grass[Type] = true;
-        TileID.Sets.GrassSpecial[Type] = true;
-        TileID.Sets.SpreadOverground[Type] = true;
-        TileID.Sets.SpreadUnderground[Type] = true;
         TileID.Sets.ResetsHalfBrickPlacementAttempt[Type] = true;
         TileID.Sets.DoesntPlaceWithTileReplacement[Type] = true;
 
-        HitSound = SoundID.Dig;
-    }
+        Main.tileMerge[Type][ModContent.TileType<AerieBrickTile>()] = true;
+        Main.tileMerge[ModContent.TileType<AerieBrickTile>()][Type] = true;
 
-    public override void KillTile(int i, int j, ref bool fail, ref bool effectOnly, ref bool noItem)
-    {
-        if (fail && !effectOnly)
-        {
-            Main.tile[i, j].TileType = (ushort)ModContent.TileType<AerieBrickTile>();
-        }
+        GodseekerTileSets.SwapToOnFailedHit[Type] = ModContent.TileType<AerieBrickTile>();
+
+        HitSound = SoundID.Dig;
     }
 }

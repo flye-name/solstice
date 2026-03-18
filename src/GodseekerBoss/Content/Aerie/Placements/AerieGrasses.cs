@@ -1,6 +1,7 @@
 ﻿using GodseekerBoss.Common.IDs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
@@ -26,38 +27,18 @@ public class AerieGrassSeeds : ModItem
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 25;
 
         ItemTrader.ChlorophyteExtractinator.AddOption_OneWay(Type, 1, ItemID.DirtBlock, 1);
-        ItemID.Sets.GrassSeeds[Type] = true;
+
+        GodseekerItemSets.TileReplacements[Type] = new GodseekerItemSets.TileReplacementInfo(true, grass_replacements);
     }
 
     public override void SetDefaults()
     {
         Item.DefaultToPlaceableTile(ModContent.TileType<AerieBrickGrassTile>());
-    }
-
-    public override bool? UseItem(Player player)
-    {
-        int i = Player.tileTargetX;
-        int j = Player.tileTargetY;
-
-        Tile tile = Framing.GetTileSafely(i, j);
-
-        if (tile.HasTile &&
-            grass_replacements.ContainsKey(tile.TileType) &&
-            player.IsInTileInteractionRange(i, j, TileReachCheckSettings.Simple))
-        {
-            Main.tile[i, j].TileType = (ushort)grass_replacements[tile.TileType];
-
-            WorldGen.SquareTileFrame(i, j, true);
-
-            SoundEngine.PlaySound(SoundID.Dig, player.position);
-
-            return true;
-        }
-
-        return false;
+        Item.useTime = Item.useAnimation;
     }
 }
 
+#region Tall Grass
 public class TallAerieGrassSeeds : ModItem
 {
     public override void SetStaticDefaults()
@@ -130,7 +111,10 @@ public sealed class Tall1x1AerieGrassTile : ModTile
 
     public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
     {
-        WorldGen.PlantCheck(i, j);
+        if (!TallAerieGrassHelper.CanPlaceAerieGrass(i, j))
+        {
+            WorldGen.KillTile(i, j);
+        }
         return false;
     }
 
@@ -148,6 +132,11 @@ public sealed class Tall1x1AerieGrassTile : ModTile
         {
             spriteEffects = SpriteEffects.FlipHorizontally;
         }
+    }
+
+    public override bool CanPlace(int i, int j)
+    {
+        return TallAerieGrassHelper.CanPlaceAerieGrass(i, j);
     }
 }
 
@@ -167,6 +156,7 @@ public sealed class Tall1x2AerieGrassTile : ModTile
         Main.tileLavaDeath[Type] = true;
 
         TileObjectData.newTile.CopyFrom(TileObjectData.Style1x2);
+        TileObjectData.newTile.Origin = new(0, 1);
         TileObjectData.newTile.CoordinateHeights = [16, 18];
         TileObjectData.newTile.LavaDeath = true;
         TileObjectData.newTile.StyleHorizontal = true;
@@ -174,6 +164,7 @@ public sealed class Tall1x2AerieGrassTile : ModTile
         TileObjectData.newTile.StyleMultiplier = 4;
 
         TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
+        TileObjectData.newAlternate.Origin = new(0, 1);
         TileObjectData.newAlternate.RandomStyleRange = 4;
         TileObjectData.newAlternate.StyleMultiplier = 4;
         TileObjectData.addAlternate(1);
@@ -194,10 +185,12 @@ public sealed class Tall1x2AerieGrassTile : ModTile
         HitSound = SoundID.Grass;
     }
 
-    public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
+    public override void PlaceInWorld(int i, int j, Item item)
     {
-        WorldGen.PlantCheck(i, j);
-        return false;
+        // Vanilla flower seeds change random style after each placement.
+        TileObjectPreviewData.randomCache.Reset();
+
+        TileObject.CanPlace(i, j, Type, item.placeStyle, Main.LocalPlayer.direction, out _, onlyCheck: true);
     }
 
     public override void SetSpriteEffects(int i, int j, ref SpriteEffects spriteEffects)
@@ -207,5 +200,37 @@ public sealed class Tall1x2AerieGrassTile : ModTile
             spriteEffects = SpriteEffects.FlipHorizontally;
         }
     }
+
+    public override bool CanPlace(int i, int j)
+    {
+        return TallAerieGrassHelper.CanPlaceAerieGrass(i, j);
+    }
 }
 
+public static class TallAerieGrassHelper
+{
+    public static readonly int[] ValidGrasses =
+    [
+        ModContent.TileType<AerieBrickGrassTile>(),
+        TileID.Grass,
+    ];
+
+    // TODO: Edit and use WorldGen.PlantCheck.
+    public static bool CanPlaceAerieGrass(int i, int j)
+    {
+        if (j < 1 || j > Main.maxTilesY - 1)
+        {
+            return false;
+        }
+
+        Tile tile = Framing.GetTileSafely(i, j + 1);
+
+        if (!tile.HasTile || tile.Slope != SlopeType.Solid || tile.IsHalfBlock)
+        {
+            return false;
+        }
+
+        return ValidGrasses.Contains(tile.TileType);
+    }
+}
+#endregion

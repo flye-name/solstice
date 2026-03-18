@@ -9,14 +9,27 @@ namespace GodseekerBoss.Common.IDs;
 
 public static class GodseekerTileSets
 {
+    /// <summary>
+    /// Whether to use the tile's alternate <see cref="TileObjectData"/>s'
+    /// <see cref="TileObjectData.RandomStyleRange"/> for calculating the
+    /// style of the placed tile.
+    /// </summary>
     public static bool[] UseAlternateTileObjectDataRandomStyles { get; private set; } = [];
+
+    /// <summary>
+    /// The tile to swap to when lightly hit by a tool, similar to grass or moss;
+    /// will use the tiles hit effects over the target tiles.
+    /// </summary>
+    public static int[] SwapToOnFailedHit { get; private set; } = [];
 
     private static Mod Mod => ModContent.GetInstance<GodseekerBoss>();
 
     [ModSystemHooks.ResizeArrays]
     private static void ResizeArrays()
     {
-        UseAlternateTileObjectDataRandomStyles = CreateSet<bool>(nameof(UseAlternateTileObjectDataRandomStyles), false);
+        UseAlternateTileObjectDataRandomStyles = CreateSet(nameof(UseAlternateTileObjectDataRandomStyles), false);
+
+        SwapToOnFailedHit = CreateSet(nameof(SwapToOnFailedHit), -1);
 
         return;
 
@@ -27,9 +40,14 @@ public static class GodseekerTileSets
         }
     }
 
+#region Edits
     [OnLoad]
     private static void Load()
     {
+        // Replicating logic like vanilla's moss tiles is impossible with ModTile.KillTile
+        // since hit sounds are played after TileLoader.KillTile (same with particles.)
+        On_WorldGen.KillTile += KillTile_FailedSwap;
+
         // CanPlace does not account for alternate TileObjectData's RandomStyleRange nor
         // SpecificRandomStyles -- although irrelevant since this tile does not use it --
         // unlike GetTileData(Tile) which does for some unknown reason.
@@ -37,6 +55,27 @@ public static class GodseekerTileSets
         // the tiles alternate TileObjectData, so I use my own (this is a hack, I am not
         // nearly talented enough to correctly do this.)
         IL_TileObject.CanPlace += CanPlace_UseCorrectTileObjectDataForRandomStyles;
+    }
+
+    private static void KillTile_FailedSwap(On_WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
+    {
+        orig(i, j, fail, effectOnly, noItem);
+
+        Tile tile = Framing.GetTileSafely(i, j);
+
+        if (!tile.HasTile)
+        {
+            return;
+        }
+
+        int? swapType = SwapToOnFailedHit[tile.type];
+
+        fail |= WorldGen.CheckTileBreakability(i, j) == 1;
+
+        if (fail && !effectOnly && swapType != -1)
+        {
+            Main.tile[i, j].TileType = (ushort)swapType;
+        }
     }
 
     private static void CanPlace_UseCorrectTileObjectDataForRandomStyles(ILContext il)
@@ -105,4 +144,5 @@ public static class GodseekerTileSets
         }
         return tileObjectData;
     }
+#endregion
 }
