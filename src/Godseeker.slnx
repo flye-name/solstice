@@ -11,6 +11,6 @@
 		<Project Path="Generators/ZourceGen/src/shader-reader/ShaderDecompiler.csproj" />
 	</Folder>
 
-	<Project Path="GodseekerBoss/GodseekerBoss.csproj" />
+	<Project Path="Godseeker/Godseeker.csproj" />
 
 </Solution>
