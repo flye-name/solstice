@@ -50,6 +50,11 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
     [ModSystemHooks.PostSetupContent]
     private static void PostLoad()
     {
+        if (Main.dedServ)
+        {
+            return;
+        }
+
         // Should be loaded after main loading is complete to render above wind.
         On_Main.DrawBackgroundBlackFill += DrawBackgroundBlackFill_Fog;
 
