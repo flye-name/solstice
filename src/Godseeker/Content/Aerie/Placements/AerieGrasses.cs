@@ -13,14 +13,13 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
-
 // ReSharper disable InconsistentNaming
 
 namespace Godseeker.Content.Aerie.Placements;
 
 public sealed class AerieGrassDust : ModDust
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieGrassDust.Key;
+    public override string Texture => PlacementTextures.AerieGrassDust.Key;
 
     public override void OnSpawn(Dust dust)
     {
@@ -49,7 +48,7 @@ public sealed class AerieGrassDust : ModDust
 
 public class AerieGrassSeeds : ModItem
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieGrassSeeds.Key;
+    public override string Texture => PlacementTextures.AerieGrassSeeds.Key;
 
     private static readonly Dictionary<int, int> grass_replacements = new()
     {
@@ -265,7 +264,7 @@ public sealed class TallAerieGrass1x1 : ModTile
 
 public sealed class TallAerieGrass1x2 : ModTile
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.TallerAerieGrassTile.Key;
+    public override string Texture => PlacementTextures.TallerAerieGrassTile.Key;
 
     public override void SetStaticDefaults()
     {

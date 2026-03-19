@@ -75,8 +75,8 @@ public static class GodseekerItemSets
         On_Item.GetDrawHitbox += GetDrawHitbox_UseStaticFrame;
 
         // Item stacking for similar items.
+        IL_ItemSorting.Sort += Sort_CountsAs;
         On_Item.IsTheSameAs += IsTheSameAs_CountsAs;
-
         // Re-JIT various vanilla methods that use 'Item.IsTheSameAs.'
         {
             IL_Chest.PutItemInNearbyChest += _ => { };
@@ -101,15 +101,13 @@ public static class GodseekerItemSets
 
         // Replicate vanilla item swapping behaviour for custom values.
         IL_Player.ItemCheck_ManageRightClickFeatures += ItemCheck_ManageRightClickFeatures_SwapItem;
-
         On_ItemSlot.TryItemSwap += TryItemSwap_SwapItem;
 
         // Replicate vanilla tile replacement behavior (similar to moss and grass seeds) with
         // any tiles.
         // TODO:
-        // - HitSound options
-        // - Better impl that integrates with vanilla moss replacement correctly
-
+        //      - HitSound options
+        //      - Better impl that integrates with vanilla moss replacement correctly
         // tMod hooks do not support non-publicized types.
         MonoModHooks.Add(
             typeof(SmartCursorHelper).GetMethod(
@@ -118,10 +116,10 @@ public static class GodseekerItemSets
             ),
             Step_GrassSeeds_Replacements
         );
-
         On_Player.PlaceThing_TryReplacingTiles += PlaceThing_TryReplacingTiles_Replacements;
     }
 
+#region Static Frame
     private static Rectangle GetItemDrawFrame_UseStaticFrame(On_Player.orig_GetItemDrawFrame orig, Player self, int type)
     {
         var rectangle = StaticFrame[type];
@@ -218,10 +216,48 @@ public static class GodseekerItemSets
 
         return rectangle.Value;
     }
+#endregion
+
+#region Counts As
+    private static void Sort_CountsAs(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        int itemAIndex = -1; // loc
+        int itemBIndex = -1; // loc
+
+        ILLabel jumpInequalityCheckTarget = c.DefineLabel();
+
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchLdloc(out itemAIndex),
+            i => i.MatchLdfld<Item>(nameof(Item.type)),
+            i => i.MatchLdloc(out itemBIndex),
+            i => i.MatchLdfld<Item>(nameof(Item.type)),
+            i => i.MatchBneUn(out _)
+        );
+
+        c.MarkLabel(jumpInequalityCheckTarget);
+
+        c.GotoPrev(
+            MoveType.Before,
+            i => i.MatchLdloc(out itemAIndex),
+            i => i.MatchLdfld<Item>(nameof(Item.type)),
+            i => i.MatchLdloc(out itemBIndex),
+            i => i.MatchLdfld<Item>(nameof(Item.type))
+        );
+
+        c.EmitLdloc(itemAIndex);
+        c.EmitLdloc(itemBIndex);
+
+        c.EmitDelegate(ItemCountsAs);
+
+        c.EmitBrtrue(jumpInequalityCheckTarget);
+    }
 
     private static bool IsTheSameAs_CountsAs(On_Item.orig_IsTheSameAs orig, Item self, Item compareItem)
     {
-        if (CountsAs[self.type]?.Contains(compareItem.type) is true)
+        if (ItemCountsAs(self, compareItem))
         {
             return true;
         }
@@ -229,6 +265,14 @@ public static class GodseekerItemSets
         return orig(self, compareItem);
     }
 
+    private static bool ItemCountsAs(Item itemA, Item itemB)
+    {
+        return CountsAs[itemA.type]?.Contains(itemB.type) is true ||
+               CountsAs[itemB.type]?.Contains(itemA.type) is true;
+    }
+#endregion
+
+#region Swaps To
     private static void ItemCheck_ManageRightClickFeatures_SwapItem(ILContext il)
     {
         var c = new ILCursor(il);
@@ -312,7 +356,9 @@ public static class GodseekerItemSets
 
         Recipe.FindRecipes();
     }
+#endregion
 
+#region Tile Replacements
     public delegate void orig_Step_GrassSeeds(
         SmartCursorHelper.SmartCursorUsageInfo providedInfo,
         ref int focusedX,
@@ -419,5 +465,6 @@ public static class GodseekerItemSets
 
         return false;
     }
+#endregion
 #endregion
 }
