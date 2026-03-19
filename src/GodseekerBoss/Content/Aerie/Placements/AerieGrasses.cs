@@ -1,8 +1,10 @@
-﻿using GodseekerBoss.Common.IDs;
+﻿using Daybreak.Common.Features.Hooks;
+using GodseekerBoss.Common.IDs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent;
@@ -10,6 +12,8 @@ using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
+using PlacementTextures = GodseekerBoss.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
+
 // ReSharper disable InconsistentNaming
 
 namespace GodseekerBoss.Content.Aerie.Placements;
@@ -69,9 +73,9 @@ public class AerieGrassSeeds : ModItem
 }
 
 #region Tall Grass
-public class TallAerieGrassSeeds : ModItem
+public sealed class TallAerieGrassSeedsDummy : ModItem
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.TallAerieGrassSeeds.Key;
+    public override string Texture => PlacementTextures.TallAerieGrassSeedsDummy.Key;
 
     public override void SetStaticDefaults()
     {
@@ -80,29 +84,109 @@ public class TallAerieGrassSeeds : ModItem
 
     public override void SetDefaults()
     {
-        Item.DefaultToPlaceableTile(ModContent.TileType<Tall1x1AerieGrassTile>());
+        Item.DefaultToPlaceableTile(0);
         Item.value = Item.sellPrice(silver: 5);
         // Vanilla flower seeds don't have auto-reuse.
         Item.autoReuse = false;
         Item.useTime = Item.useAnimation;
     }
-}
 
-public sealed class TallAerieGrassFlowerSeeds : TallAerieGrassSeeds
-{
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.TallAerieGrassFlowerSeeds.Key;
-
-    public override void SetDefaults()
+    public override void OnCreated(ItemCreationContext context)
     {
-        base.SetDefaults();
+        if (context is not
+            (JourneyDuplicationItemCreationContext or
+            BuyItemCreationContext or
+            RecipeItemCreationContext))
+        {
+            return;
+        }
 
-        Item.placeStyle = 1;
+        int stack = Item.stack;
+        Item.SetDefaults(TallAerieGrassHelper.AlternateSeedItems[0].Type);
+        Item.stack = Math.Min(stack, Item.maxStack);
     }
 }
 
-public sealed class Tall1x1AerieGrassTile : ModTile
+[Autoload(false)]
+public sealed class TallAerieGrassSeeds<T> : ModItem where T : ModTile
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.TallAerieGrassTile.Key;
+    public override string Texture => PlacementTextures.TallAerieGrassSeeds.Key;
+
+    public override string Name => "TallAerieGrassSeeds" + typeof(T).Name + PlaceStyle;
+
+    protected override bool CloneNewInstances => true;
+
+    private int PlaceStyle { get; init; }
+
+    private Rectangle ItemFrame { get; init; }
+
+    private Rectangle BarFrame { get; init; }
+
+    public TallAerieGrassSeeds(int placeStyle, int frameX, int frameY)
+    {
+        PlaceStyle = placeStyle;
+
+        // Ensure textures are loaded.
+        PlacementTextures.TallAerieGrassSeeds.Wait();
+        PlacementTextures.TallAerieGrassSeedsBar.Wait();
+
+        ItemFrame = PlacementTextures.TallAerieGrassSeeds.Value.Frame(2, 2, frameX, frameY);
+        BarFrame = PlacementTextures.TallAerieGrassSeedsBar.Value.Frame(2, 2, frameX, frameY);
+    }
+
+    public override void SetStaticDefaults()
+    {
+        CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 25;
+
+        int parent = ModContent.ItemType<TallAerieGrassSeedsDummy>();
+
+        ContentSamples.CreativeHelper.ShouldRemoveFromList(Item);
+        ContentSamples.CreativeResearchItemPersistentIdOverride[Type] = parent;
+
+        int next = Array.FindIndex(TallAerieGrassHelper.AlternateSeedItems, i => i.Type == Type) + 1;
+        next %= TallAerieGrassHelper.AlternateSeedItems.Length;
+
+        next = TallAerieGrassHelper.AlternateSeedItems[next].Type;
+
+        GodseekerItemSets.SwapsTo[Type] = new GodseekerItemSets.ItemSwapInfo(next, true, SoundID.Grass);
+
+        int[] similar = TallAerieGrassHelper.AlternateSeedItems.Select(i => i.Type).Append(parent).ToArray();
+
+        GodseekerItemSets.CountsAs[Type] = similar;
+
+        GodseekerItemSets.StaticFrame[Type] = ItemFrame;
+    }
+
+    public override void SetDefaults()
+    {
+        Item.DefaultToPlaceableTile(ModContent.TileType<T>(), PlaceStyle);
+        Item.value = Item.sellPrice(silver: 5);
+        // Vanilla flower seeds don't have auto-reuse.
+        Item.autoReuse = false;
+        Item.useTime = Item.useAnimation;
+    }
+
+    public override void PostDrawInInventory(
+        SpriteBatch spriteBatch,
+        Vector2 position,
+        Rectangle frame,
+        Color drawColor,
+        Color itemColor,
+        Vector2 origin,
+        float scale
+    )
+    {
+        var texture = PlacementTextures.TallAerieGrassSeedsBar.Value;
+
+        position += new Vector2(15f, 10f) * Main.inventoryScale;// * scale;
+
+        spriteBatch.Draw(texture, position, BarFrame, drawColor, 0f, BarFrame.Size() * 0.5f, 1f, SpriteEffects.None, 0f);
+    }
+}
+
+public sealed class TallAerieGrass1x1 : ModTile
+{
+    public override string Texture => PlacementTextures.TallAerieGrassTile.Key;
 
     public override void SetStaticDefaults()
     {
@@ -179,7 +263,7 @@ public sealed class Tall1x1AerieGrassTile : ModTile
     }
 }
 
-public sealed class Tall1x2AerieGrassTile : ModTile
+public sealed class TallAerieGrass1x2 : ModTile
 {
     public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.TallerAerieGrassTile.Key;
 
@@ -253,6 +337,25 @@ public sealed class Tall1x2AerieGrassTile : ModTile
 
 public static class TallAerieGrassHelper
 {
+    public static readonly ModItem[] AlternateSeedItems =
+    [
+        // 1x1
+        new TallAerieGrassSeeds<TallAerieGrass1x1>(placeStyle: 0, frameX: 0, frameY: 0),
+        new TallAerieGrassSeeds<TallAerieGrass1x1>(placeStyle: 1, frameX: 0, frameY: 1),
+        // 1x2
+        new TallAerieGrassSeeds<TallAerieGrass1x2>(placeStyle: 0, frameX: 1, frameY: 0),
+        new TallAerieGrassSeeds<TallAerieGrass1x2>(placeStyle: 1, frameX: 1, frameY: 1),
+    ];
+
+    [OnLoad]
+    private static void Load(Mod mod)
+    {
+        foreach (var item in AlternateSeedItems)
+        {
+            mod.AddContent(item);
+        }
+    }
+
     public static readonly int[] ValidGrasses =
     [
         ModContent.TileType<AerieBrickGrassTile>(),

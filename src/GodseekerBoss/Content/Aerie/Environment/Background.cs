@@ -14,7 +14,7 @@ using MiscTextures = GodseekerBoss.GeneratedAssets.Assets.Images.Textures;
 
 namespace GodseekerBoss.Content.Aerie.Environment;
 
-public class AerieBackground : ModSurfaceBackgroundStyle
+public sealed class AerieBackground : ModSurfaceBackgroundStyle
 {
 #region Edits
     private static readonly Color far_fog_color = new(247, 177, 155);
@@ -25,6 +25,11 @@ public class AerieBackground : ModSurfaceBackgroundStyle
     [OnLoad]
     private static new void Load()
     {
+        if (Main.dedServ)
+        {
+            return;
+        }
+
         IL_Main.DrawBG += DrawBG_RemoveSpaceOffset;
 
         On_Main.UpdateAtmosphereTransparencyToSkyColor += UpdateAtmosphereTransparencyToSkyColor_HideSpace;
@@ -45,6 +50,11 @@ public class AerieBackground : ModSurfaceBackgroundStyle
     [ModSystemHooks.PostSetupContent]
     private static void PostLoad()
     {
+        if (Main.dedServ)
+        {
+            return;
+        }
+
         // Should be loaded after main loading is complete to render above wind.
         On_Main.DrawBackgroundBlackFill += DrawBackgroundBlackFill_Fog;
 

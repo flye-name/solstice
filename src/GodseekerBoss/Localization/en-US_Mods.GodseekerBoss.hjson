@@ -19,19 +19,34 @@ Items: {
 		Tooltip: "'D. Watkins'"
 	}
 
-	TallAerieGrassFlowerSeeds: {
-		DisplayName: Tall Aerie Moss Flower Seeds
-		Tooltip: ""
-	}
-
-	TallAerieGrassSeeds: {
-		DisplayName: Tall Aerie Moss Seeds
-		Tooltip: ""
-	}
-
 	AerieGrassSeeds: {
 		DisplayName: Aerie Moss
 		Tooltip: ""
+	}
+
+	TallAerieGrassSeedsDummy: {
+		DisplayName: Tall Aerie Moss Seeds
+		Tooltip: <right> to toggle placement size, and flowers
+	}
+
+	TallAerieGrassSeedsTallAerieGrass1x10: {
+		DisplayName: Tall Aerie Moss Seeds (1x1)
+		Tooltip: <right> to toggle placement size, and flowers
+	}
+
+	TallAerieGrassSeedsTallAerieGrass1x11: {
+		DisplayName: Tall Aerie Moss Seeds (1x1, Flowers)
+		Tooltip: <right> to toggle placement size, and flowers
+	}
+
+	TallAerieGrassSeedsTallAerieGrass1x20: {
+		DisplayName: Tall Aerie Moss Seeds (1x2)
+		Tooltip: <right> to toggle placement size, and flowers
+	}
+
+	TallAerieGrassSeedsTallAerieGrass1x21: {
+		DisplayName: Tall Aerie Moss Seeds (1x2, Flowers)
+		Tooltip: <right> to toggle placement size, and flowers
 	}
 }
 
