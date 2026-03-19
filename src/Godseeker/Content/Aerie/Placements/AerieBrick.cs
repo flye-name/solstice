@@ -4,12 +4,13 @@ using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
 
 namespace Godseeker.Content.Aerie.Placements;
 
 public sealed class AerieBrick : ModItem
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieBrick.Key;
+    public override string Texture => PlacementTextures.AerieBrick.Key;
 
     public override void SetStaticDefaults()
     {
@@ -31,9 +32,10 @@ public sealed class AerieBrick : ModItem
     }
 }
 
+[LegacyName("GodseekerBoss/AerieBrickTile")]
 public class AerieBrickTile : ModTile
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieBrickTile.Key;
+    public override string Texture => PlacementTextures.AerieBrickTile.Key;
 
     public override void SetStaticDefaults()
     {
@@ -59,6 +61,7 @@ public class AerieBrickTile : ModTile
     }
 }
 
+[LegacyName("GodseekerBoss/AerieBrickGrassTile")]
 public sealed class AerieBrickGrassTile : AerieBrickTile
 {
     public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieBrickGrassTile.Key;
