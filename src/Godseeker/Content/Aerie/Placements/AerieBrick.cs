@@ -32,7 +32,6 @@ public sealed class AerieBrick : ModItem
     }
 }
 
-[LegacyName("GodseekerBoss/AerieBrickTile")]
 public class AerieBrickTile : ModTile
 {
     public override string Texture => PlacementTextures.AerieBrickTile.Key;
@@ -61,10 +60,9 @@ public class AerieBrickTile : ModTile
     }
 }
 
-[LegacyName("GodseekerBoss/AerieBrickGrassTile")]
 public sealed class AerieBrickGrassTile : AerieBrickTile
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.AerieBrickGrassTile.Key;
+    public override string Texture => PlacementTextures.AerieBrickGrassTile.Key;
 
     public override void SetStaticDefaults()
     {
