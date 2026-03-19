@@ -26,27 +26,27 @@ Items: {
 
 	TallAerieGrassSeedsDummy: {
 		DisplayName: Tall Aerie Moss Seeds
-		Tooltip: ""
+		Tooltip: <right> to toggle placement size, and flowers
 	}
 
 	TallAerieGrassSeedsTallAerieGrass1x10: {
 		DisplayName: Tall Aerie Moss Seeds (1x1)
-		Tooltip: ""
+		Tooltip: <right> to toggle placement size, and flowers
 	}
 
 	TallAerieGrassSeedsTallAerieGrass1x11: {
 		DisplayName: Tall Aerie Moss Seeds (1x1, Flowers)
-		Tooltip: ""
+		Tooltip: <right> to toggle placement size, and flowers
 	}
 
 	TallAerieGrassSeedsTallAerieGrass1x20: {
 		DisplayName: Tall Aerie Moss Seeds (1x2)
-		Tooltip: ""
+		Tooltip: <right> to toggle placement size, and flowers
 	}
 
 	TallAerieGrassSeedsTallAerieGrass1x21: {
 		DisplayName: Tall Aerie Moss Seeds (1x2, Flowers)
-		Tooltip: ""
+		Tooltip: <right> to toggle placement size, and flowers
 	}
 }
 

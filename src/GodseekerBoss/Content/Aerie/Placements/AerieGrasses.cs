@@ -178,7 +178,7 @@ public sealed class TallAerieGrassSeeds<T> : ModItem where T : ModTile
     {
         var texture = PlacementTextures.TallAerieGrassSeedsBar.Value;
 
-        position += new Vector2(9f, 8f) * Main.inventoryScale / scale;
+        position += new Vector2(15f, 10f) * Main.inventoryScale;// * scale;
 
         spriteBatch.Draw(texture, position, BarFrame, drawColor, 0f, BarFrame.Size() * 0.5f, 1f, SpriteEffects.None, 0f);
     }
