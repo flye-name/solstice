@@ -3,7 +3,10 @@ using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using SubworldLibrary;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Terraria;
@@ -12,7 +15,9 @@ using Terraria.GameContent.Generation;
 using Terraria.GameContent.UI.States;
 using Terraria.IO;
 using Terraria.Localization;
+using Terraria.Map;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using Terraria.WorldBuilding;
 
 namespace Godseeker.Content.Aerie.Environment;
@@ -65,6 +70,215 @@ public class AerieSubworld : Subworld
         On_NPC.UpdateNPC_UpdateGravity += UpdateNPC_UpdateGravity_RemoveSpaceGravity;
 
         IL_Player.Update += Update_RemoveSpaceGravity;
+    }
+
+    private static ushort aerieMapSkyPosition;
+
+    private const string aerie_map_sky_key = "AerieSkyGradient";
+
+    private static readonly Color aerie_map_sky_gradient_top = new(176, 197, 247);
+    private static readonly Color aerie_map_sky_gradient_bot = new(255, 168, 154);
+
+    [OnLoad(Side = ModSide.Client)]
+    private static void LoadClient()
+    {
+        // TML lacks any convenient hooks after loading modded map entries;
+        // luckily we don't have to unload our additional entries (see MapLoader.UnloadModMap.)
+        MonoModHooks.Add(
+            typeof(MapLoader).GetMethod(
+                nameof(MapLoader.FinishSetup),
+                BindingFlags.Static | BindingFlags.NonPublic
+            ),
+            FinishSetup_AddAerieSkyGradient
+        );
+
+        IL_MapHelper.CreateMapTile += CreateMapTile_UseAerieSkyGradient;
+
+        MonoModHooks.Modify(
+            typeof(MapIO).GetMethod(
+                nameof(MapIO.WriteModMap),
+                BindingFlags.Static | BindingFlags.NonPublic
+            ),
+            WriteModMap_UseAerieSkyGradient
+        );
+
+        MonoModHooks.Modify(
+            typeof(MapIO).GetMethod(
+                nameof(MapIO.ReadModMap),
+                BindingFlags.Static | BindingFlags.NonPublic
+            ),
+            ReadModMap_UseAerieSkyGradient
+        );
+    }
+
+    private static void WriteModMap_UseAerieSkyGradient(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        int writerIndex = -1; // arg
+        int typeIndex = -1; // loc
+
+        ILLabel? loopTarget = null;
+
+        c.GotoNext(
+            i => i.MatchRet()
+        );
+
+        c.GotoNext(
+            i => i.MatchLdarg(out writerIndex),
+            i => i.MatchLdloc(out _),
+            i => i.MatchCallvirt<ICollection<ushort>>($"get_{nameof(ICollection.Count)}")
+        );
+
+        c.GotoNext(
+            i => i.MatchLdarg(writerIndex),
+            i => i.MatchLdloc(out typeIndex)
+        );
+
+        c.GotoNext(
+            i => i.MatchLdstr(string.Empty)
+        );
+
+        c.GotoPrev(
+            MoveType.After,
+            i => i.MatchBr(out loopTarget)
+        );
+
+        Debug.Assert(loopTarget is not null);
+
+        c.MoveAfterLabels();
+
+        c.EmitLdarg(writerIndex);
+        c.EmitLdloc(typeIndex);
+
+        c.EmitDelegate(
+            static (BinaryWriter writer, ushort type) =>
+            {
+                if (type < aerieMapSkyPosition || type >= aerieMapSkyPosition + byte.MaxValue)
+                {
+                    return false;
+                }
+
+                writer.Write(value: true);
+                writer.Write(nameof(Godseeker));
+                writer.Write(aerie_map_sky_key);
+
+                writer.Write((ushort)(type - aerieMapSkyPosition));
+
+                return true;
+            }
+        );
+
+        c.EmitBrtrue(loopTarget);
+
+        MonoModHooks.DumpIL(ModContent.GetInstance<Godseeker>(), il);
+    }
+
+    private static void ReadModMap_UseAerieSkyGradient(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        int modNameIndex = -1; // loc, string
+        int nameIndex = -1; // loc, string
+        int optionIndex = -1; // loc, ushort
+
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchCallvirt<BinaryReader>(nameof(BinaryReader.ReadString)),
+            i => i.MatchStloc(out modNameIndex)
+        );
+
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchCallvirt<BinaryReader>(nameof(BinaryReader.ReadString)),
+            i => i.MatchStloc(out nameIndex)
+        );
+
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchCallvirt<BinaryReader>(nameof(BinaryReader.ReadUInt16)),
+            i => i.MatchStloc(out optionIndex)
+        );
+
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchLdloc(out _),
+            i => i.MatchLdloc(out _),
+            i => i.MatchLdloc(out _),
+            i => i.MatchCallvirt<IDictionary<ushort, ushort>>("set_Item")
+        );
+
+        c.Index--;
+
+        c.EmitLdloc(modNameIndex);
+        c.EmitLdloc(nameIndex);
+        c.EmitLdloc(optionIndex);
+
+        c.EmitDelegate(
+            static (
+                ushort newType,
+                string modName,
+                string name,
+                ushort option
+            ) =>
+            {
+                if (modName != nameof(Godseeker) || name != aerie_map_sky_key)
+                {
+                    return newType;
+                }
+
+                return (ushort)(aerieMapSkyPosition + option);
+            }
+        );
+
+        MonoModHooks.DumpIL(ModContent.GetInstance<Godseeker>(), il);
+    }
+
+    private static void CreateMapTile_UseAerieSkyGradient(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchLdsfld(typeof(MapHelper), nameof(MapHelper.skyPosition))
+        );
+
+        c.EmitDelegate(
+            static (ushort skyPosition) =>
+            {
+                if (Active)
+                {
+                    return aerieMapSkyPosition;
+                }
+
+                return skyPosition;
+            }
+        );
+    }
+
+    private delegate void orig_FinishSetup();
+
+    private static void FinishSetup_AddAerieSkyGradient(orig_FinishSetup orig)
+    {
+        orig();
+
+        aerieMapSkyPosition = (ushort)MapHelper.colorLookup.Length;
+
+        Color[] colors = new Color[byte.MaxValue];
+
+        for (int i = 0; i < colors.Length; i++)
+        {
+            colors[i] = Color.Lerp(aerie_map_sky_gradient_top, aerie_map_sky_gradient_bot, (float)i / colors.Length);
+        }
+
+        Array.Resize(ref MapHelper.colorLookup, aerieMapSkyPosition + colors.Length);
+        Lang._mapLegendCache.Resize(aerieMapSkyPosition + colors.Length);
+
+        for (int k = 0; k < colors.Length; k++)
+        {
+            MapHelper.colorLookup[aerieMapSkyPosition + k] = colors[k];
+            Lang._mapLegendCache[aerieMapSkyPosition + k] = LocalizedText.Empty;
+        }
     }
 
     private static void DropTombstone_DisableTombstones(On_Player.orig_DropTombstone orig, Player self, long coinsOwned, NetworkText deathText, int hitDirection)
