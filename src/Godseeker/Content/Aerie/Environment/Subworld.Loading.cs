@@ -11,9 +11,13 @@ namespace Godseeker.Content.Aerie.Environment;
 
 public partial class AerieSubworld : Subworld
 {
-    public override void DrawMenu(GameTime gameTime)
+    public override void DrawMenu(GameTime gameTime) => SubworldLoading.DrawCloudTransition();
+
+    public override bool ChangeAudio()
     {
-        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Red);
+        if (Main.gameMenu)
+            Main.newMusic = MusicLoader.GetMusicSlot(Mod, "Assets/Music/Loading");
+        return Main.gameMenu; 
     }
 }
 
@@ -21,6 +25,7 @@ public class SubworldLoading : ModSystem
 {
     public static bool ShouldBeLoading;
     public static float Progress;
+    public static int PostLoadDelay;
     public static bool IntoSubworld;
     public static Player DummyPlayer = new Player();
     
@@ -33,7 +38,11 @@ public class SubworldLoading : ModSystem
             if (ShouldBeLoading)
             {
                 Main.spriteBatch.End(out var snapshot);
-                DrawCloudTransition(snapshot);
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
+
+                DrawCloudTransition();
+                
+                Main.spriteBatch.End();
                 Main.spriteBatch.Begin(in snapshot);
             }
         };
@@ -50,14 +59,16 @@ public class SubworldLoading : ModSystem
         bool finishedLoading = IntoSubworld == SubworldSystem.IsActive<AerieSubworld>() && !Main.gameMenu;
         if (finishedLoading)
         {
-            Progress = MathF.Max(Progress - 0.05f, 0f);
+            if (PostLoadDelay-- < 0)
+                Progress = MathF.Max(Progress - 0.025f, 0f);
 
             if (Progress <= 0f)
                 ShouldBeLoading = false;
         }
         else
         {
-            Progress = MathF.Min(Progress + 0.05f, 1f);
+            PostLoadDelay = 40;
+            Progress = MathF.Min(Progress + 0.025f, 1f);
 
             if (!Main.gameMenu && Progress >= 1f)
             {
@@ -67,18 +78,19 @@ public class SubworldLoading : ModSystem
                     SubworldSystem.Exit();
             }
         }
-        
-        Main.NewText(Progress);
     }
 
-    public static void DrawCloudTransition(SpriteBatchSnapshot snapshot)
+    public static void DrawCloudTransition()
     {
-        Main.spriteBatch.Begin(in snapshot);
-            
-        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(0, 0, (int)(Progress * Main.screenWidth / 2), Main.screenHeight), Color.Red);
-        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(Main.screenWidth - (int)(Progress * Main.screenWidth / 2), 0, (int)(Progress * Main.screenWidth / 2), Main.screenHeight), Color.Red);
+        bool finishedLoading = IntoSubworld == SubworldSystem.IsActive<AerieSubworld>() && !Main.gameMenu;
+
+        int width = Main.screenWidth + 100;
+        int height = Main.screenHeight + 100;
+        Rectangle rectangle = new Rectangle(-50, -50, width, (int)(height * Progress));
+        if (finishedLoading)
+            rectangle = new Rectangle(-50, (int)(height * (1f - Progress)) - 50, width, height);
         
-        Main.spriteBatch.End();
+        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rectangle, Color.Red);
     }
 
     public static void EnterAerie()
@@ -86,4 +98,11 @@ public class SubworldLoading : ModSystem
         IntoSubworld = !SubworldSystem.IsActive<AerieSubworld>();
         ShouldBeLoading = true;
     }
+}
+
+public class SubworldLoadingSceneEffect : ModSceneEffect
+{
+    public override bool IsSceneEffectActive(Player player) => SubworldLoading.ShouldBeLoading;
+
+    public override int Music => MusicLoader.GetMusicSlot(Mod, "Assets/Music/Loading");
 }
