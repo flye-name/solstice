@@ -22,7 +22,7 @@ using Terraria.WorldBuilding;
 
 namespace Godseeker.Content.Aerie.Environment;
 
-public class AerieSubworld : Subworld
+public partial class AerieSubworld : Subworld
 {
     #region Edits
     private static readonly Type[] disabledPowerTypes =

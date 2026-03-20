@@ -31,14 +31,7 @@ public sealed class AerieTestItem : ModItem
             return true;
         }
 
-        if (!SubworldSystem.IsActive<AerieSubworld>())
-        {
-            SubworldSystem.Enter<AerieSubworld>();
-        }
-        else
-        {
-            SubworldSystem.Exit();
-        }
+        SubworldLoading.EnterAerie();
 
         return true;
     }
