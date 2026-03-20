@@ -20,7 +20,7 @@ public static class GodseekerTileSets
     /// The tile to swap to when lightly hit by a tool, similar to grass or moss;
     /// will use the tiles hit effects over the target tiles.
     /// </summary>
-    public static int[] TransformToOnHit { get; private set; } = [];
+    public static int[] TransformTo { get; private set; } = [];
 
     private static Mod Mod => ModContent.GetInstance<Godseeker>();
 
@@ -29,7 +29,7 @@ public static class GodseekerTileSets
     {
         UseAlternateTileObjectDataRandomStyles = CreateSet(nameof(UseAlternateTileObjectDataRandomStyles), false);
 
-        TransformToOnHit = CreateSet(nameof(TransformToOnHit), -1);
+        TransformTo = CreateSet(nameof(TransformTo), -1);
 
         return;
 
@@ -44,11 +44,11 @@ public static class GodseekerTileSets
     [OnLoad]
     private static void Load()
     {
-        On_Player.DoesPickTargetTransformOnKill += DoesPickTargetTransformOnKill_IncludeTransforms;
+        On_Player.DoesPickTargetTransformOnKill += DoesPickTargetTransformOnKill_TransformTo;
 
         // Replicating logic like vanilla's moss tiles is impossible with ModTile.KillTile
         // since hit sounds are played after TileLoader.KillTile (same with particles.)
-        On_WorldGen.KillTile += KillTile_TransformTile;
+        On_WorldGen.KillTile += KillTile_TransformTo;
 
         // CanPlace does not account for alternate TileObjectData's RandomStyleRange nor
         // SpecificRandomStyles -- although irrelevant since this tile does not use it --
@@ -59,9 +59,10 @@ public static class GodseekerTileSets
         IL_TileObject.CanPlace += CanPlace_UseCorrectTileObjectDataForRandomStyles;
     }
 
-    private static bool DoesPickTargetTransformOnKill_IncludeTransforms(On_Player.orig_DoesPickTargetTransformOnKill orig, Player self, HitTile hitCounter, int damage, int x, int y, int pickPower, int bufferIndex, Tile tileTarget)
+#region Transform To
+    private static bool DoesPickTargetTransformOnKill_TransformTo(On_Player.orig_DoesPickTargetTransformOnKill orig, Player self, HitTile hitCounter, int damage, int x, int y, int pickPower, int bufferIndex, Tile tileTarget)
     {
-        int swapType = TransformToOnHit[tileTarget.type];
+        int swapType = TransformTo[tileTarget.type];
 
         if (swapType >= 0 && hitCounter.AddDamage(bufferIndex, damage, updateAmount: false) >= 100)
         {
@@ -71,7 +72,7 @@ public static class GodseekerTileSets
         return orig(self,  hitCounter, damage, x, y,  pickPower, bufferIndex, tileTarget);
     }
 
-    private static void KillTile_TransformTile(On_WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
+    private static void KillTile_TransformTo(On_WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
     {
         orig(i, j, fail, effectOnly, noItem);
 
@@ -82,7 +83,7 @@ public static class GodseekerTileSets
             return;
         }
 
-        int swapType = TransformToOnHit[tile.type];
+        int swapType = TransformTo[tile.type];
 
         fail |= WorldGen.CheckTileBreakability(i, j) == 1;
 
@@ -91,7 +92,9 @@ public static class GodseekerTileSets
             Main.tile[i, j].TileType = (ushort)swapType;
         }
     }
+    #endregion
 
+#region Use Alternate TileObjectData Random Styles
     private static void CanPlace_UseCorrectTileObjectDataForRandomStyles(ILContext il)
     {
         var c = new ILCursor(il);
@@ -158,5 +161,6 @@ public static class GodseekerTileSets
         }
         return tileObjectData;
     }
+#endregion
 #endregion
 }

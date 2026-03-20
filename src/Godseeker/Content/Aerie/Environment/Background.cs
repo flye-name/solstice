@@ -22,14 +22,9 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
     private static readonly Color near_fog_color = new(255, 248, 227);
     private static readonly Color behind_tiles_fog_color = Color.Lerp(mid_fog_color, near_fog_color, 0.65f);
 
-    [OnLoad]
+    [OnLoad(Side = ModSide.Client)]
     private static new void Load()
     {
-        if (Main.dedServ)
-        {
-            return;
-        }
-
         IL_Main.DrawBG += DrawBG_RemoveSpaceOffset;
 
         On_Main.UpdateAtmosphereTransparencyToSkyColor += UpdateAtmosphereTransparencyToSkyColor_HideSpace;

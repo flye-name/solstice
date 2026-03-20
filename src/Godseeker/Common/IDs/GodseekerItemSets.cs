@@ -359,7 +359,7 @@ public static class GodseekerItemSets
 #endregion
 
 #region Tile Replacements
-    public delegate void orig_Step_GrassSeeds(
+    private delegate void orig_Step_GrassSeeds(
         SmartCursorHelper.SmartCursorUsageInfo providedInfo,
         ref int focusedX,
         ref int focusedY

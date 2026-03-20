@@ -19,14 +19,7 @@ public sealed class AerieBrick : ModItem
 
     public override void SetDefaults()
     {
-        Item.useStyle = ItemUseStyleID.Swing;
-        Item.useTurn = true;
-        Item.useAnimation = 15;
-        Item.useTime = 10;
-        Item.autoReuse = true;
-        Item.maxStack = Item.CommonMaxStack;
-        Item.consumable = true;
-        Item.createTile = ModContent.TileType<AerieBrickTile>();
+        Item.DefaultToPlaceableTile(ModContent.TileType<AerieBrickTile>());
         Item.width = 12;
         Item.height = 12;
     }
@@ -77,7 +70,7 @@ public sealed class AerieBrickGrassTile : AerieBrickTile
         Main.tileMerge[Type][ModContent.TileType<AerieBrickTile>()] = true;
         Main.tileMerge[ModContent.TileType<AerieBrickTile>()][Type] = true;
 
-        GodseekerTileSets.TransformToOnHit[Type] = ModContent.TileType<AerieBrickTile>();
+        GodseekerTileSets.TransformTo[Type] = ModContent.TileType<AerieBrickTile>();
 
         HitSound = SoundID.Dig;
 
