@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.GameContent.Generation;
@@ -380,9 +381,14 @@ public partial class AerieSubworld : Subworld
 
     public override int Height => 400;
 
-    public override List<GenPass> Tasks =>
+    public override List<GenPass> Tasks => // TODO: Add actual generation so these run
     [
-        new PassLegacy("Aerie Settings", AerieSubworldSettings)
+        new PassLegacy("Aerie Fake Loading", (progress, configuration) =>
+        {
+            // TODO: Check if it's the first time visiting
+            Thread.Sleep(30000);
+        }),
+        new PassLegacy("Aerie Settings", AerieSubworldSettings),
     ];
 
     private static void AerieSubworldSettings(GenerationProgress progress, GameConfiguration configurations)
