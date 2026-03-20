@@ -48,6 +48,11 @@ Items: {
 		DisplayName: Tall Aerie Moss Seeds (1x2, Flowers)
 		Tooltip: <right> to toggle placement size, and flowers
 	}
+
+	AerieCloud: {
+		DisplayName: Aerie Cloud
+		Tooltip: ""
+	}
 }
 
 Biomes: {
