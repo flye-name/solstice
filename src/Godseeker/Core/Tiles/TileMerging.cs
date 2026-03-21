@@ -4,12 +4,10 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static Terraria.Utilities.NPCUtils;
 
 namespace Godseeker.Core.Tiles;
 
@@ -136,28 +134,40 @@ public static class TileMerging
         int mask = 0;
         int shaderIndex = 0;
 
-        Check(i, j - 1, 1, true);
-        Check(i, j + 1, 2, false);
-        Check(i - 1, j, 4, false);
-        Check(i + 1, j, 8, false);
+        Tile down = Framing.GetTileSafely(i, j + 1);
+        if (center.Slope.Down && down.Slope.Up && !down.IsHalfBlock)
+        {
+            Check(down, 2);
+        }
+
+        if (center.IsHalfBlock)
+        {
+            return (mask, shaderIndex);
+        }
+
+        Tile up = Framing.GetTileSafely(i, j - 1);
+        if (center.Slope.Up && up.Slope.Down)
+        {
+            Check(up, 1);
+        }
+
+        Tile left = Framing.GetTileSafely(i - 1, j);
+        if (center.Slope.Left && left.Slope.Right && !left.IsHalfBlock)
+        {
+            Check(left, 4);
+        }
+
+        Tile right = Framing.GetTileSafely(i + 1, j);
+        if (center.Slope.Right && right.Slope.Left && !right.IsHalfBlock)
+        {
+            Check(right, 8);
+        }
 
         return (mask, shaderIndex);
 
-        void Check(int x, int y, int bit, bool isUp)
+        void Check(Tile tile, int bit)
         {
-            Tile neighbor = Framing.GetTileSafely(x, y);
-
-            if (neighbor.TileType != type)
-            {
-                return;
-            }
-
-            bool canMerge = isUp
-                ? !center.IsHalfBlock && (center.BottomSlope || center.Slope == 0) &&
-                  (neighbor.TopSlope || neighbor.Slope == 0)
-                : !center.IsHalfBlock;
-
-            if (!canMerge)
+            if (tile.TileType != type)
             {
                 return;
             }
@@ -166,7 +176,7 @@ public static class TileMerging
 
             if (shaderIndex == 0)
             {
-                shaderIndex = neighbor.TileColor;
+                shaderIndex = tile.TileColor;
             }
         }
     }
