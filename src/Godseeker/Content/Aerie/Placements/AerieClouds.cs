@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Godseeker.Common.IDs;
+using Godseeker.Core.Tiles;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -36,7 +38,6 @@ public class AerieCloudTile : ModTile
     public override void SetStaticDefaults()
     {
         Main.tileSolid[Type] = true;
-        Main.tileMergeDirt[Type] = true;
         Main.tileBlockLight[Type] = true;
         Main.tileLighted[Type] = false;
         Main.tileBlockLight[Type] = false;
@@ -44,6 +45,13 @@ public class AerieCloudTile : ModTile
         TileID.Sets.ChecksForMerge[Type] = true;
 
         TileID.Sets.NegatesFallDamage[Type] = true;
+
+        TileMerging.AddCustomMerge(
+            Type,
+            PlacementTextures.AerieCloudTileMerge,
+            ModContent.TileType<AerieBrickTile>(),
+            ModContent.TileType<AerieBrickGrassTile>()
+        );
 
         AddMapEntry(new Color(246, 234, 215));
 
