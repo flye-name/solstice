@@ -9,14 +9,17 @@ using Terraria.ModLoader;
 
 namespace Godseeker.Content.Aerie.Environment;
 
-public partial class AerieSubworld : Subworld
+public partial class AerieSubworld
 {
     public override void DrawMenu(GameTime gameTime) => SubworldLoading.DrawCloudTransition();
 
     public override bool ChangeAudio()
     {
         if (Main.gameMenu)
+        {
             Main.newMusic = MusicLoader.GetMusicSlot(Mod, "Assets/Music/Loading");
+        }
+
         return Main.gameMenu; 
     }
 }
@@ -90,7 +93,7 @@ public class SubworldLoading : ModSystem
         if (finishedLoading)
             rectangle = new Rectangle(-50, (int)(height * (1f - Progress)) - 50, width, height);
         
-        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rectangle, Color.Red);
+        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rectangle, Color.Black);
     }
 
     public static void EnterAerie()
