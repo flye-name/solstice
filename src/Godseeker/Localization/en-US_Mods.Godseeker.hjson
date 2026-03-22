@@ -51,6 +51,11 @@ Items: {
 
 	AerieCloud: {
 		DisplayName: Aerie Cloud
+		Tooltip: Prevents fall damage
+	}
+
+	AerieCloudWall: {
+		DisplayName: Aerie Cloud Wall
 		Tooltip: ""
 	}
 }

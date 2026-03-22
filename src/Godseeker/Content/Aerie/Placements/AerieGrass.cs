@@ -357,8 +357,11 @@ public static class TallAerieGrassHelper
 
     public static readonly int[] ValidGrasses =
     [
+        ModContent.TileType<AerieCloudTile>(),
+        ModContent.TileType<AerieBrickTile>(),
         ModContent.TileType<AerieBrickGrassTile>(),
         TileID.Grass,
+        TileID.Dirt,
     ];
 
     // TODO: Edit and use WorldGen.PlantCheck.
