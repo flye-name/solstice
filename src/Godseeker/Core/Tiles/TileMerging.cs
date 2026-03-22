@@ -7,18 +7,15 @@ using System.Diagnostics.CodeAnalysis;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
-using Terraria.ModLoader;
 
 namespace Godseeker.Core.Tiles;
 
-// Adapted from 'https://github.com/GabeHasWon/SpiritReforged/blob/scarabdate/Common/TileCommon/TileMerging/TileMerger.cs' with consent from math2.
+// Adapted from 'https://github.com/GabeHasWon/SpiritReforged/blob/scarabdate/Common/TileCommon/TileMerging/TileMerger.cs' with permission from math2.
 public static class TileMerging
 {
-    private const int full_frame_width = 108;
-
     private static readonly Dictionary<int, Asset<Texture2D>> textureOverlayByType = [];
 
-    private static HashSet<int>?[] mergesWith { get; set; } = [];
+    private static Dictionary<int, HashSet<int>> MergesWith { get; } = [];
 
     private static readonly Point[] offsets =
     [
@@ -28,29 +25,13 @@ public static class TileMerging
         new(54, 18), new(72, 0), new(72, 18), new(18, 18)
     ];
 
-    private static Mod Mod => ModContent.GetInstance<Godseeker>();
-
-    [ModSystemHooks.ResizeArrays]
-    private static void ResizeArrays()
-    {
-        mergesWith = CreateSet<HashSet<int>?>(nameof(mergesWith), null);
-
-        return;
-
-        static T[] CreateSet<T>(string name, T defaultState)
-        {
-            return TileID.Sets.Factory.CreateNamedSet(Mod, name)
-                         .RegisterCustomSet(defaultState);
-        }
-    }
-
-    [OnUnload]
-    private static void Unload()
-    {
-        textureOverlayByType.Clear();
-        paintCache.Clear();
-    }
-
+    /// <summary>
+    /// Adds custom merge frame overlays for supplied <paramref name="targetTypes"/>;
+    /// uses a texture format different to that of vanilla dirt merge frames.
+    /// <br/>
+    /// Additionally, merge overlays will use the paint of the neighboring
+    /// tiles over the paint of the center tile.
+    /// </summary>
     public static void AddCustomMerge(int type, Asset<Texture2D> texture, params int[] targetTypes)
     {
         textureOverlayByType[type] = texture;
@@ -59,8 +40,8 @@ public static class TileMerging
 
         foreach (int targetType in targetTypes)
         {
-            mergesWith[targetType] ??= [];
-            mergesWith[targetType]?.Add(type);
+            MergesWith.TryAdd(targetType, []);
+            MergesWith[targetType].Add(type);
 
             Main.tileMerge[type][targetType] = true;
             Main.tileMerge[targetType][type] = true;
@@ -73,8 +54,7 @@ public static class TileMerging
     [GlobalTileHooks.PostDraw]
     private static void PostDraw(int i, int j, int type, SpriteBatch spriteBatch)
     {
-        var merges = mergesWith[type];
-        if (merges is not null && merges.Count > 0)
+        if (MergesWith.TryGetValue(type, out var merges) && merges.Count > 0)
         {
             DrawMerge(spriteBatch, i, j, merges);
         }
@@ -82,6 +62,8 @@ public static class TileMerging
 
     private static void DrawMerge(SpriteBatch spriteBatch, int i, int j, params IEnumerable<int> types)
     {
+        const int full_frame_width = 108;
+
         Tile tile = Framing.GetTileSafely(i, j);
 
         Color color = Lighting.GetColor(i, j);
@@ -109,12 +91,9 @@ public static class TileMerging
 
             Texture2D? texture = null;
 
-            if (paint > PaintID.None)
+            if (paint > PaintID.None && !TryGetPaintTexture(type, paint, asset, out texture))
             {
-                if (!TryGetPaintTexture(type, paint, asset, out texture))
-                {
-                    finalColor = finalColor.MultiplyRGBA(WorldGen.paintColor(paint));
-                }
+                finalColor = finalColor.MultiplyRGBA(WorldGen.paintColor(paint));
             }
 
             texture ??= asset.Value;
@@ -134,12 +113,16 @@ public static class TileMerging
         int mask = 0;
         int shaderIndex = 0;
 
+        // Check for each tile merging with its neighbor;
+        // tiles should only merge if their slope state allows it.
+
         Tile down = Framing.GetTileSafely(i, j + 1);
         if (center.Slope.Down && down.Slope.Up && !down.IsHalfBlock)
         {
             Check(down, 2);
         }
 
+        // Half tiles should only merge with the tile below them.
         if (center.IsHalfBlock)
         {
             return (mask, shaderIndex);
