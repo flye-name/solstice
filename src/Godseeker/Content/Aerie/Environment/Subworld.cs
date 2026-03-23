@@ -78,7 +78,8 @@ public partial class AerieSubworld : Subworld
     private const string aerie_map_sky_key = "AerieSkyGradient";
 
     private static readonly Color aerie_map_sky_gradient_top = new(176, 197, 247);
-    private static readonly Color aerie_map_sky_gradient_bot = new(255, 168, 154);
+    private static readonly Color aerie_map_sky_gradient_mid = new(252, 150, 165);
+    private static readonly Color aerie_map_sky_gradient_bot = new(255, 220, 178);
 
     [OnLoad(Side = ModSide.Client)]
     private static void LoadClient()
@@ -261,15 +262,24 @@ public partial class AerieSubworld : Subworld
 
     private static void FinishSetup_AddAerieSkyGradient(orig_FinishSetup orig)
     {
+        const float upper_gradient_size = 0.6f;
+
         orig();
 
         aerieMapSkyPosition = (ushort)MapHelper.colorLookup.Length;
 
         Color[] colors = new Color[byte.MaxValue];
 
-        for (int i = 0; i < colors.Length; i++)
+        int upper = (int)(colors.Length * upper_gradient_size);
+
+        for (int i = 0; i < upper; i++)
         {
-            colors[i] = Color.Lerp(aerie_map_sky_gradient_top, aerie_map_sky_gradient_bot, (float)i / colors.Length);
+            colors[i] = Color.Lerp(aerie_map_sky_gradient_top, aerie_map_sky_gradient_mid, (float)i / upper);
+        }
+
+        for (int i = 0; i < colors.Length - upper; i++)
+        {
+            colors[upper + i] = Color.Lerp(aerie_map_sky_gradient_mid, aerie_map_sky_gradient_bot, (float)i / (colors.Length - upper));
         }
 
         Array.Resize(ref MapHelper.colorLookup, aerieMapSkyPosition + colors.Length);
