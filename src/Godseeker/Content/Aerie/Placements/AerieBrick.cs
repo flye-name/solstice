@@ -1,6 +1,9 @@
 ﻿using Godseeker.Common.IDs;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -20,8 +23,14 @@ public sealed class AerieBrick : ModItem
     public override void SetDefaults()
     {
         Item.DefaultToPlaceableTile(ModContent.TileType<AerieBrickTile>());
-        Item.width = 12;
-        Item.height = 12;
+    }
+
+    public override void AddRecipes()
+    {
+        CreateRecipe()
+           .AddIngredient<AerieBrickWall>(4)
+           .AddTile(TileID.WorkBenches)
+           .Register();
     }
 }
 
@@ -80,5 +89,49 @@ public sealed class AerieBrickGrassTile : AerieBrickTile
     public override void NumDust(int i, int j, bool fail, ref int num)
     {
         num = fail ? 3 : 6;
+    }
+}
+
+public sealed class AerieBrickWall : ModItem
+{
+    public override string Texture => PlacementTextures.AerieBrickWall.Key;
+
+    public override void SetStaticDefaults()
+    {
+        CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 400;
+    }
+
+    public override void SetDefaults()
+    {
+        Item.DefaultToPlaceableWall(ModContent.WallType<AerieBrickWallTile>());
+    }
+
+    public override void AddRecipes()
+    {
+        CreateRecipe(4)
+           .AddIngredient<AerieBrick>()
+           .AddTile(TileID.WorkBenches)
+           .Register();
+    }
+}
+
+public sealed class AerieBrickWallTile : ModWall
+{
+    public override string Texture => PlacementTextures.AerieBrickWallTile.Key;
+
+    public override void SetStaticDefaults()
+    {
+        Main.wallHouse[Type] = true;
+
+        AddMapEntry(new Color(100, 98, 90));
+
+        DustType = -1;
+
+        WallID.Sets.AllowsWind[Type] = true;
+    }
+
+    public override void NumDust(int i, int j, bool fail, ref int num)
+    {
+        num = fail ? 1 : 3;
     }
 }

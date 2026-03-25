@@ -124,6 +124,8 @@ public class AerieCloudWallTile : ModWall
 
         Main.wallLight[Type] = true;
 
+        WallID.Sets.AllowsWind[Type] = true;
+
         AddMapEntry(new Color(190, 168, 156));
 
         DustType = ModContent.DustType<AerieCloudDust>();

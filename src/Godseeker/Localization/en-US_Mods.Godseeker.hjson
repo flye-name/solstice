@@ -58,6 +58,11 @@ Items: {
 		DisplayName: Aerie Cloud Wall
 		Tooltip: ""
 	}
+
+	AerieBrickWall: {
+		DisplayName: Aerie Brick Wall
+		Tooltip: ""
+	}
 }
 
 Biomes: {
