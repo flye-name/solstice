@@ -173,8 +173,6 @@ public partial class AerieSubworld : Subworld
         );
 
         c.EmitBrtrue(loopTarget);
-
-        MonoModHooks.DumpIL(ModContent.GetInstance<Godseeker>(), il);
     }
 
     private static void ReadModMap_UseAerieSkyGradient(ILContext il)
