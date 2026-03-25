@@ -232,8 +232,6 @@ public partial class AerieSubworld : Subworld
                 return (ushort)(aerieMapSkyPosition + option);
             }
         );
-
-        MonoModHooks.DumpIL(ModContent.GetInstance<Godseeker>(), il);
     }
 
     private static void CreateMapTile_UseAerieSkyGradient(ILContext il)
