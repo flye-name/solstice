@@ -14,6 +14,7 @@ using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.GameContent.Generation;
 using Terraria.GameContent.UI.States;
+using Terraria.ID;
 using Terraria.IO;
 using Terraria.Localization;
 using Terraria.Map;
@@ -410,7 +411,8 @@ public partial class AerieSubworld : Subworld
         SubworldSystem.hideUnderworld = true;
     }
 
-    public override void Update()
+    [ModSystemHooks.PreUpdatePlayers]
+    private static void UpdateSubworld()
     {
         Main.cloudAlpha = 0f;
         Main.cloudBGActive = 0f;
@@ -430,15 +432,24 @@ public partial class AerieSubworld : Subworld
         Main.windSpeedTarget = -1f;
         Main.windSpeedCurrent = -1f;
 
-        // TODO: Proper lower cloud bouncing.
+        if (Main.netMode == NetmodeID.Server)
+        {
+            return;
+        }
+
         if (Main.LocalPlayer.position.Y > (Main.maxTilesY * 16f) - 1200 && Main.LocalPlayer.velocity.Y >= 0)
         {
             Main.LocalPlayer.wingTime = Main.LocalPlayer.wingTimeMax;
             Main.LocalPlayer.velocity.Y -= 1.2f;
+
+            // Net-sync velocity changes.
+            NetMessage.SendData(MessageID.PlayerControls, -1, -1, null, Main.myPlayer);
         }
         else if (Main.LocalPlayer.position.Y > (Main.maxTilesY * 16f) - 1310 && Main.LocalPlayer.velocity.Y <= 0)
         {
             Main.LocalPlayer.velocity.Y -= 1f;
+
+            NetMessage.SendData(MessageID.PlayerControls, -1, -1, null, Main.myPlayer);
         }
     }
 

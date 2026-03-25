@@ -125,6 +125,11 @@ public sealed class TallAerieGrassSeeds<T> : ModItem where T : ModTile
     {
         PlaceStyle = placeStyle;
 
+        if (Main.dedServ)
+        {
+            return;
+        }
+
         // Ensure textures are loaded.
         PlacementTextures.TallAerieGrassSeeds.Wait();
         PlacementTextures.TallAerieGrassSeedsBar.Wait();
