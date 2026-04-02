@@ -1,7 +1,6 @@
 using Daybreak.Common.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SteelSeries.GameSense;
 using SubworldLibrary;
 using System;
 using Terraria;
