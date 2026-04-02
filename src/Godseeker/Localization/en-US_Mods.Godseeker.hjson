@@ -63,6 +63,11 @@ Items: {
 		DisplayName: Aerie Brick Wall
 		Tooltip: ""
 	}
+
+	AerieCeramic: {
+		DisplayName: Aerie Ceramic
+		Tooltip: ""
+	}
 }
 
 Biomes: {
