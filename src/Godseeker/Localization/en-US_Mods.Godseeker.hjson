@@ -68,6 +68,11 @@ Items: {
 		DisplayName: Aerie Ceramic
 		Tooltip: ""
 	}
+
+	AerieFlute: {
+		DisplayName: Aerie Flute
+		Tooltip: ""
+	}
 }
 
 Biomes: {
