@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using Terraria;
+using Terraria.ModLoader;
 using Terraria.Utilities;
 using BackgroundTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Backgrounds.Textures;
 
@@ -17,7 +18,7 @@ public static class Stars
 
     private static readonly Star[] stars = new Star[star_count];
 
-    [OnLoad]
+    [OnLoad(Side = ModSide.Client)]
     private static void Load()
     {
         for (int i = 0; i < stars.Length; i++)
