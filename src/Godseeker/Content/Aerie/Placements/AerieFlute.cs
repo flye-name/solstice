@@ -16,8 +16,8 @@ public sealed class AerieFlute : ModItem
     {
         Item.width = 28;
         Item.height = 36;
-        Item.useAnimation = 60;
-        Item.useTime = 60;
+        Item.useAnimation = 20;
+        Item.useTime = 20;
         Item.useStyle = ItemUseStyleID.Shoot;
         Item.noUseGraphic = true;
         Item.shoot = ModContent.ProjectileType<HeldFlute>();
