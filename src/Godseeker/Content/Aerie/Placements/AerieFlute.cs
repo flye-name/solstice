@@ -78,7 +78,7 @@ public class HeldFlute : ModProjectile
         Projectile.direction = player.direction;
         Projectile.spriteDirection = player.direction;
         
-        if (Projectile.ai[0]++ > 200)
+        if (Projectile.ai[0]++ > 25)
             SubworldLoading.EnterAerie();
     }
 }
