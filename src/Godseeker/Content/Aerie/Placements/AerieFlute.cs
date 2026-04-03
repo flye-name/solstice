@@ -36,8 +36,6 @@ public sealed class AerieFlute : ModItem
             return true;
         }
 
-        SubworldLoading.EnterAerie();
-
         return true;
     }
 }
@@ -73,11 +71,14 @@ public class HeldFlute : ModProjectile
         
         Vector2 playerCenter = player.RotatedRelativePoint(player.MountedCenter);
         
-        Projectile.Center = playerCenter + new Vector2(player.direction * 10, -3);
+        Projectile.Center = playerCenter + new Vector2(player.direction * 10, -3 + player.gfxOffY);
         player.heldProj = Projectile.whoAmI;
         player.SetDummyItemTime(2);
         
         Projectile.direction = player.direction;
         Projectile.spriteDirection = player.direction;
+        
+        if (Projectile.ai[0]++ > 200)
+            SubworldLoading.EnterAerie();
     }
 }
