@@ -85,6 +85,8 @@ public class SubworldLoading : ModSystem
         
         int width = Main.screenWidth + 500;
         int height = Main.screenHeight + 500;
+
+        int size = width > height ? width : height;
         
         Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-250, -250, width, height), Color.Black * Progress);
         
@@ -95,12 +97,14 @@ public class SubworldLoading : ModSystem
 
         MiscShaders.AerieLoading.Progress = Progress;
         MiscShaders.AerieLoading.Loaded = finishedLoading;
-        MiscShaders.AerieLoading.Time = Main.GlobalTimeWrappedHourly;
-        MiscShaders.AerieLoading.Resolution = new Vector2(width, height);
-        MiscShaders.AerieLoading.Color = new Vector4(0.98f, 0.95f, 1, 1);
+        MiscShaders.AerieLoading.Time = Main.GlobalTimeWrappedHourly * 0.8f;
+        MiscShaders.AerieLoading.LineIntensity = MathF.Pow(Progress, 2) * 0.1f;
+        MiscShaders.AerieLoading.LineSize = 1;
+        MiscShaders.AerieLoading.ColorAmount = 64;
+        MiscShaders.AerieLoading.Color = new Vector4(0.9f, 0.95f, 1, 1);
         MiscShaders.AerieLoading.Apply();
         
-        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-250, -250, width, height), Color.White * Progress);
+        Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-250, -250, size, size), Color.White * Progress);
         
         Main.spriteBatch.End();
         Main.spriteBatch.Begin(in snapshot);
