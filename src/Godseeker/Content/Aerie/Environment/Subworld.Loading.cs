@@ -5,12 +5,10 @@ using SubworldLibrary;
 using System;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.Graphics.Renderers;
 using Terraria.ModLoader;
-using Terraria.Utilities;
 using MiscShaders = Godseeker.GeneratedAssets.Assets.Effects;
 
-namespace Godseeker.Content.Aerie.Environment;
+namespace Godseeker.Content.Aerie;
 
 public partial class AerieSubworld : Subworld
 {

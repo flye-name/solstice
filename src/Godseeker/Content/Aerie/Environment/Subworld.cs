@@ -22,7 +22,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.WorldBuilding;
 
-namespace Godseeker.Content.Aerie.Environment;
+namespace Godseeker.Content.Aerie;
 
 public partial class AerieSubworld : Subworld
 {

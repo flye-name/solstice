@@ -7,7 +7,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace Godseeker.Content.Aerie.Placements;
+namespace Godseeker.Content.Aerie;
 
 public sealed class GodspeedPainting : ModItem
 {

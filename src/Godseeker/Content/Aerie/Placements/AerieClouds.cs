@@ -6,7 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
 
-namespace Godseeker.Content.Aerie.Placements;
+namespace Godseeker.Content.Aerie;
 
 public class AerieCloudDust : ModDust
 {

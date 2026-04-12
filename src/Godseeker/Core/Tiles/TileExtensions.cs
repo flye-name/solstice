@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 
-namespace Godseeker.Core.Tiles;
+namespace Godseeker.Core;
 
 public static class TileExtensions
 {

@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace Godseeker.Core.UI;
+namespace Godseeker.Core;
 
 [Autoload(Side = ModSide.Client)]
 public class Dialogue : ModSystem

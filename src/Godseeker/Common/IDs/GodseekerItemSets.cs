@@ -15,7 +15,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace Godseeker.Common.IDs;
+namespace Godseeker.Common;
 
 public static class GodseekerItemSets
 {

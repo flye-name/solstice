@@ -1,15 +1,11 @@
-﻿using Godseeker.Common.IDs;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
 
-namespace Godseeker.Content.Aerie.Placements;
+namespace Godseeker.Content.Aerie;
 
 public sealed class AerieCeramic : ModItem
 {
@@ -27,7 +23,7 @@ public sealed class AerieCeramic : ModItem
 
     public override void AddRecipes()
     {
-        
+        // TODO
     }
 }
 

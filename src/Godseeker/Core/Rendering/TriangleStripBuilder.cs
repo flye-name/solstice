@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 
-namespace Godseeker.Core.Rendering;
+namespace Godseeker.Core;
 
 // Watered down version of Vermin/Syrup's triangle strip implementation in Cataphract.
 public enum StripCurveType : byte

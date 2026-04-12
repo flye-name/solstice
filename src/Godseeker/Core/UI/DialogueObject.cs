@@ -6,7 +6,7 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
-namespace Godseeker.Core.UI;
+namespace Godseeker.Core;
 
 public struct DialogueData
 {

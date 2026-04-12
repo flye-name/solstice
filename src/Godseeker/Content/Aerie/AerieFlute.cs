@@ -1,12 +1,10 @@
-﻿using Godseeker.Content.Aerie.Environment;
-using Microsoft.Xna.Framework;
-using SubworldLibrary;
+﻿using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace Godseeker.Content.Aerie.Placements;
+namespace Godseeker.Content.Aerie;
 
 public sealed class AerieFlute : ModItem
 {
@@ -31,11 +29,12 @@ public sealed class AerieFlute : ModItem
 
     public override bool? UseItem(Player player)
     {
+        /*
         if (player.whoAmI != Main.myPlayer)
         {
             return true;
         }
-
+        */
         return true;
     }
 }

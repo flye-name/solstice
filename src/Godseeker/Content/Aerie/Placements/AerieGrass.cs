@@ -15,7 +15,7 @@ using Terraria.ObjectData;
 using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
 // ReSharper disable InconsistentNaming
 
-namespace Godseeker.Content.Aerie.Placements;
+namespace Godseeker.Content.Aerie;
 
 public sealed class AerieGrassDust : ModDust
 {

@@ -10,7 +10,7 @@ using Terraria;
 using Terraria.ModLoader;
 using MiscTextures = Godseeker.GeneratedAssets.Assets.Images.Textures;
 
-namespace Godseeker.Content.Aerie.Environment;
+namespace Godseeker.Content.Aerie;
 
 // TODO: HighFPSSupport Compatibility
 public record struct WindParticle : IParticle

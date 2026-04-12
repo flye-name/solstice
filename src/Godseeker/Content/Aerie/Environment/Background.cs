@@ -12,7 +12,7 @@ using BackgroundTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Backgro
 using MiscShaders = Godseeker.GeneratedAssets.Assets.Effects;
 using MiscTextures = Godseeker.GeneratedAssets.Assets.Images.Textures;
 
-namespace Godseeker.Content.Aerie.Environment;
+namespace Godseeker.Content.Aerie;
 
 public sealed class AerieBackground : ModSurfaceBackgroundStyle
 {

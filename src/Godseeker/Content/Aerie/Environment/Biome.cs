@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.ModLoader;
 using BackgroundTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Backgrounds.Textures;
 
-namespace Godseeker.Content.Aerie.Environment;
+namespace Godseeker.Content.Aerie;
 
 public class AerieBiome : ModBiome
 {

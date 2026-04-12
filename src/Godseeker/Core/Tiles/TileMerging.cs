@@ -8,7 +8,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 
-namespace Godseeker.Core.Tiles;
+namespace Godseeker.Core;
 
 // Adapted from 'https://github.com/GabeHasWon/SpiritReforged/blob/scarabdate/Common/TileCommon/TileMerging/TileMerger.cs' with permission from math2.
 public static class TileMerging

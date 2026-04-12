@@ -1,5 +1,5 @@
 ﻿using Daybreak.Common.Features.Hooks;
-using Godseeker.Content.Aerie.Environment;
+using Godseeker.Content.Aerie;
 using MonoMod.Cil;
 using SubworldLibrary;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Reflection;
 using Terraria.IO;
 using Terraria.ModLoader;
 
-namespace Godseeker.Core.Subworld;
+namespace Godseeker.Core;
 
 #if DEBUG
 internal static class LocalSubworldSaving

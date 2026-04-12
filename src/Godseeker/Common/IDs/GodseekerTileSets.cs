@@ -8,7 +8,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace Godseeker.Common.IDs;
+namespace Godseeker.Common;
 
 public static class GodseekerTileSets
 {

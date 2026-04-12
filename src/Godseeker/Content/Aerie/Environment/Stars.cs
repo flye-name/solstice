@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 using Terraria.Utilities;
 using BackgroundTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Backgrounds.Textures;
 
-namespace Godseeker.Content.Aerie.Environment;
+namespace Godseeker.Content.Aerie;
 
 public static class Stars
 {
