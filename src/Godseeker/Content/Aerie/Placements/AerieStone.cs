@@ -23,7 +23,7 @@ public sealed class AerieStone : ModItem
 
     public override void AddRecipes()
     {
-        
+        // TODO
     }
 }
 

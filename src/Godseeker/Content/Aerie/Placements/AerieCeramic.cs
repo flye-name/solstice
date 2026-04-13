@@ -8,6 +8,11 @@ using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placemen
 
 namespace Godseeker.Content.Aerie;
 
+public sealed class AerieCeramicDust : ModDust
+{
+    public override string Texture => PlacementTextures.AerieCeramicDust.Key;
+}
+
 public sealed class AerieCeramic : ModItem
 {
     public override string Texture => PlacementTextures.AerieCeramic.Key;
@@ -51,7 +56,13 @@ public class AerieCeramicTile : ModTile
 
         AddMapEntry(new Color(108, 93, 78));
 
-        DustType = -1;
+        DustType = ModContent.DustType<AerieCeramicDust>();
+
         HitSound = SoundID.Tink;
+    }
+
+    public override void NumDust(int i, int j, bool fail, ref int num)
+    {
+        num = fail ? 1 : 3;
     }
 }

@@ -363,8 +363,10 @@ public static class TallAerieGrassHelper
     public static readonly int[] ValidGrasses =
     [
         ModContent.TileType<AerieCloudTile>(),
+        ModContent.TileType<AerieStoneTile>(),
         ModContent.TileType<AerieBrickTile>(),
         ModContent.TileType<AerieBrickGrassTile>(),
+        ModContent.TileType<AerieCeramicTile>(),
         TileID.Grass,
         TileID.Dirt,
     ];

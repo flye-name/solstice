@@ -8,7 +8,7 @@ using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placemen
 
 namespace Godseeker.Content.Aerie;
 
-public class AerieCloudDust : ModDust
+public sealed class AerieCloudDust : ModDust
 {
     public override string Texture => PlacementTextures.AerieCloudDust.Key;
 
