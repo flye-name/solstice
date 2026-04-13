@@ -22,7 +22,15 @@ public static class TileMerging
         new(-1, -1), new(18, 0), new(18, 36), new(54, 0),
         new(0, 18), new(0, 0), new(0, 36), new(90, 0),
         new(36, 18), new(36, 0), new(36, 36), new(90, 18),
-        new(54, 18), new(72, 0), new(72, 18), new(18, 18)
+        new(54, 18), new(72, 0), new(72, 18), new(18, 18),
+    ];
+
+    private static readonly Point[] corner_offsets =
+    [
+        new(-1, -1), new(18, 90), new(18, 72), new(36, 54),
+        new(0, 90), new(0, 54), new(18, 108), new(54, 90),
+        new(0, 72), new(0, 108), new(18, 54), new(54, 72),
+        new(54, 54), new(36, 90), new(36, 72), new(36, 108),
     ];
 
     /// <summary>
@@ -62,6 +70,8 @@ public static class TileMerging
 
     private static void DrawMerge(SpriteBatch spriteBatch, int i, int j, params IEnumerable<int> types)
     {
+        const bool allow_corners = true;
+
         const int full_frame_width = 108;
 
         Tile tile = Framing.GetTileSafely(i, j);
@@ -81,6 +91,11 @@ public static class TileMerging
         {
             (int mask, int paint) = GetMergeData(i, j, type);
 
+            if (allow_corners)
+            {
+                DrawCorners(type, mask);
+            }
+
             if (mask <= 0 ||
                 !textureOverlayByType.TryGetValue(type, out var asset))
             {
@@ -99,6 +114,36 @@ public static class TileMerging
             texture ??= asset.Value;
 
             Point p = offsets[mask];
+
+            var source = new Rectangle(p.X + (frameNumber * full_frame_width), p.Y, 16, 16);
+
+            spriteBatch.Draw(texture, position, source, finalColor);
+        }
+
+        return;
+
+        void DrawCorners(int type, int edgeMask)
+        {
+            (int mask, int paint) = GetMergeCornerData(i, j, type, edgeMask);
+
+            if (mask <= 0 ||
+                !textureOverlayByType.TryGetValue(type, out var asset))
+            {
+                return;
+            }
+
+            Color finalColor = color;
+
+            Texture2D? texture = null;
+
+            if (paint > PaintID.None && !TryGetPaintTexture(type, paint, asset, out texture))
+            {
+                finalColor = finalColor.MultiplyRGBA(WorldGen.paintColor(paint));
+            }
+
+            texture ??= asset.Value;
+
+            Point p = corner_offsets[mask];
 
             var source = new Rectangle(p.X + (frameNumber * full_frame_width), p.Y, 16, 16);
 
@@ -163,9 +208,67 @@ public static class TileMerging
             }
         }
     }
+
+    private static (int mask, int shaderIndex) GetMergeCornerData(int i, int j, int type, int edgeMask)
+    {
+        Tile center = Framing.GetTileSafely(i, j);
+
+        int mask = 0;
+        int shaderIndex = 0;
+
+        Tile downLeft = Framing.GetTileSafely(i - 1, j + 1);
+        if (center.Slope.DownLeft && downLeft.Slope.UpRight && !downLeft.IsHalfBlock
+         && (edgeMask & 2) == 0 && (edgeMask & 4) == 0)
+        {
+            Check(downLeft, 2);
+        }
+
+        Tile downRight = Framing.GetTileSafely(i + 1, j + 1);
+        if (center.Slope.DownRight && downLeft.Slope.UpLeft && !downLeft.IsHalfBlock
+         && (edgeMask & 2) == 0 && (edgeMask & 8) == 0)
+        {
+            Check(downRight, 8);
+        }
+
+        if (center.IsHalfBlock)
+        {
+            return (mask, shaderIndex);
+        }
+
+        Tile upLeft = Framing.GetTileSafely(i - 1, j - 1);
+        if (center.Slope.UpLeft && upLeft.Slope.DownRight
+         && (edgeMask & 1) == 0 && (edgeMask & 4) == 0)
+        {
+            Check(upLeft, 1);
+        }
+
+        Tile upRight = Framing.GetTileSafely(i + 1, j - 1);
+        if (center.Slope.UpRight && upRight.Slope.DownLeft
+         && (edgeMask & 1) == 0 && (edgeMask & 8) == 0)
+        {
+            Check(upRight, 4);
+        }
+
+        return (mask, shaderIndex);
+
+        void Check(Tile tile, int bit)
+        {
+            if (tile.TileType != type)
+            {
+                return;
+            }
+
+            mask |= bit;
+
+            if (shaderIndex == 0)
+            {
+                shaderIndex = tile.TileColor;
+            }
+        }
+    }
 #endregion
 
-#region Paint
+    #region Paint
     private static readonly Dictionary<TileMergingVariantKey, TileMergingRenderTargetHolder> paintCache = [];
 
     internal readonly record struct TileMergingVariantKey(int Type, int PaintColor);

@@ -1,5 +1,5 @@
 ﻿using Daybreak.Common.Features.Hooks;
-using Godseeker.Common.IDs;
+using Godseeker.Common;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

@@ -1,4 +1,4 @@
-﻿using Godseeker.Core.Tiles;
+﻿using Godseeker.Core;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.Creative;
@@ -59,6 +59,8 @@ public class AerieCloudTile : ModTile
             PlacementTextures.AerieCloudTileMerge,
             ModContent.TileType<AerieBrickTile>(),
             ModContent.TileType<AerieBrickGrassTile>(),
+            ModContent.TileType<AerieCeramicTile>(),
+            ModContent.TileType<AerieStoneTile>(),
             TileID.Cloud,
             TileID.RainCloud,
             TileID.SnowCloud

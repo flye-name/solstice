@@ -1,7 +1,6 @@
 ﻿using Daybreak.Common.Features.Hooks;
 using Daybreak.Common.Rendering;
 using Godseeker.Core;
-using Godseeker.Core.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;

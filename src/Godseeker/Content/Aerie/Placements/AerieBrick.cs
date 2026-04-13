@@ -1,4 +1,4 @@
-﻿using Godseeker.Common.IDs;
+﻿using Godseeker.Common;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.Creative;

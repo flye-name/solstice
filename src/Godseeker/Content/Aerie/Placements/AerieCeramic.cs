@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Godseeker.Core;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -38,6 +39,14 @@ public class AerieCeramicTile : ModTile
         Main.tileBlockLight[Type] = true;
         Main.tileLighted[Type] = false;
         TileID.Sets.ChecksForMerge[Type] = true;
+
+        TileMerging.AddCustomMerge(
+            Type,
+            PlacementTextures.AerieCeramicTileMerge,
+            ModContent.TileType<AerieBrickTile>(),
+            ModContent.TileType<AerieBrickGrassTile>(),
+            ModContent.TileType<AerieStoneTile>()
+        );
 
         AddMapEntry(new Color(108, 93, 78));
 
