@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace Godseeker.Core;
 
@@ -33,6 +34,24 @@ public static class TileMerging
         new(54, 54), new(36, 90), new(36, 72), new(36, 108),
     ];
 
+    private static bool[] UsesCornerMergeFrames { get; set; } = [];
+
+    private static Mod Mod => ModContent.GetInstance<Godseeker>();
+
+    [ModSystemHooks.ResizeArrays]
+    private static void ResizeArrays()
+    {
+        UsesCornerMergeFrames = CreateSet(nameof(UsesCornerMergeFrames), false);
+
+        return;
+
+        static T[] CreateSet<T>(string name, T defaultState)
+        {
+            return TileID.Sets.Factory.CreateNamedSet(Mod, name)
+                         .RegisterCustomSet(defaultState);
+        }
+    }
+
     /// <summary>
     /// Adds custom merge frame overlays for supplied <paramref name="targetTypes"/>;
     /// uses a texture format different to that of vanilla dirt merge frames.
@@ -58,7 +77,28 @@ public static class TileMerging
         }
     }
 
-#region Drawing
+    /// <inheritdoc cref="AddCustomMerge(int, Asset{Texture2D}, int[])"/>
+    public static void AddCustomMerge(int type, bool useCorners, Asset<Texture2D> texture, params int[] targetTypes)
+    {
+        textureOverlayByType[type] = texture;
+
+        TileID.Sets.ChecksForMerge[type] = true;
+
+        UsesCornerMergeFrames[type] = useCorners;
+
+        foreach (int targetType in targetTypes)
+        {
+            MergesWith.TryAdd(targetType, []);
+            MergesWith[targetType].Add(type);
+
+            Main.tileMerge[type][targetType] = true;
+            Main.tileMerge[targetType][type] = true;
+
+            TileID.Sets.ChecksForMerge[targetType] = true;
+        }
+    }
+
+    #region Drawing
     [GlobalTileHooks.PostDraw]
     private static void PostDraw(int i, int j, int type, SpriteBatch spriteBatch)
     {
@@ -70,8 +110,6 @@ public static class TileMerging
 
     private static void DrawMerge(SpriteBatch spriteBatch, int i, int j, params IEnumerable<int> types)
     {
-        const bool allow_corners = true;
-
         const int full_frame_width = 108;
 
         Tile tile = Framing.GetTileSafely(i, j);
@@ -91,7 +129,7 @@ public static class TileMerging
         {
             (int mask, int paint) = GetMergeData(i, j, type);
 
-            if (allow_corners)
+            if (UsesCornerMergeFrames[type])
             {
                 DrawCorners(type, mask);
             }

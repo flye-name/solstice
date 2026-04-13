@@ -42,6 +42,7 @@ public class AerieCeramicTile : ModTile
 
         TileMerging.AddCustomMerge(
             Type,
+            useCorners: true,
             PlacementTextures.AerieCeramicTileMerge,
             ModContent.TileType<AerieBrickTile>(),
             ModContent.TileType<AerieBrickGrassTile>(),
