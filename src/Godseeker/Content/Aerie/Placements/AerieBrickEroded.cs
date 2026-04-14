@@ -7,9 +7,9 @@ using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placemen
 
 namespace Godseeker.Content.Aerie;
 
-public sealed class AerieStone : ModItem
+public sealed class AerieBrickEroded : ModItem
 {
-    public override string Texture => PlacementTextures.AerieStone.Key;
+    public override string Texture => PlacementTextures.AerieBrickEroded.Key;
 
     public override void SetStaticDefaults()
     {
@@ -18,18 +18,13 @@ public sealed class AerieStone : ModItem
 
     public override void SetDefaults()
     {
-        Item.DefaultToPlaceableTile(ModContent.TileType<AerieStoneTile>());
-    }
-
-    public override void AddRecipes()
-    {
-        // goon
+        Item.DefaultToPlaceableTile(ModContent.TileType<AerieBrickErodedTile>());
     }
 }
 
-public class AerieStoneTile : ModTile
+public class AerieBrickErodedTile : ModTile
 {
-    public override string Texture => PlacementTextures.AerieStoneTile.Key;
+    public override string Texture => PlacementTextures.AerieBrickErodedTile.Key;
 
     public override void SetStaticDefaults()
     {
@@ -39,7 +34,7 @@ public class AerieStoneTile : ModTile
         Main.tileLighted[Type] = false;
         TileID.Sets.ChecksForMerge[Type] = true;
 
-        AddMapEntry(new Color(103, 94, 78));
+        AddMapEntry(new Color(138, 158, 168));
 
         DustType = -1;
         HitSound = SoundID.Tink;
