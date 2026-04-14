@@ -30,6 +30,7 @@ public class AerieBrickErodedTile : ModTile
     {
         Main.tileSolid[Type] = true;
         Main.tileMergeDirt[Type] = true;
+        Main.tileBrick[Type] = true;
         Main.tileBlockLight[Type] = true;
         Main.tileLighted[Type] = false;
         TileID.Sets.ChecksForMerge[Type] = true;

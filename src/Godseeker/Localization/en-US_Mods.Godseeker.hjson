@@ -78,6 +78,11 @@ Items: {
 		DisplayName: Aerie Stone
 		Tooltip: ""
 	}
+
+	AerieBrickEroded: {
+		DisplayName: Aerie Brick Eroded
+		Tooltip: ""
+	}
 }
 
 Biomes: {
