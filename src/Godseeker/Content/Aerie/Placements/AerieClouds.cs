@@ -59,8 +59,10 @@ public class AerieCloudTile : ModTile
             PlacementTextures.AerieCloudTileMerge,
             ModContent.TileType<AerieBrickTile>(),
             ModContent.TileType<AerieBrickGrassTile>(),
+            ModContent.TileType<AerieBrickErodedTile>(),
             ModContent.TileType<AerieCeramicTile>(),
             ModContent.TileType<AerieStoneTile>(),
+            ModContent.TileType<AerieStoneGrassTile>(),
             TileID.Cloud,
             TileID.RainCloud,
             TileID.SnowCloud

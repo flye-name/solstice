@@ -80,7 +80,7 @@ Items: {
 	}
 
 	AerieBrickEroded: {
-		DisplayName: Aerie Brick Eroded
+		DisplayName: Eroded Aerie Brick
 		Tooltip: ""
 	}
 }

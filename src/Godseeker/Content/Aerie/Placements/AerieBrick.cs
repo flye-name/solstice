@@ -1,4 +1,5 @@
 ﻿using Godseeker.Common;
+using Godseeker.Core;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.Creative;
@@ -55,6 +56,14 @@ public class AerieBrickTile : ModTile
         Main.tileBrick[Type] = true;
         TileID.Sets.ChecksForMerge[Type] = true;
 
+        TileMerging.AddCustomMerge(
+            Type,
+            PlacementTextures.AerieBrickTileMerge,
+            ModContent.TileType<AerieStoneTile>(),
+            ModContent.TileType<AerieStoneGrassTile>(),
+            ModContent.TileType<AerieBrickErodedTile>()
+        );
+
         AddMapEntry(new Color(138, 158, 168));
 
         DustType = -1;
@@ -88,6 +97,14 @@ public sealed class AerieBrickGrassTile : AerieBrickTile
         Main.tileMerge[ModContent.TileType<AerieBrickTile>()][Type] = true;
 
         GodseekerTileSets.TransformTo[Type] = ModContent.TileType<AerieBrickTile>();
+
+        TileMerging.AddCustomMerge(
+            Type,
+            PlacementTextures.AerieBrickGrassTileMerge,
+            ModContent.TileType<AerieStoneTile>(),
+            ModContent.TileType<AerieStoneGrassTile>(),
+            ModContent.TileType<AerieBrickErodedTile>()
+        );
 
         HitSound = SoundID.Dig;
 
