@@ -20,6 +20,19 @@ public sealed class AerieBrickEroded : ModItem
     {
         Item.DefaultToPlaceableTile(ModContent.TileType<AerieBrickErodedTile>());
     }
+
+    public override void AddRecipes()
+    {
+        CreateRecipe()
+           .AddIngredient<AerieBrick>()
+           .AddTile(TileID.WorkBenches)
+           .Register();
+
+        CreateRecipe()
+           .AddIngredient<AerieStone>(2)
+           .AddTile(TileID.WorkBenches)
+           .Register();
+    }
 }
 
 public class AerieBrickErodedTile : ModTile

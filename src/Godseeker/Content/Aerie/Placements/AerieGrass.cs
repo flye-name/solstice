@@ -53,6 +53,7 @@ public class AerieGrassSeeds : ModItem
     private static readonly Dictionary<int, int> grass_replacements = new()
     {
         {ModContent.TileType<AerieBrickTile>(), ModContent.TileType<AerieBrickGrassTile>()},
+        {ModContent.TileType<AerieStoneTile>(), ModContent.TileType<AerieStoneGrassTile>()},
     };
 
     public override void SetStaticDefaults()
@@ -66,7 +67,7 @@ public class AerieGrassSeeds : ModItem
 
     public override void SetDefaults()
     {
-        Item.DefaultToPlaceableTile(ModContent.TileType<AerieBrickGrassTile>());
+        Item.DefaultToPlaceableTile(0);
         Item.useTime = Item.useAnimation;
     }
 }
@@ -364,8 +365,10 @@ public static class TallAerieGrassHelper
     [
         ModContent.TileType<AerieCloudTile>(),
         ModContent.TileType<AerieStoneTile>(),
+        ModContent.TileType<AerieStoneGrassTile>(),
         ModContent.TileType<AerieBrickTile>(),
         ModContent.TileType<AerieBrickGrassTile>(),
+        ModContent.TileType<AerieBrickErodedTile>(),
         ModContent.TileType<AerieCeramicTile>(),
         TileID.Grass,
         TileID.Dirt,

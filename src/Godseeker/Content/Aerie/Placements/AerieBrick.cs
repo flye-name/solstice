@@ -28,6 +28,17 @@ public sealed class AerieBrick : ModItem
            .AddIngredient<AerieBrickWall>(4)
            .AddTile(TileID.WorkBenches)
            .Register();
+
+        // TODO: Recipe groups
+        CreateRecipe()
+           .AddIngredient<AerieBrickEroded>()
+           .AddTile(TileID.Furnaces)
+           .Register();
+
+        CreateRecipe()
+           .AddIngredient<AerieStone>(2)
+           .AddTile(TileID.Furnaces)
+           .Register();
     }
 }
 

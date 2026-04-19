@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Godseeker.Common;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -23,7 +24,15 @@ public sealed class AerieStone : ModItem
 
     public override void AddRecipes()
     {
-        // goon
+        CreateRecipe(2)
+           .AddIngredient<AerieBrick>()
+           .AddTile(TileID.WorkBenches)
+           .Register();
+
+        CreateRecipe(2)
+           .AddIngredient<AerieBrickEroded>()
+           .AddTile(TileID.WorkBenches)
+           .Register();
     }
 }
 
@@ -43,5 +52,29 @@ public class AerieStoneTile : ModTile
 
         DustType = -1;
         HitSound = SoundID.Tink;
+    }
+}
+
+public sealed class AerieStoneGrassTile : AerieStoneTile
+{
+    public override string Texture => PlacementTextures.AerieStoneGrassTile.Key;
+
+    public override void SetStaticDefaults()
+    {
+        base.SetStaticDefaults();
+
+        RegisterItemDrop(ModContent.ItemType<AerieStone>(), 0);
+
+        TileID.Sets.ChecksForMerge[Type] = true;
+        TileID.Sets.ResetsHalfBrickPlacementAttempt[Type] = true;
+        TileID.Sets.DoesntPlaceWithTileReplacement[Type] = true;
+
+        Main.tileMerge[Type][ModContent.TileType<AerieStoneTile>()] = true;
+        Main.tileMerge[ModContent.TileType<AerieStoneTile>()][Type] = true;
+
+        GodseekerTileSets.TransformTo[Type] = ModContent.TileType<AerieStoneTile>();
+
+        HitSound = SoundID.Dig;
+        DustType = ModContent.DustType<AerieGrassDust>();
     }
 }
