@@ -9,6 +9,11 @@ Items: {
 		Tooltip: ""
 	}
 
+	AerieBrickEroded: {
+		DisplayName: Eroded Aerie Brick
+		Tooltip: ""
+	}
+
 	WorldSpawnSetter: {
 		DisplayName: World Spawn Setter
 		Tooltip: ""
@@ -76,11 +81,6 @@ Items: {
 
 	AerieStone: {
 		DisplayName: Aerie Stone
-		Tooltip: ""
-	}
-
-	AerieBrickEroded: {
-		DisplayName: Eroded Aerie Brick
 		Tooltip: ""
 	}
 

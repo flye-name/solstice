@@ -51,7 +51,8 @@ public class AerieCeramicTile : ModTile
             PlacementTextures.AerieCeramicTileMerge,
             ModContent.TileType<AerieBrickTile>(),
             ModContent.TileType<AerieBrickGrassTile>(),
-            ModContent.TileType<AerieStoneTile>()
+            ModContent.TileType<AerieStoneTile>(),
+            ModContent.TileType<AerieStoneGrassTile>()
         );
 
         AddMapEntry(new Color(108, 93, 78));
