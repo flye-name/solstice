@@ -33,6 +33,11 @@ public sealed class AerieStone : ModItem
            .AddIngredient<AerieBrickEroded>()
            .AddTile(TileID.WorkBenches)
            .Register();
+
+        CreateRecipe()
+           .AddIngredient<AerieStoneWall>(4)
+           .AddTile(TileID.WorkBenches)
+           .Register();
     }
 }
 
@@ -76,5 +81,44 @@ public sealed class AerieStoneGrassTile : AerieStoneTile
 
         HitSound = SoundID.Dig;
         DustType = ModContent.DustType<AerieGrassDust>();
+    }
+}
+
+public sealed class AerieStoneWall : ModItem
+{
+    public override string Texture => PlacementTextures.AerieStoneWall.Key;
+
+    public override void SetStaticDefaults()
+    {
+        CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 400;
+    }
+
+    public override void SetDefaults()
+    {
+        Item.DefaultToPlaceableWall(ModContent.WallType<AerieStoneWallTile>());
+    }
+
+    public override void AddRecipes()
+    {
+        CreateRecipe(4)
+           .AddIngredient<AerieStone>()
+           .AddTile(TileID.WorkBenches)
+           .Register();
+    }
+}
+
+public class AerieStoneWallTile : ModWall
+{
+    public override string Texture => PlacementTextures.AerieStoneWallTile.Key;
+
+    public override void SetStaticDefaults()
+    {
+        Main.wallHouse[Type] = true;
+
+        WallID.Sets.AllowsWind[Type] = true;
+
+        AddMapEntry(new Color(54, 48, 39));
+
+        DustType = -1;
     }
 }

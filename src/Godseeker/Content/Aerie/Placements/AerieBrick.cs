@@ -148,11 +148,11 @@ public sealed class AerieBrickWallTile : ModWall
     {
         Main.wallHouse[Type] = true;
 
+        WallID.Sets.AllowsWind[Type] = true;
+
         AddMapEntry(new Color(100, 98, 90));
 
         DustType = -1;
-
-        WallID.Sets.AllowsWind[Type] = true;
     }
 
     public override void NumDust(int i, int j, bool fail, ref int num)
