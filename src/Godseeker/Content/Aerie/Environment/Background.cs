@@ -169,7 +169,7 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
         var zoom = useZoom ? Main.GameViewMatrix.Zoom : new Vector2(1f);
 
         spriteBatch.End(out var snapshot);
-        spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap, CustomEffect = MiscShaders.AerieFog.Value });
+        spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
         { 
             float size = MathF.Max(Main.screenWidth, Main.screenHeight);
 
@@ -183,7 +183,7 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
 
             MiscShaders.AerieFog.Source = new Vector4(shaderSource.X, shaderSource.Y, shaderSource.Width, shaderSource.Height);
 
-            // MiscShaders.AerieFog.Apply();
+            MiscShaders.AerieFog.Apply();
 
             spriteBatch.Draw(MiscTextures.CoherentNoise, source, color);
         }

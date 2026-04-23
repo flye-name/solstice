@@ -6,7 +6,7 @@ float parallax;
 
 float4 source;
 
-float steps = 2;
+float steps = 6;
 
 const float4x4 bayer =
     float4x4(0, 8, 2, 10,
@@ -64,7 +64,7 @@ float4 Fog(float4 sampleColor : COLOR0, float2 uv : TEXCOORD0, float2 screenCoor
     float4 posterized = color + (bayer[bayeruv.x][bayeruv.y]) / steps;
     posterized = floor(posterized.a * steps) / steps;
     
-    color = lerp(color, posterized, 1 - color.a);
+    color = lerp(color, posterized, 1 - pow(color.a, 2));
     
     color *= sampleColor;
     
