@@ -8,6 +8,8 @@ float4 source;
 
 float steps = 6;
 
+float pixelSize = 2;
+
 const float4x4 bayer =
     float4x4(0, 8, 2, 10,
              12, 4, 14, 6,
@@ -48,11 +50,21 @@ float cloudNoise(float2 uv)
     return saturate(1 - pow(1 - clouds, 3));
 }
 
+float2 normalize_with_pixelation(float2 coords, float pixel_size, float2 resolution)
+{
+    return floor(coords / pixel_size) / (resolution / pixel_size);
+}
+
 float4 Fog(float4 sampleColor : COLOR0, float2 uv : TEXCOORD0, float2 screenCoords : SV_POSITION) : COLOR0
 {
-    float2 bayeruv = frac((screenCoords.xy + float2(floor(source.z * parallax / 2) * 2, 0)) / 4) * 4;
+    float2 coords = uv * source.wz;
     
-    float2 coords = uv;
+    coords += source.xy;
+    
+    float2 bayerParallax = float2(floor(source.z * parallax / pixelSize) * pixelSize, 0);
+    float2 bayeruv = frac((coords + bayerParallax) / pixelSize / 4) * 4;
+    
+    coords = normalize_with_pixelation(coords, pixelSize, source.wz);
     coords.y *= source.w / source.z;
     
     coords.x += parallax;

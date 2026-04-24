@@ -179,9 +179,9 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
 
             MiscShaders.AerieFog.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f);
 
-            var shaderSource = Utils.CenteredRectangle(source.Center(), source.Size() * zoom);
+            var offset = new Vector2(Main.screenPosition.X % 2, Main.screenPosition.Y % 2);
 
-            MiscShaders.AerieFog.Source = new Vector4(shaderSource.X, shaderSource.Y, shaderSource.Width, shaderSource.Height);
+            MiscShaders.AerieFog.Source = new Vector4(offset.X, offset.Y, source.Width, source.Height);
 
             MiscShaders.AerieFog.Apply();
 
