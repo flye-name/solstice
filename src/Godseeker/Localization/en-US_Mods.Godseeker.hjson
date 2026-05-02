@@ -88,6 +88,16 @@ Items: {
 		DisplayName: Aerie Stone Wall
 		Tooltip: ""
 	}
+
+	Censer: {
+		DisplayName: Censer
+		Tooltip: ""
+	}
+
+	WindChime: {
+		DisplayName: Wind Chime
+		Tooltip: ""
+	}
 }
 
 Biomes: {
