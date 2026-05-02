@@ -412,6 +412,11 @@ public partial class AerieSubworld : Subworld
     [ModSystemHooks.PreUpdatePlayers]
     private static void UpdateSubworld()
     {
+        if (!Active)
+        {
+            return;
+        }
+
         Main.cloudAlpha = 0f;
         Main.cloudBGActive = 0f;
 
