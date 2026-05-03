@@ -12,7 +12,18 @@ using Terraria.ObjectData;
 
 namespace Godseeker.Content.Aerie;
 
-public class CenserTile : ModTile
+public sealed class Censer : ModItem
+{
+    public override string Texture => Assets.Images.Aerie.Placements.Censer.KEY;
+
+    public override void SetDefaults()
+    {
+        Item.DefaultToPlaceableTile(ModContent.TileType<CenserTile>());
+        Item.value = Item.buyPrice(copper: 10);
+    }
+}
+
+public sealed class CenserTile : ModTile
 {
     public override string Texture => Assets.Images.Aerie.Placements.CenserTile.KEY;
 
@@ -50,25 +61,9 @@ public class CenserTile : ModTile
         return false;
     }
 
-    public override void NearbyEffects(int i, int j, bool closer)
-    {
-
-    }
-
     public override void AdjustMultiTileVineParameters(int i, int j, ref float? overrideWindCycle, ref float windPushPowerX, ref float windPushPowerY, ref bool dontRotateTopTiles, ref float totalWindMultiplier, ref Texture2D glowTexture, ref Color glowColor)
     {
         overrideWindCycle = 1f;
         windPushPowerY = 0;
-    }
-}
-
-public class Censer : ModItem
-{
-    public override string Texture => Assets.Images.Aerie.Placements.Censer.KEY;
-
-    public override void SetDefaults()
-    {
-        Item.DefaultToPlaceableTile(ModContent.TileType<CenserTile>());
-        Item.value = Item.buyPrice(copper: 10);
     }
 }

@@ -12,6 +12,17 @@ using Terraria.ObjectData;
 
 namespace Godseeker.Content.Aerie;
 
+public sealed class WindChime : ModItem
+{
+    public override string Texture => Assets.Images.Aerie.Placements.WindChime.KEY;
+
+    public override void SetDefaults()
+    {
+        Item.DefaultToPlaceableTile(ModContent.TileType<WindChimeTile>());
+        Item.value = Item.buyPrice(copper: 10);
+    }
+}
+
 public class WindChimeTile : ModTile
 {
     public override string Texture => Assets.Images.Aerie.Placements.WindChimeTile.KEY;
@@ -96,16 +107,5 @@ public class WindChimeTile : ModTile
     {
         overrideWindCycle = 1f;
         windPushPowerY = 0;
-    }
-}
-
-public class WindChime : ModItem
-{
-    public override string Texture => Assets.Images.Aerie.Placements.WindChime.KEY;
-
-    public override void SetDefaults()
-    {
-        Item.DefaultToPlaceableTile(ModContent.TileType<WindChimeTile>());
-        Item.value = Item.buyPrice(copper: 10);
     }
 }
