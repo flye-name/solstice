@@ -9,13 +9,12 @@ using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
-using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
 
-namespace Godseeker.Content.Aerie.Placements;
+namespace Godseeker.Content.Aerie;
 
 public class WindChimeTile : ModTile
 {
-    public override string Texture => PlacementTextures.WindChimeTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.WindChimeTile.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -102,7 +101,7 @@ public class WindChimeTile : ModTile
 
 public class WindChime : ModItem
 {
-    public override string Texture => PlacementTextures.WindChime.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.WindChime.KEY;
 
     public override void SetDefaults()
     {

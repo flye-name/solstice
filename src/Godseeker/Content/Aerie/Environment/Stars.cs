@@ -6,7 +6,6 @@ using System;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.Utilities;
-using BackgroundTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Backgrounds.Textures;
 
 namespace Godseeker.Content.Aerie;
 
@@ -70,7 +69,7 @@ public static class Stars
             * Matrix.CreateScale(screenScale)
             * Matrix.CreateTranslation(new(center, 0));
 
-        var texture = BackgroundTextures.Star.Value;
+        var texture = Assets.Images.Aerie.Backgrounds.Star.Asset.Value;
 
         var origin = texture.Size() * 0.5f;
 

@@ -8,7 +8,7 @@ namespace Godseeker.Content.Aerie;
 
 public sealed class AerieFlute : ModItem
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Textures.AerieFlute.Key;
+    public override string Texture => Assets.Images.AerieFlute.KEY;
 
     public override void SetDefaults()
     {
@@ -41,7 +41,7 @@ public sealed class AerieFlute : ModItem
 
 public class HeldFlute : ModProjectile 
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Textures.AerieFluteHeld.Key;
+    public override string Texture => Assets.Images.AerieFluteHeld.KEY;
     
     public override void SetDefaults()
     {

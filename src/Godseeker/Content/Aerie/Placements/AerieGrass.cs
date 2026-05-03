@@ -12,14 +12,13 @@ using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
-using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
 // ReSharper disable InconsistentNaming
 
 namespace Godseeker.Content.Aerie;
 
 public sealed class AerieGrassDust : ModDust
 {
-    public override string Texture => PlacementTextures.AerieGrassDust.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieGrassDust.KEY;
 
     public override void OnSpawn(Dust dust)
     {
@@ -48,7 +47,7 @@ public sealed class AerieGrassDust : ModDust
 
 public class AerieGrassSeeds : ModItem
 {
-    public override string Texture => PlacementTextures.AerieGrassSeeds.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieGrassSeeds.KEY;
 
     private static readonly Dictionary<int, int> grass_replacements = new()
     {
@@ -75,7 +74,7 @@ public class AerieGrassSeeds : ModItem
 #region Tall Grass
 public sealed class TallAerieGrassSeedsDummy : ModItem
 {
-    public override string Texture => PlacementTextures.TallAerieGrassSeedsDummy.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.TallAerieGrassSeedsDummy.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -110,7 +109,7 @@ public sealed class TallAerieGrassSeedsDummy : ModItem
 [Autoload(false)]
 public sealed class TallAerieGrassSeeds<T> : ModItem where T : ModTile
 {
-    public override string Texture => PlacementTextures.TallAerieGrassSeeds.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.TallAerieGrassSeeds.KEY;
 
     public override string Name => "TallAerieGrassSeeds" + typeof(T).Name + PlaceStyle;
 
@@ -132,11 +131,11 @@ public sealed class TallAerieGrassSeeds<T> : ModItem where T : ModTile
         }
 
         // Ensure textures are loaded.
-        PlacementTextures.TallAerieGrassSeeds.Wait();
-        PlacementTextures.TallAerieGrassSeedsBar.Wait();
+        Assets.Images.Aerie.Placements.TallAerieGrassSeeds.Asset.Wait();
+        Assets.Images.Aerie.Placements.TallAerieGrassSeedsBar.Asset.Wait();
 
-        ItemFrame = PlacementTextures.TallAerieGrassSeeds.Value.Frame(2, 2, frameX, frameY);
-        BarFrame = PlacementTextures.TallAerieGrassSeedsBar.Value.Frame(2, 2, frameX, frameY);
+        ItemFrame = Assets.Images.Aerie.Placements.TallAerieGrassSeeds.Asset.Value.Frame(2, 2, frameX, frameY);
+        BarFrame = Assets.Images.Aerie.Placements.TallAerieGrassSeedsBar.Asset.Value.Frame(2, 2, frameX, frameY);
     }
 
     public override void SetStaticDefaults()
@@ -181,7 +180,7 @@ public sealed class TallAerieGrassSeeds<T> : ModItem where T : ModTile
         float scale
     )
     {
-        var texture = PlacementTextures.TallAerieGrassSeedsBar.Value;
+        var texture = Assets.Images.Aerie.Placements.TallAerieGrassSeedsBar.Asset.Value;
 
         position += new Vector2(15f, 10f) * Main.inventoryScale;// * scale;
 
@@ -191,7 +190,7 @@ public sealed class TallAerieGrassSeeds<T> : ModItem where T : ModTile
 
 public sealed class TallAerieGrass1x1 : ModTile
 {
-    public override string Texture => PlacementTextures.TallAerieGrassTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.TallAerieGrassTile.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -270,7 +269,7 @@ public sealed class TallAerieGrass1x1 : ModTile
 
 public sealed class TallAerieGrass1x2 : ModTile
 {
-    public override string Texture => PlacementTextures.TallerAerieGrassTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.TallerAerieGrassTile.KEY;
 
     public override void SetStaticDefaults()
     {

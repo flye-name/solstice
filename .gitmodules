@@ -1,6 +1,4 @@
 [submodule "src/daybreak-mod"]
 	path = src/daybreak-mod
 	url = https://github.com/gold-meridian/daybreak-mod
-[submodule "src/Generators/ZourceGen"]
-	path = src/Generators/ZourceGen
-	url = https://github.com/ZenTheMod/ZourceGen
+

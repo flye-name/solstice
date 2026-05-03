@@ -1,22 +1,43 @@
 ﻿using Daybreak.Common.Features.Hooks;
+using Daybreak.Common.Features.Models;
 using Daybreak.Common.Rendering;
+using Godseeker.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
 using System;
 using Terraria;
+using Terraria.GameContent.RGB;
 using Terraria.GameContent.Skies;
 using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
-using BackgroundTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Backgrounds.Textures;
-using MiscShaders = Godseeker.GeneratedAssets.Assets.Effects;
-using MiscTextures = Godseeker.GeneratedAssets.Assets.Images.Textures;
 
 namespace Godseeker.Content.Aerie;
 
 public sealed class AerieBackground : ModSurfaceBackgroundStyle
 {
-#region Edits
+    private sealed class Data : IStatic<Data>
+    {
+        public required WrapperShaderData<Assets.Effects.AerieFog.Parameters> AerieFogShader { get; init; }
+
+        public required WrapperShaderData<Assets.Effects.AerieRing.Parameters> AerieRingShader { get; init; }
+
+        public static Data LoadData(Mod mod)
+        {
+            return Main.RunOnMainThread(
+                () => new Data
+                {
+                    AerieFogShader = Assets.Effects.AerieFog.CreatePass1(),
+                    AerieRingShader = Assets.Effects.AerieRing.CreatePass1(),
+                }
+            ).GetAwaiter().GetResult();
+        }
+
+        public static void UnloadData(Data data)
+        { }
+    }
+
+    #region Edits
     private static readonly Color far_fog_color = new(247, 177, 155);
     private static readonly Color mid_fog_color = new(255, 218, 176);
     private static readonly Color near_fog_color = new(255, 248, 227);
@@ -166,7 +187,9 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
             return;
         }
 
-        var zoom = useZoom ? Main.GameViewMatrix.Zoom : new Vector2(1f);
+        var fogShader = Data.Instance.AerieFogShader;
+
+        // var zoom = useZoom ? Main.GameViewMatrix.Zoom : new Vector2(1f);
 
         spriteBatch.End(out var snapshot);
         spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearWrap });
@@ -175,17 +198,17 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
 
             var source = new Rectangle(0, (int)MathF.Max(top, Main.screenHeight - size), (int)size, (int)size);
 
-            MiscShaders.AerieFog.Parallax = Main.screenPosition.X * parallax / Main.screenWidth;
+            fogShader.Parameters.parallax = Main.screenPosition.X * parallax / Main.screenWidth;
 
-            MiscShaders.AerieFog.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f);
+            fogShader.Parameters.time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f);
 
             var offset = new Vector2(Main.screenPosition.X % 2, Main.screenPosition.Y % 2);
 
-            MiscShaders.AerieFog.Source = new Vector4(offset.X, offset.Y, source.Width, source.Height);
+            fogShader.Parameters.source = new Vector4(offset.X, offset.Y, source.Width, source.Height);
 
-            MiscShaders.AerieFog.Apply();
+            fogShader.Apply();
 
-            spriteBatch.Draw(MiscTextures.CoherentNoise, source, color);
+            spriteBatch.Draw(Assets.Images.CoherentNoise.Asset.Value, source, color);
         }
         spriteBatch.Restart(in snapshot);
     }
@@ -253,9 +276,14 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
     {
         if (AerieSubworld.Active)
         {
-            var skyDest = new Rectangle(0, 0, Main.screenWidth, Math.Max(Main.screenHeight, BackgroundTextures.Sky.Value.Height));
+            var sky = Assets.Images.Aerie.Backgrounds.Sky.Asset.Value;
+            var ring = Assets.Images.Aerie.Backgrounds.Ring.Asset.Value;
 
-            Main.spriteBatch.Draw(BackgroundTextures.Sky, skyDest, Color.White);
+            var ringShader = Data.Instance.AerieRingShader;
+
+            var skyDest = new Rectangle(0, 0, Main.screenWidth, Math.Max(Main.screenHeight, sky.Height));
+
+            Main.spriteBatch.Draw(sky, skyDest, Color.White);
 
             Stars.DrawStars(Main.spriteBatch);
 
@@ -266,11 +294,11 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
 
                 var ringsDest = Utils.CenteredRectangle(size * 0.5f, new(MathF.Max(Main.screenWidth, Main.screenHeight)));
 
-                MiscShaders.AerieRing.Time = Main.GlobalTimeWrappedHourly;
+                ringShader.Parameters.time = Main.GlobalTimeWrappedHourly;
 
-                MiscShaders.AerieRing.Apply();
+                ringShader.Apply();
 
-                Main.spriteBatch.Draw(BackgroundTextures.Ring, ringsDest, Color.White);
+                Main.spriteBatch.Draw(ring, ringsDest, Color.White);
             }
             Main.spriteBatch.Restart(in snapshot);
         }
@@ -306,12 +334,12 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
 
     public override int ChooseFarTexture()
     {
-        return BackgroundTextureLoader.GetBackgroundSlot(BackgroundTextures.Far.Key);
+        return BackgroundTextureLoader.GetBackgroundSlot(Assets.Images.Aerie.Backgrounds.Far.KEY);
     }
 
     public override int ChooseMiddleTexture()
     {
-        return BackgroundTextureLoader.GetBackgroundSlot(BackgroundTextures.Mid.Key);
+        return BackgroundTextureLoader.GetBackgroundSlot(Assets.Images.Aerie.Backgrounds.Mid.KEY);
     }
 
     public override int ChooseCloseTexture(ref float scale, ref double parallax, ref float a, ref float b)

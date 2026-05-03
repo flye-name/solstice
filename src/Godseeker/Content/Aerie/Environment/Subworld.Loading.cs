@@ -6,7 +6,6 @@ using System;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
-using MiscShaders = Godseeker.GeneratedAssets.Assets.Effects;
 
 namespace Godseeker.Content.Aerie;
 
@@ -93,14 +92,16 @@ public class SubworldLoading : ModSystem
         
         bool finishedLoading = IntoSubworld == SubworldSystem.IsActive<AerieSubworld>() && !Main.gameMenu;
 
-        MiscShaders.AerieLoading.Progress = Progress;
-        MiscShaders.AerieLoading.Loaded = finishedLoading;
-        MiscShaders.AerieLoading.Time = Main.GlobalTimeWrappedHourly * 0.8f;
-        MiscShaders.AerieLoading.LineIntensity = MathF.Pow(Progress, 2) * 0.1f;
-        MiscShaders.AerieLoading.LineSize = 1;
-        MiscShaders.AerieLoading.ColorAmount = 64;
-        MiscShaders.AerieLoading.Color = new Vector4(0.9f, 0.95f, 1, 1);
-        MiscShaders.AerieLoading.Apply();
+        var shader = Assets.Effects.AerieLoading.CreatePass1();
+
+        shader.Parameters.uProgress = Progress;
+        shader.Parameters.uLoaded = finishedLoading;
+        shader.Parameters.uTime = Main.GlobalTimeWrappedHourly * 0.8f;
+        shader.Parameters.uLineIntensity = MathF.Pow(Progress, 2) * 0.1f;
+        shader.Parameters.uLineSize = 1;
+        shader.Parameters.uColorAmount = 64;
+        shader.Parameters.uColor = new Vector4(0.9f, 0.95f, 1, 1);
+        shader.Apply();
         
         Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-250, -250, size, size), Color.White * Progress);
         

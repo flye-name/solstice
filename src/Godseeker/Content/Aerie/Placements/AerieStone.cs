@@ -5,13 +5,12 @@ using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
 
 namespace Godseeker.Content.Aerie;
 
 public sealed class AerieStone : ModItem
 {
-    public override string Texture => PlacementTextures.AerieStone.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieStone.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -44,7 +43,7 @@ public sealed class AerieStone : ModItem
 
 public class AerieStoneTile : ModTile
 {
-    public override string Texture => PlacementTextures.AerieStoneTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieStoneTile.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -56,7 +55,7 @@ public class AerieStoneTile : ModTile
 
         TileMerging.AddCustomMerge(
             Type,
-            PlacementTextures.AerieStoneTileMerge,
+            Assets.Images.Aerie.Placements.AerieStoneTileMerge.Asset,
             ModContent.TileType<AerieBrickErodedTile>()
         );
 
@@ -69,7 +68,7 @@ public class AerieStoneTile : ModTile
 
 public sealed class AerieStoneGrassTile : AerieStoneTile
 {
-    public override string Texture => PlacementTextures.AerieStoneGrassTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieStoneGrassTile.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -88,7 +87,7 @@ public sealed class AerieStoneGrassTile : AerieStoneTile
 
         TileMerging.AddCustomMerge(
             Type,
-            PlacementTextures.AerieStoneTileMerge,
+            Assets.Images.Aerie.Placements.AerieStoneTileMerge.Asset,
             ModContent.TileType<AerieBrickErodedTile>()
         );
 
@@ -99,7 +98,7 @@ public sealed class AerieStoneGrassTile : AerieStoneTile
 
 public sealed class AerieStoneWall : ModItem
 {
-    public override string Texture => PlacementTextures.AerieStoneWall.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieStoneWall.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -122,7 +121,7 @@ public sealed class AerieStoneWall : ModItem
 
 public class AerieStoneWallTile : ModWall
 {
-    public override string Texture => PlacementTextures.AerieStoneWallTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieStoneWallTile.KEY;
 
     public override void SetStaticDefaults()
     {

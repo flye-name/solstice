@@ -6,7 +6,7 @@ namespace Godseeker.Content.Aerie;
 
 public sealed class WorldSpawnSetter : ModItem
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Textures.TestItem.Key;
+    public override string Texture => Assets.Images.TestItem.KEY;
 
     public override void SetDefaults()
     {

@@ -11,7 +11,7 @@ namespace Godseeker.Content.Aerie;
 
 public sealed class GodspeedPainting : ModItem
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.GodspeedPainting.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.GodspeedPainting.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -35,7 +35,7 @@ public sealed class GodspeedPainting : ModItem
 
 public sealed class GodspeedPaintingTile : ModTile
 {
-    public override string Texture => GeneratedAssets.Assets.Images.Aerie.Placements.Textures.GodspeedPaintingTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.GodspeedPaintingTile.KEY;
 
     public override void SetStaticDefaults()
     {

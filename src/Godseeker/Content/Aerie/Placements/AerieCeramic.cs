@@ -4,18 +4,17 @@ using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
 
 namespace Godseeker.Content.Aerie;
 
 public sealed class AerieCeramicDust : ModDust
 {
-    public override string Texture => PlacementTextures.AerieCeramicDust.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieCeramicDust.KEY;
 }
 
 public sealed class AerieCeramic : ModItem
 {
-    public override string Texture => PlacementTextures.AerieCeramic.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieCeramic.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -35,7 +34,7 @@ public sealed class AerieCeramic : ModItem
 
 public class AerieCeramicTile : ModTile
 {
-    public override string Texture => PlacementTextures.AerieCeramicTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieCeramicTile.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -48,7 +47,7 @@ public class AerieCeramicTile : ModTile
         TileMerging.AddCustomMerge(
             Type,
             useCorners: true,
-            PlacementTextures.AerieCeramicTileMerge,
+            Assets.Images.Aerie.Placements.AerieCeramicTileMerge.Asset,
             ModContent.TileType<AerieBrickTile>(),
             ModContent.TileType<AerieBrickGrassTile>(),
             ModContent.TileType<AerieStoneTile>(),

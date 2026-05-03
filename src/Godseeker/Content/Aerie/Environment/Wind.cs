@@ -7,7 +7,6 @@ using System;
 using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
-using MiscTextures = Godseeker.GeneratedAssets.Assets.Images.Textures;
 
 namespace Godseeker.Content.Aerie;
 
@@ -182,7 +181,7 @@ public static class Wind
 
         GraphicsDevice device = Main.graphics.GraphicsDevice;
 
-        device.Textures[0] = MiscTextures.Bloom;
+        device.Textures[0] = Assets.Images.Bloom.Asset.Value;
 
         BackgroundWind.Draw(spriteBatch, device);
 
@@ -203,7 +202,7 @@ public static class Wind
 
         GraphicsDevice device = Main.graphics.GraphicsDevice;
 
-        device.Textures[0] = MiscTextures.Bloom;
+        device.Textures[0] = Assets.Images.Bloom.Asset.Value;
 
         ForegroundWind.Draw(spriteBatch, device);
 

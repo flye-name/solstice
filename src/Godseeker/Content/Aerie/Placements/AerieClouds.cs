@@ -4,20 +4,19 @@ using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
 
 namespace Godseeker.Content.Aerie;
 
 public sealed class AerieCloudDust : ModDust
 {
-    public override string Texture => PlacementTextures.AerieCloudDust.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieCloudDust.KEY;
 
     public override void SetStaticDefaults() => UpdateType = DustID.Cloud;
 }
 
 public sealed class AerieCloud : ModItem
 {
-    public override string Texture => PlacementTextures.AerieCloud.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieCloud.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -40,7 +39,7 @@ public sealed class AerieCloud : ModItem
 
 public class AerieCloudTile : ModTile
 {
-    public override string Texture => PlacementTextures.AerieCloudTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieCloudTile.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -56,7 +55,7 @@ public class AerieCloudTile : ModTile
 
         TileMerging.AddCustomMerge(
             Type,
-            PlacementTextures.AerieCloudTileMerge,
+            Assets.Images.Aerie.Placements.AerieCloudTileMerge.Asset,
             ModContent.TileType<AerieBrickTile>(),
             ModContent.TileType<AerieBrickGrassTile>(),
             ModContent.TileType<AerieBrickErodedTile>(),
@@ -97,7 +96,7 @@ public class AerieCloudTile : ModTile
 
 public sealed class AerieCloudWall : ModItem
 {
-    public override string Texture => PlacementTextures.AerieCloudWall.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieCloudWall.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -120,7 +119,7 @@ public sealed class AerieCloudWall : ModItem
 
 public class AerieCloudWallTile : ModWall
 {
-    public override string Texture => PlacementTextures.AerieCloudWallTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieCloudWallTile.KEY;
 
     public override void SetStaticDefaults()
     {

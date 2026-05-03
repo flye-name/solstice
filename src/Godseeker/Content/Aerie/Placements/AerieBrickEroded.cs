@@ -3,13 +3,12 @@ using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using PlacementTextures = Godseeker.GeneratedAssets.Assets.Images.Aerie.Placements.Textures;
 
 namespace Godseeker.Content.Aerie;
 
 public sealed class AerieBrickEroded : ModItem
 {
-    public override string Texture => PlacementTextures.AerieBrickEroded.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieBrickEroded.KEY;
 
     public override void SetStaticDefaults()
     {
@@ -37,7 +36,7 @@ public sealed class AerieBrickEroded : ModItem
 
 public class AerieBrickErodedTile : ModTile
 {
-    public override string Texture => PlacementTextures.AerieBrickErodedTile.Key;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieBrickErodedTile.KEY;
 
     public override void SetStaticDefaults()
     {

@@ -6,11 +6,6 @@
 		<Project Path="daybreak-mod/src/Daybreak/Daybreak.csproj" />
 	</Folder>
 
-	<Folder Name="/Generators/AssetGen/">
-		<Project Path="Generators/ZourceGen/src/AssetGen/AssetGen.csproj" />
-		<Project Path="Generators/ZourceGen/src/shader-reader/ShaderDecompiler.csproj" />
-	</Folder>
-
 	<Project Path="Godseeker/Godseeker.csproj" />
 
 </Solution>
