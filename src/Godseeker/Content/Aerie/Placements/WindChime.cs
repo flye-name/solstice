@@ -23,7 +23,7 @@ public sealed class WindChime : ModItem
     }
 }
 
-public class WindChimeTile : ModTile
+public sealed class WindChimeTile : ModTile
 {
     public override string Texture => Assets.Images.Aerie.Placements.WindChimeTile.KEY;
 
