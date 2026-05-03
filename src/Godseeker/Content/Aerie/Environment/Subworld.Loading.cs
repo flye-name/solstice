@@ -92,15 +92,12 @@ public class SubworldLoading : ModSystem
         
         bool finishedLoading = IntoSubworld == SubworldSystem.IsActive<AerieSubworld>() && !Main.gameMenu;
 
-        var shader = Assets.Effects.AerieLoading.CreatePass1();
+        var shader = Assets.Effects.AerieLoading.CreateLoadingShader();
 
-        shader.Parameters.uProgress = Progress;
-        shader.Parameters.uLoaded = finishedLoading;
-        shader.Parameters.uTime = Main.GlobalTimeWrappedHourly * 0.8f;
-        shader.Parameters.uLineIntensity = MathF.Pow(Progress, 2) * 0.1f;
-        shader.Parameters.uLineSize = 1;
-        shader.Parameters.uColorAmount = 64;
-        shader.Parameters.uColor = new Vector4(0.9f, 0.95f, 1, 1);
+        shader.Parameters.Progress = Progress;
+        shader.Parameters.Loaded = finishedLoading;
+        shader.Parameters.Time = Main.GlobalTimeWrappedHourly * 0.8f;
+
         shader.Apply();
         
         Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, new Rectangle(-250, -250, size, size), Color.White * Progress);

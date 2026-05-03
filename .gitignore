@@ -9,3 +9,6 @@ obj/
 *.user
 
 TemplateEngineHost/
+
+# Binaries
+*.fxc

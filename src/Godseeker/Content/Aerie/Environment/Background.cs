@@ -27,8 +27,8 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
             return Main.RunOnMainThread(
                 () => new Data
                 {
-                    AerieFogShader = Assets.Effects.AerieFog.CreatePass1(),
-                    AerieRingShader = Assets.Effects.AerieRing.CreatePass1(),
+                    AerieFogShader = Assets.Effects.AerieFog.CreateFogShader(),
+                    AerieRingShader = Assets.Effects.AerieRing.CreateRingShader(),
                 }
             ).GetAwaiter().GetResult();
         }
@@ -198,13 +198,13 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
 
             var source = new Rectangle(0, (int)MathF.Max(top, Main.screenHeight - size), (int)size, (int)size);
 
-            fogShader.Parameters.parallax = Main.screenPosition.X * parallax / Main.screenWidth;
+            fogShader.Parameters.Parallax = Main.screenPosition.X * parallax / Main.screenWidth;
 
-            fogShader.Parameters.time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f);
+            fogShader.Parameters.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f);
 
             var offset = new Vector2(Main.screenPosition.X % 2, Main.screenPosition.Y % 2);
 
-            fogShader.Parameters.source = new Vector4(offset.X, offset.Y, source.Width, source.Height);
+            fogShader.Parameters.Source = new Vector4(offset.X, offset.Y, source.Width, source.Height);
 
             fogShader.Apply();
 
@@ -293,8 +293,6 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
                 Vector2 size = new(Main.screenWidth, Main.screenHeight);
 
                 var ringsDest = Utils.CenteredRectangle(size * 0.5f, new(MathF.Max(Main.screenWidth, Main.screenHeight)));
-
-                ringShader.Parameters.time = Main.GlobalTimeWrappedHourly;
 
                 ringShader.Apply();
 
