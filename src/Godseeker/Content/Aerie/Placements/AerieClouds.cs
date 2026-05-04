@@ -98,15 +98,14 @@ public class AerieCloudTile : ModTile
             Main.instance.TilesRenderer.DrawSingleTile(new(), false, -1, Main.screenPosition, new(Main.offScreenRange), i, j);
         }
 
-        var shader = Assets.Effects.AerieCloudOverlay.CreateAerieCloudOverlay();
+        var shader = Assets.Effects.AerieCloudOverlay.CreateAerieCloudOverlayShader();
 
         Main.spriteBatch.End(out var ss);
         Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Shader, Matrix.Identity);
 
         Main.spriteBatch.Draw(target?.Target, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White);
 
-        Main.spriteBatch.End();
-        Main.spriteBatch.Begin(ss);
+        Main.spriteBatch.Restart(in ss);
 
         return false;
     }
