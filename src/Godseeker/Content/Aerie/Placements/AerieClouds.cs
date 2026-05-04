@@ -1,9 +1,18 @@
-﻿using Godseeker.Core;
+﻿using Daybreak.Common.Rendering;
+using Godseeker.Core;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Terraria;
+using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.GameContent.Creative;
+using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using static Terraria.GameContent.Animations.Actions.NPCs;
 
 namespace Godseeker.Content.Aerie;
 
@@ -75,6 +84,31 @@ public class AerieCloudTile : ModTile
     public override void PostSetDefaults()
     {
         Main.tileNoSunLight[Type] = false;
+    }
+
+    public RenderTargetLease? target;
+
+    public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
+    {
+        target?.Dispose();
+        target = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice);
+
+        using (target?.Scope(clearColor: Color.Transparent))
+        {
+            Main.instance.TilesRenderer.DrawSingleTile(new(), false, -1, Main.screenPosition, new(Main.offScreenRange), i, j);
+        }
+
+        var shader = Assets.Effects.AerieCloudOverlay.CreateAerieCloudOverlay();
+
+        Main.spriteBatch.End(out var ss);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Shader, Matrix.Identity);
+
+        Main.spriteBatch.Draw(target?.Target, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White);
+
+        Main.spriteBatch.End();
+        Main.spriteBatch.Begin(ss);
+
+        return false;
     }
 
     public override bool HasWalkDust()
