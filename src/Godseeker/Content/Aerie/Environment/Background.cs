@@ -53,6 +53,9 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
         On_Main.DrawSurfaceBG_BackMountainsStep1 += DrawSurfaceBG_BackMountainsStep1_Fog;
         On_Main.DrawSurfaceBG_BackMountainsStep2 += DrawSurfaceBG_BackMountainsStep2_Fog;
 
+        IL_Main.DrawSurfaceBG_BackMountainsStep1 += DrawSurfaceBG_BackMountainsStep1_Parallax;
+        IL_Main.DrawSurfaceBG += DrawSurfaceBG_Parallax;
+
         IL_Main.DoDraw += DoDraw_CorrectSamplerState;
 
         On_AmbientSky.FadingSkyEntity.Update += Update_DisableSkyEntities;
@@ -153,22 +156,77 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
 
     private static void DrawSurfaceBG_BackMountainsStep1_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, double backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBGTopHack)
     {
+        if (!AerieSubworld.Active)
+        {
+            orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBGTopHack);
+            return;
+        }
+
         orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBGTopHack);
 
-        if (AerieSubworld.Active)
-        {
-            DrawFog(Main.spriteBatch, far_fog_color);
-        }
+        DrawFog(Main.spriteBatch, far_fog_color);
     }
 
     private static void DrawSurfaceBG_BackMountainsStep2_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
     {
+        if (!AerieSubworld.Active)
+        {
+            orig(self, pushBGTopHack);
+            return;
+        }
+
         orig(self, pushBGTopHack);
 
-        if (AerieSubworld.Active)
-        {
-            DrawFog(Main.spriteBatch, mid_fog_color);
-        }
+        DrawFog(Main.spriteBatch, mid_fog_color);
+
+        _ = Main.treeMntBGSet1[1];
+    }
+
+    private static void DrawSurfaceBG_BackMountainsStep1_Parallax(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchLdcR8(0.15),
+            i => i.MatchStfld<Main>(nameof(Main.bgParallax))
+        );
+
+        c.EmitDelegate(
+            static () =>
+            {
+                if (AerieSubworld.Active)
+                {
+                    Main.instance.bgParallax *= 0.4f;
+                }
+            }
+        );
+    }
+
+    private static void DrawSurfaceBG_Parallax(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        c.GotoNext(
+            MoveType.Before,
+            i => i.MatchCall<Main>(nameof(Main.DrawSurfaceBG_BackMountainsStep2))
+        );
+
+        c.GotoPrev(
+            MoveType.After,
+            i => i.MatchLdcR8(0.2),
+            i => i.MatchStfld<Main>(nameof(Main.bgParallax))
+        );
+
+        c.EmitDelegate(
+            static () =>
+            {
+                if (AerieSubworld.Active)
+                {
+                    Main.instance.bgParallax *= 0.5f;
+                }
+            }
+        );
     }
 
     private static void DrawFog(SpriteBatch spriteBatch, Color color, int top = -1, float parallax = -1, bool useZoom = false)
