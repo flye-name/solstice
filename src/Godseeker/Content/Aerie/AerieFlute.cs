@@ -57,7 +57,7 @@ public class HeldFlute : ModProjectile
         Player player = Main.player[Projectile.owner];
         if (Projectile.localAI[0] == 0)
         {
-            SoundEngine.PlaySound(new SoundStyle("Godseeker/Assets/Flute"), Projectile.Center);
+            SoundEngine.PlaySound(Assets.Flute.Asset, Projectile.Center);
             Projectile.localAI[0] = 1;
         }
         
