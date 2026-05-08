@@ -449,7 +449,7 @@ public static class GodseekerItemSets
 
         if (!tile.HasTile ||
             !replacementInfo.Replacements.ContainsKey(tile.TileType) ||
-            !self.IsInTileInteractionRange(i, j, TileReachCheckSettings.Simple) ||
+            !self.IsInTileInteractionRange(i, j, new TileReachCheckSettings { TileRangeMultiplier = 1 }) ||
             !(self.controlUseItem && self.itemAnimation > 0 && self.ItemTimeIsZero))
         {
             return false;
