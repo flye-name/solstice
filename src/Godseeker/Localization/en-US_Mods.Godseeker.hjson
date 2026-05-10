@@ -98,6 +98,16 @@ Items: {
 		DisplayName: Wind Chime
 		Tooltip: ""
 	}
+
+	AerieGrassWallItem: {
+		DisplayName: Aerie Grass Wall
+		Tooltip: ""
+	}
+
+	AerieGrassWall: {
+		DisplayName: Aerie Grass Wall
+		Tooltip: ""
+	}
 }
 
 Biomes: {
