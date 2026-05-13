@@ -106,10 +106,9 @@ public class AerieLeafCoatingWall : GlobalWall
 }
 
 
-// test items
 public class AerieLeafCoating : ModItem
 {
-    public override string Texture => Assets.Images.AerieFluteHeld.KEY;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieLeaf.KEY;
 
     public override void SetDefaults()
     {
