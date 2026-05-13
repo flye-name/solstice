@@ -55,12 +55,5 @@ public class TileDataSaving : ModSystem
             return;
         
         bytes.CopyTo(MemoryMarshal.AsBytes(tileData.AsSpan()));
-
-        for (int i = 0; i < Main.maxTilesX; i++)
-            for (int i = 0; i < Main.maxTilesY; i++)
-        foreach (var modTile in TileLoader.tiles)
-        {
-            modTile.Name
-        }
     }
 }
