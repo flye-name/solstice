@@ -108,6 +108,16 @@ Items: {
 		DisplayName: Aerie Grass Wall
 		Tooltip: ""
 	}
+
+	AerieLeafCoating: {
+		DisplayName: Aerie Leaf Coating
+		Tooltip: ""
+	}
+
+	AerieLeafCoatingPaintSeparator: {
+		DisplayName: Aerie Leaf Coating Paint Separator
+		Tooltip: ""
+	}
 }
 
 Biomes: {

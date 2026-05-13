@@ -31,19 +31,13 @@ public class AerieGrassWallTile : ModWall
         fail = false;
     }
 
-    public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
-    {
-        Texture2D texture = ModContent.Request<Texture2D>($"{Texture}_Leaves").Value;
+    public override void PostDraw(int i, int j, SpriteBatch spriteBatch) => AerieLeafCoatingDrawing.DrawLeafOverlay(i, j, true);
+}
 
-        var offset = i * j;
-        float sway = MathF.Sin(Main.GameUpdateCount / 20f + offset) * Main.windSpeedCurrent * 2f;
-
-        int frameCount = 4;
-        int frameHeight = texture.Height / frameCount;
-        Rectangle rect = new(0, new UnifiedRandom(offset).Next(frameCount) * frameHeight, texture.Width, frameHeight);
-
-        Main.spriteBatch.Draw(texture, new Vector2(i, j).ToWorldCoordinates() - Main.screenPosition + new Vector2(Main.offScreenRange + sway), rect, Lighting.GetColor(i, j), offset + sway * 0.05f, rect.Size() / 2f, 1, SpriteEffects.None, 0);
-    }
+// used in AerieLeafCoatingDrawing
+public class AerieGrassWallLeavesFake : ModWall
+{
+    public override string Texture => Assets.Images.Aerie.Placements.AerieGrassWallTile_Leaves.KEY;
 }
 
 public class AerieGrassWall : ModItem
