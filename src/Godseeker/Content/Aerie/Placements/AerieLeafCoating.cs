@@ -69,7 +69,18 @@ public class AerieLeafCoatingTile : GlobalTile
         if (tile.HasTile && tile.Get<SolsticeTileData>().LeafCoatingActive_Tile) 
             AerieLeafCoatingDrawing.DrawLeafOverlay(i, j, false);
     }
-    
+
+    public override void KillTile(int i, int j, int type, ref bool fail, ref bool effectOnly, ref bool noItem)
+    {
+        if (!fail)
+        {
+            Tile tile = Main.tile[i, j];
+            tile.Get<SolsticeTileData>().LeafCoatingActive_Tile = false;
+            tile.Get<SolsticeTileData>().LeafCoatingUnaffectedByPaint_Tile = false;
+            
+            // TODO: Visuals
+        }
+    }
 }
 
 public class AerieLeafCoatingWall : GlobalWall
@@ -79,6 +90,18 @@ public class AerieLeafCoatingWall : GlobalWall
         Tile tile = Main.tile[i, j];
         if (type > WallID.None && tile.Get<SolsticeTileData>().LeafCoatingActive_Wall) 
             AerieLeafCoatingDrawing.DrawLeafOverlay(i, j, true);
+    }
+
+    public override void KillWall(int i, int j, int type, ref bool fail)
+    {
+        if (!fail)
+        {
+            Tile tile = Main.tile[i, j];
+            tile.Get<SolsticeTileData>().LeafCoatingActive_Wall = false;
+            tile.Get<SolsticeTileData>().LeafCoatingUnaffectedByPaint_Wall = false;
+            
+            // TODO: Visuals
+        }
     }
 }
 
