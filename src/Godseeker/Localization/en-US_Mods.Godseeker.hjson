@@ -100,12 +100,12 @@ Items: {
 	}
 
 	AerieGrassWallItem: {
-		DisplayName: Aerie Grass Wall
+		DisplayName: Aerie Moss Wall
 		Tooltip: ""
 	}
 
 	AerieGrassWall: {
-		DisplayName: Aerie Grass Wall
+		DisplayName: Aerie Moss Wall
 		Tooltip: ""
 	}
 
