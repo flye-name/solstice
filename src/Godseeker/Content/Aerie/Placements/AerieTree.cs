@@ -13,7 +13,7 @@ namespace Godseeker.Content.Aerie.Placements;
 
 public class AerieSapling : ModTile
 {
-    public override string Texture => Assets.Images.Aerie.Placements.ExampleSapling.KEY;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieSapling.KEY;
 
     public override void SetStaticDefaults()
     {
