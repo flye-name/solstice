@@ -1,0 +1,7 @@
+displayName = SOLSTICE
+author = flye, Lion8cake, Incattus, DannnDrawsThings, boredguy9, Maskano, Zoey, Demi, Darkmango, Roton, math2
+version = 0.1
+
+modReferences = Daybreak@2.4.0, SubworldLibrary@2.2.3.3
+
+buildIgnore = .tml-build\*, lib\*, .idea\*, .vs\*, *.tmp, Assets\Effects\Compiler\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, .editorconfig, TemplateEngineHost\*, Subworld_Save
