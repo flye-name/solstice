@@ -10,6 +10,11 @@ namespace Solstice.Content.Aerie;
 public sealed class AerieCeramicDust : ModDust
 {
     public override string Texture => Assets.Images.Aerie.Placements.AerieCeramicDust.KEY;
+
+    public override void OnSpawn(Dust dust)
+    {
+        dust.frame = new(0, Main.rand.Next(3) * 10, 10, 10);
+    }
 }
 
 public sealed class AerieCeramic : ModItem
