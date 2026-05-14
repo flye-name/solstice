@@ -2,6 +2,7 @@ using Daybreak.Common.Features.Hooks;
 using Daybreak.Common.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoMod.Cil;
 using ReLogic.Content;
 using Solstice.Core;
@@ -16,6 +17,7 @@ using Terraria.Graphics.Light;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.Utilities;
+using static Solstice.Core.TileMerging;
 
 namespace Solstice.Content.Aerie;
 
@@ -294,7 +296,7 @@ public static class AerieLeafLitterRendering
 #endregion
 
 #region Paint
-    private static AerieLeafRenderTargetHolder? paintInstance;
+    private static readonly Dictionary<int, AerieLeafRenderTargetHolder> paintCache = [];
 
     internal class AerieLeafRenderTargetHolder(int paintColor, Asset<Texture2D> asset, int copySettingsFrom = -1) : TilePaintSystemV2.ARenderTargetHolder
     {
@@ -325,16 +327,19 @@ public static class AerieLeafLitterRendering
     {
         texture = null;
 
-        if (paintInstance?.IsReady is true)
+        if (paintCache.TryGetValue(paintColor, out AerieLeafRenderTargetHolder? holder) &&
+            holder.IsReady)
         {
-            texture = paintInstance.Target;
+            texture = holder.Target;
 
             return true;
         }
 
-        paintInstance = new AerieLeafRenderTargetHolder(paintColor, asset);
+        var newHolder = new AerieLeafRenderTargetHolder(paintColor, asset);
 
-        Main.instance.TilePaintSystem._requests.Add(paintInstance);
+        paintCache[paintColor] = newHolder;
+
+        Main.instance.TilePaintSystem._requests.Add(newHolder);
 
         return false;
     }
