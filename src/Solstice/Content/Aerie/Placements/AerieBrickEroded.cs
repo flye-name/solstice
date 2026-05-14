@@ -49,7 +49,7 @@ public class AerieBrickErodedTile : ModTile
 
         AddMapEntry(new Color(138, 158, 168));
 
-        DustType = -1;
+        DustType = DustID.Tin;
         HitSound = SoundID.Tink;
     }
 }

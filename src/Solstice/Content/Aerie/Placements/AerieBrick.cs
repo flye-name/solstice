@@ -65,7 +65,7 @@ public class AerieBrickTile : ModTile
 
         AddMapEntry(new Color(138, 158, 168));
 
-        DustType = -1;
+        DustType = DustID.Tin;
         HitSound = SoundID.Tink;
     }
 
@@ -151,7 +151,7 @@ public sealed class AerieBrickWallTile : ModWall
 
         AddMapEntry(new Color(100, 98, 90));
 
-        DustType = -1;
+        DustType = DustID.Tin;
     }
 
     public override void NumDust(int i, int j, bool fail, ref int num)
