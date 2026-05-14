@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -114,8 +115,6 @@ public static class TileMerging
 
         Tile tile = Framing.GetTileSafely(i, j);
 
-        Color color = Lighting.GetColor(i, j);
-
         int frameNumber = tile.Get<TileWallWireStateData>().TileFrameNumber;
 
         Vector2 zero =
@@ -140,22 +139,19 @@ public static class TileMerging
                 continue;
             }
 
-            Color finalColor = color;
-
             Texture2D? texture = null;
 
-            if (paint > PaintID.None && !TryGetPaintTexture(type, paint, asset, out texture))
-            {
-                finalColor = finalColor.MultiplyRGBA(WorldGen.paintColor(paint));
-            }
+            bool useColor = paint > PaintID.None && !TryGetPaintTexture(type, paint, asset, out texture);
 
             texture ??= asset.Value;
+
+            Color color = TileUtils.GetDrawColor(i, j, false, useColor);
 
             Point p = offsets[mask];
 
             var source = new Rectangle(p.X + (frameNumber * full_frame_width), p.Y, 16, 16);
 
-            spriteBatch.Draw(texture, position, source, finalColor);
+            spriteBatch.Draw(texture, position, source, color);
         }
 
         return;
@@ -170,22 +166,19 @@ public static class TileMerging
                 return;
             }
 
-            Color finalColor = color;
-
             Texture2D? texture = null;
 
-            if (paint > PaintID.None && !TryGetPaintTexture(type, paint, asset, out texture))
-            {
-                finalColor = finalColor.MultiplyRGBA(WorldGen.paintColor(paint));
-            }
+            bool useColor = paint > PaintID.None && !TryGetPaintTexture(type, paint, asset, out texture);
 
             texture ??= asset.Value;
+
+            Color color = TileUtils.GetDrawColor(i, j, false, useColor);
 
             Point p = corner_offsets[mask];
 
             var source = new Rectangle(p.X + (frameNumber * full_frame_width), p.Y, 16, 16);
 
-            spriteBatch.Draw(texture, position, source, finalColor);
+            spriteBatch.Draw(texture, position, source, color);
         }
     }
 
@@ -306,7 +299,7 @@ public static class TileMerging
     }
 #endregion
 
-    #region Paint
+#region Paint
     private static readonly Dictionary<TileMergingVariantKey, TileMergingRenderTargetHolder> paintCache = [];
 
     internal readonly record struct TileMergingVariantKey(int Type, int PaintColor);

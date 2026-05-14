@@ -99,23 +99,18 @@ Items: {
 		Tooltip: ""
 	}
 
-	AerieGrassWallItem: {
-		DisplayName: Aerie Moss Wall
-		Tooltip: ""
-	}
-
-	AerieGrassWall: {
-		DisplayName: Aerie Moss Wall
-		Tooltip: ""
-	}
-
 	AerieLeafCoating: {
-		DisplayName: Aerie Leaf Coating
+		DisplayName: Aerie Leaf Litter
 		Tooltip: ""
 	}
 
 	AerieLeafCoatingPaintSeparator: {
-		DisplayName: Aerie Leaf Coating Paint Separator
+		DisplayName: Whatever the fuck this is
+		Tooltip: ""
+	}
+
+	AerieLeafLitter: {
+		DisplayName: Aerie Leaf Litter
 		Tooltip: ""
 	}
 }
