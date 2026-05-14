@@ -323,7 +323,7 @@ public static class AerieLeafLitterRendering
 
         const float sway_freq = 1f / 20f;
 
-        var asset = Assets.Images.Aerie.Placements.AerieGrassWallTile_Leaves.Asset;
+        var asset = Assets.Images.Aerie.Placements.AerieLeafLitterOverlay.Asset;
 
         var sb = Main.spriteBatch;
 
@@ -425,7 +425,7 @@ public static class AerieLeafLitterRendering
 
 public class AerieLeafLitter : ModItem
 {
-    public override string Texture => Assets.Images.Aerie.Placements.AerieLeaf.KEY;
+    public override string Texture => Assets.Images.Aerie.Placements.AerieLeafLitter.KEY;
 
     public override void SetDefaults()
     {
