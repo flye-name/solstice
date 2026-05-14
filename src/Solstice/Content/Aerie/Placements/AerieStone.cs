@@ -61,7 +61,7 @@ public class AerieStoneTile : ModTile
 
         AddMapEntry(new Color(103, 94, 78));
 
-        DustType = -1;
+        DustType = ModContent.DustType<AerieCeramicDust>();
         HitSound = SoundID.Tink;
     }
 }
@@ -131,6 +131,6 @@ public class AerieStoneWallTile : ModWall
 
         AddMapEntry(new Color(54, 48, 39));
 
-        DustType = -1;
+        DustType = ModContent.DustType<AerieCeramicDust>();
     }
 }
