@@ -1,9 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;
@@ -12,7 +7,7 @@ namespace Solstice.Core;
 
 public static class TileUtils
 {
-    public static Color GetDrawColor(int i, int j, bool wall = false, bool paint = false)
+    public static Color GetDrawColor(int i, int j, bool wall = false, bool paint = false, bool allowFullBright = true)
     {
         Tile tile = Framing.GetTileSafely(i, j);
 
@@ -27,14 +22,30 @@ public static class TileUtils
 
         Color TileColor()
         {
-            return TileDrawing.GetFinalLight(tile, tile.TileType, Lighting.GetColor(i, j), Color.White);
+            Color tileColor = Lighting.GetColor(i, j);
+
+            if (tile.IsTileFullbright && (paint || allowFullBright))
+            {
+                tileColor = Color.White;
+            }
+
+            if (tile.IsActuated)
+            {
+                tileColor = tile.actColor(tileColor);
+            }
+            else if (TileDrawing.ShouldTileShine(tile.TileType, tile.frameX))
+            {
+                tileColor = Main.shine(tileColor, tile.TileType);
+            }
+
+            return tileColor;
         }
 
         Color WallColor()
         {
-            Color wallColor = Lighting.GetColor(j, i);
+            Color wallColor = Lighting.GetColor(i, j);
 
-            if (tile.IsWallFullbright || tile.WallType == WallID.EchoWall)
+            if ((tile.IsWallFullbright && (paint || allowFullBright)) || tile.WallType == WallID.EchoWall)
             {
                 wallColor = Color.White;
             }
@@ -49,6 +60,18 @@ public static class TileExtensions
     extension(Tile tile)
     {
         public bool HasWall => tile.WallType != WallID.None;
+
+        public bool TileCoatedOrPainted => tile.TilePainted || tile.TileCoated;
+
+        public bool WallCoatedOrPainted => tile.WallPainted || tile.WallCoated;
+
+        public bool TilePainted => tile.TileColor > PaintID.None;
+
+        public bool WallPainted => tile.WallColor > PaintID.None;
+
+        public bool TileCoated => tile.IsTileInvisible || tile.IsTileFullbright;
+
+        public bool WallCoated => tile.IsWallInvisible || tile.IsWallFullbright;
     }
 
     extension(SlopeType slope)

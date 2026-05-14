@@ -104,11 +104,6 @@ Items: {
 		Tooltip: ""
 	}
 
-	AerieLeafCoatingPaintSeparator: {
-		DisplayName: Whatever the fuck this is
-		Tooltip: ""
-	}
-
 	AerieLeafLitter: {
 		DisplayName: Aerie Leaf Litter
 		Tooltip: ""

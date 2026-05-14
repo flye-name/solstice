@@ -2,7 +2,6 @@ using Daybreak.Common.Features.Hooks;
 using Daybreak.Common.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoMod.Cil;
 using ReLogic.Content;
 using Solstice.Core;
@@ -17,7 +16,6 @@ using Terraria.Graphics.Light;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.Utilities;
-using static Solstice.Core.TileMerging;
 
 namespace Solstice.Content.Aerie;
 
@@ -28,6 +26,9 @@ public static class AerieLeafLitterRendering
     [OnLoad]
     private static void Load()
     {
+        On_Player.TryPainting += TryPainting_LeafPaint;
+        On_Player.PlaceThing_PaintScrapper_TryScrapping += PlaceThing_PaintScrapper_TryScrapping_LeafPaint;
+
         IL_Main.DoDraw += DoDraw_RenderOrder;
 
         On_Main.DoDraw_WallsTilesNPCs += DoDraw_WallsTilesNPCs_Clear;
@@ -41,6 +42,79 @@ public static class AerieLeafLitterRendering
 
         On_TileDrawing.PostDrawTiles += PostDrawTiles_LeafLitter;
         On_Main.DoDraw_WallsAndBlacks += DoDraw_WallsAndBlacks_LeafLitter;
+    }
+
+    private static void TryPainting_LeafPaint(On_Player.orig_TryPainting orig, Player self, int x, int y, bool paintingAWall, bool applyItemAnimation)
+    {
+        Tile tile = Framing.GetTileSafely(x, y);
+
+        ref var tileData = ref tile.Get<SolsticeTileData>();
+
+        if (!applyItemAnimation)
+        {
+            orig(self, x, y, paintingAWall, applyItemAnimation);
+            return;
+        }
+
+        if (paintingAWall)
+        {
+            tileData.LeafLitterNoPaintWall = false;
+        }
+        else
+        {
+            tileData.LeafLitterNoPaintTile = false;
+        }
+
+        orig(self, x, y, paintingAWall, applyItemAnimation);
+    }
+
+    private static void PlaceThing_PaintScrapper_TryScrapping_LeafPaint(On_Player.orig_PlaceThing_PaintScrapper_TryScrapping orig, Player self, int x, int y)
+    {
+        Tile tile = Framing.GetTileSafely(x, y);
+
+        ref var tileData = ref tile.Get<SolsticeTileData>();
+
+        if (!self.ItemTimeIsZero || self.itemAnimation <= 0 || !self.controlUseItem ||
+            (!tile.TileCoatedOrPainted && !tile.WallCoatedOrPainted))
+        {
+            orig(self, x, y);
+            return;
+        }
+
+        if (tileData.HasLeafLitterTile && !tileData.LeafLitterNoPaintTile)
+        {
+            tileData.LeafLitterNoPaintTile = true;
+            self.ApplyItemTime(self.inventory[self.selectedItem], self.tileSpeed);
+            PaintEffect(false);
+            return;
+        }
+
+        if (tileData.HasLeafLitterWall && !tile.TileCoatedOrPainted && !tileData.LeafLitterNoPaintWall)
+        {
+            tileData.LeafLitterNoPaintWall = true;
+            self.ApplyItemTime(self.inventory[self.selectedItem], self.tileSpeed);
+            PaintEffect(true);
+            return;
+        }
+
+        orig(self, x, y);
+
+        return;
+
+        void PaintEffect(bool wall)
+        {
+            var oldCoating = WorldGen.coatingColors(tile, !wall);
+
+            if (wall ? tile.WallPainted : tile.TilePainted)
+            {
+                WorldGen.paintEffect(x, y, 0, wall ? tile.WallColor : tile.TileColor);
+            }
+
+            if (wall ? tile.WallCoated : tile.TileCoated)
+            {
+                WorldGen.paintCoatEffect(x, y, 0, oldCoating);
+            }
+        }
     }
 
     // Don't do this.
@@ -192,7 +266,7 @@ public static class AerieLeafLitterRendering
 
                 var tileData = tile.Get<SolsticeTileData>();
 
-                if (!tile.HasTile || !TileDrawing.IsVisible(tile) || !tileData.HasLeafLitterTile)
+                if (!tile.HasTile || !(TileDrawing.IsVisible(tile) || tileData.LeafLitterNoPaintTile) || !tileData.HasLeafLitterTile)
                 {
                     continue;
                 }
@@ -218,7 +292,7 @@ public static class AerieLeafLitterRendering
 
                 var tileData = tile.Get<SolsticeTileData>();
 
-                if (!tile.HasWall || tile.IsWallInvisible || !tileData.HasLeafLitterWall)
+                if (!tile.HasWall || (tile.IsWallInvisible && !tileData.LeafLitterNoPaintWall) || !tileData.HasLeafLitterWall)
                 {
                     continue;
                 }
@@ -276,9 +350,12 @@ public static class AerieLeafLitterRendering
 
         int paint = wall ? tile.WallColor : tile.TileColor;
 
-        if (wall
+        bool disallowPaint =
+            wall
           ? tileData.LeafLitterNoPaintWall
-          : tileData.LeafLitterNoPaintTile)
+           : tileData.LeafLitterNoPaintTile;
+
+        if (disallowPaint)
         {
             paint = 0;
         }
@@ -289,7 +366,7 @@ public static class AerieLeafLitterRendering
 
         texture ??= asset.Value;
 
-        Color color = TileUtils.GetDrawColor(i, j, false, useColor);
+        Color color = TileUtils.GetDrawColor(i, j, wall, useColor, !disallowPaint);
 
         sb.Draw(texture, position, frame, color, rotation, frame.Size() * 0.5f, 1f, SpriteEffects.None, 0);
     }
@@ -369,35 +446,16 @@ public class AerieLeafLitter : ModItem
         if (tile.HasTile && Main.tileSolid[tile.TileType] && !tileData.HasLeafLitterTile)
         {
             tileData.HasLeafLitterTile = true;
+            tileData.LeafLitterNoPaintTile = false;
             return true;
         }
 
         if (tile.HasWall && !tileData.HasLeafLitterWall)
         {
             tileData.HasLeafLitterWall = true;
+            tileData.LeafLitterNoPaintWall = false;
         }
 
-        return true;
-    }
-}
-
-public class AerieLeafCoatingPaintSeparator : ModItem
-{
-    public override string Texture => Assets.Images.AerieFlute.KEY;
-
-    public override void SetDefaults()
-    {
-        Item.CloneDefaults(ItemID.Paintbrush);
-    }
-
-    public override bool? UseItem(Player player)
-    {
-        if (!Main.tile[Main.MouseWorld.ToTileCoordinates().X, Main.MouseWorld.ToTileCoordinates().Y].HasTile && Main.tile[Main.MouseWorld.ToTileCoordinates().X, Main.MouseWorld.ToTileCoordinates().Y].WallType == 0)
-            return base.UseItem(player);
-        
-        ref var tileData = ref Main.tile[Main.MouseWorld.ToTileCoordinates().X, Main.MouseWorld.ToTileCoordinates().Y].Get<SolsticeTileData>();
-        tileData.LeafLitterNoPaintTile = !tileData.LeafLitterNoPaintTile;
-        tileData.LeafLitterNoPaintWall = !tileData.LeafLitterNoPaintWall;
         return true;
     }
 }
