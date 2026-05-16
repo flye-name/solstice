@@ -126,7 +126,7 @@ public static class TileMerging
 
         foreach (int type in types)
         {
-            (int mask, int paint) = GetMergeData(i, j, type);
+            (int mask, int paintType, bool fullBright) = GetMergeData(i, j, type);
 
             if (UsesCornerMergeFrames[type])
             {
@@ -141,11 +141,11 @@ public static class TileMerging
 
             Texture2D? texture = null;
 
-            bool useColor = paint > PaintID.None && !TryGetPaintTexture(type, paint, asset, out texture);
+            bool useColor = paintType > PaintID.None && !TryGetPaintTexture(type, paintType, asset, out texture);
 
             texture ??= asset.Value;
 
-            Color color = TileUtils.GetDrawColor(i, j, false, useColor);
+            Color color = GetTileColor(type, useColor, paintType, fullBright);
 
             Point p = offsets[mask];
 
@@ -158,7 +158,7 @@ public static class TileMerging
 
         void DrawCorners(int type, int edgeMask)
         {
-            (int mask, int paint) = GetMergeCornerData(i, j, type, edgeMask);
+            (int mask, int paintType, bool fullBright) = GetMergeCornerData(i, j, type, edgeMask);
 
             if (mask <= 0 ||
                 !textureOverlayByType.TryGetValue(type, out var asset))
@@ -168,11 +168,11 @@ public static class TileMerging
 
             Texture2D? texture = null;
 
-            bool useColor = paint > PaintID.None && !TryGetPaintTexture(type, paint, asset, out texture);
+            bool useColor = paintType > PaintID.None && !TryGetPaintTexture(type, paintType, asset, out texture);
 
             texture ??= asset.Value;
 
-            Color color = TileUtils.GetDrawColor(i, j, false, useColor);
+            Color color = GetTileColor(type, useColor, paintType, fullBright);
 
             Point p = corner_offsets[mask];
 
@@ -180,14 +180,41 @@ public static class TileMerging
 
             spriteBatch.Draw(texture, position, source, color);
         }
+
+        Color GetTileColor(int type, bool useColor, int paintType, bool fullBright)
+        {
+            Color tileColor = Lighting.GetColor(i, j);
+
+            if (fullBright)
+            {
+                tileColor = Color.White;
+            }
+
+            if (tile.IsActuated)
+            {
+                tileColor = tile.actColor(tileColor);
+            }
+            else if (TileDrawing.ShouldTileShine((ushort)type, tile.frameX))
+            {
+                tileColor = Main.shine(tileColor, type);
+            }
+
+            if (useColor)
+            {
+                tileColor = tileColor.MultiplyRGBA(WorldGen.paintColor(paintType));
+            }
+
+            return tileColor;
+        }
     }
 
-    private static (int mask, int shaderIndex) GetMergeData(int i, int j, int type)
+    private static (int mask, int paintType, bool fullBright) GetMergeData(int i, int j, int type)
     {
         Tile center = Framing.GetTileSafely(i, j);
 
         int mask = 0;
-        int shaderIndex = 0;
+        int paintType = 0;
+        bool fullBright = false;
 
         // Check for each tile merging with its neighbor;
         // tiles should only merge if their slope state allows it.
@@ -201,7 +228,7 @@ public static class TileMerging
         // Half tiles should only merge with the tile below them.
         if (center.IsHalfBlock)
         {
-            return (mask, shaderIndex);
+            return (mask, paintType, fullBright);
         }
 
         Tile up = Framing.GetTileSafely(i, j - 1);
@@ -222,30 +249,33 @@ public static class TileMerging
             Check(right, 8);
         }
 
-        return (mask, shaderIndex);
+        return (mask, paintType, fullBright);
 
         void Check(Tile tile, int bit)
         {
-            if (tile.TileType != type)
+            if (tile.TileType != type || !TileDrawing.IsVisible(tile))
             {
                 return;
             }
 
             mask |= bit;
 
-            if (shaderIndex == 0)
+            if (paintType == 0)
             {
-                shaderIndex = tile.TileColor;
+                paintType = tile.TileColor;
             }
+
+            fullBright = tile.IsTileFullbright;
         }
     }
 
-    private static (int mask, int shaderIndex) GetMergeCornerData(int i, int j, int type, int edgeMask)
+    private static (int mask, int paintType, bool fullBright) GetMergeCornerData(int i, int j, int type, int edgeMask)
     {
         Tile center = Framing.GetTileSafely(i, j);
 
         int mask = 0;
-        int shaderIndex = 0;
+        int paintType = 0;
+        bool fullBright = false;
 
         Tile downLeft = Framing.GetTileSafely(i - 1, j + 1);
         if (center.Slope.DownLeft && downLeft.Slope.UpRight && !downLeft.IsHalfBlock
@@ -263,7 +293,7 @@ public static class TileMerging
 
         if (center.IsHalfBlock)
         {
-            return (mask, shaderIndex);
+            return (mask, paintType, fullBright);
         }
 
         Tile upLeft = Framing.GetTileSafely(i - 1, j - 1);
@@ -280,21 +310,23 @@ public static class TileMerging
             Check(upRight, 4);
         }
 
-        return (mask, shaderIndex);
+        return (mask, paintType, fullBright);
 
         void Check(Tile tile, int bit)
         {
-            if (tile.TileType != type)
+            if (tile.TileType != type || !TileDrawing.IsVisible(tile))
             {
                 return;
             }
 
             mask |= bit;
 
-            if (shaderIndex == 0)
+            if (paintType == 0)
             {
-                shaderIndex = tile.TileColor;
+                paintType = tile.TileColor;
             }
+
+            fullBright = tile.IsTileFullbright;
         }
     }
 #endregion
