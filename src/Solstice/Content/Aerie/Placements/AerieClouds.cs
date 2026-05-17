@@ -1,5 +1,6 @@
-﻿using Solstice.Core;
+﻿using Solstice.Core.Tiles;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -7,11 +8,23 @@ using Terraria.ModLoader;
 
 namespace Solstice.Content.Aerie;
 
+// TODO: reimplement tile particle emission, dust pixelation, send dust to tile target, make shader not look like shit
 public sealed class AerieCloudDust : ModDust
 {
     public override string Texture => Assets.Images.Aerie.Placements.AerieCloudDust.KEY;
 
-    public override void SetStaticDefaults() => UpdateType = DustID.Cloud;
+    public override void OnSpawn(Dust dust)
+    {
+        dust.noGravity = true;
+    }
+
+    public override bool PreDraw(Dust dust)
+    {
+        Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
+
+        Main.EntitySpriteDraw(texture, dust.position - Main.screenPosition, texture.Bounds, Color.White, dust.rotation, texture.Size() / 2f, 1f, SpriteEffects.None, 0f);
+        return false;
+    }
 }
 
 public sealed class AerieCloud : ModItem
@@ -37,7 +50,7 @@ public sealed class AerieCloud : ModItem
     }
 }
 
-public class AerieCloudTile : ModTile
+public class AerieCloudTile : ShaderMaskedTile
 {
     public override string Texture => Assets.Images.Aerie.Placements.AerieCloudTile.KEY;
 
@@ -53,19 +66,7 @@ public class AerieCloudTile : ModTile
 
         TileID.Sets.NegatesFallDamage[Type] = true;
 
-        TileMerging.AddCustomMerge(
-            Type,
-            Assets.Images.Aerie.Placements.AerieCloudTileMerge.Asset,
-            ModContent.TileType<AerieBrickTile>(),
-            ModContent.TileType<AerieBrickGrassTile>(),
-            ModContent.TileType<AerieBrickErodedTile>(),
-            ModContent.TileType<AerieCeramicTile>(),
-            ModContent.TileType<AerieStoneTile>(),
-            ModContent.TileType<AerieStoneGrassTile>(),
-            TileID.Cloud,
-            TileID.RainCloud,
-            TileID.SnowCloud
-        );
+        TileID.Sets.BlockMergesWithMergeAllBlock[Type] = true;
 
         AddMapEntry(new Color(246, 234, 215));
 
@@ -75,6 +76,48 @@ public class AerieCloudTile : ModTile
     public override void PostSetDefaults()
     {
         Main.tileNoSunLight[Type] = false;
+    }
+
+    protected override void ApplyShader()
+    {
+        Main.graphics.graphicsDevice.Textures[1] = Assets.Images.CoherentNoise.Asset.Value;
+
+        var shader = Assets.Effects.AerieCloudOverlay.CreateAerieCloudOverlayShader();
+        shader.Parameters.Time = Main.GlobalTimeWrappedHourly / 60;
+        shader.Parameters.Zoom = 256f;
+        shader.Parameters.ScreenOffset = Main.screenPosition;
+        shader.Parameters.ScreenSize = new(Main.screenWidth, Main.screenHeight);
+
+        shader.Apply();
+    }
+
+    protected override void RenderIntoMask(Point p)
+    {
+        Main.instance.TilesRenderer.DrawSingleTile(new(), false, -1, Main.screenPosition, Vector2.Zero, p.X, p.Y);
+    }
+
+    /*public RenderTargetLease? target;
+
+    public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
+    {
+        target?.Dispose();
+        target = ScreenspaceTargetPool.Shared.Rent(Main.graphics.GraphicsDevice);
+
+        using (target?.Scope(clearColor: Color.Transparent))
+        {
+            Main.instance.TilesRenderer.DrawSingleTile(new(), false, -1, Main.screenPosition, new(Main.offScreenRange), i, j);
+        }
+
+        var shader = Assets.Effects.AerieCloudOverlay.CreateAerieCloudOverlayShader();
+
+        Main.spriteBatch.End(out var ss);
+        Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, shader.Shader, Matrix.Identity);
+
+        Main.spriteBatch.Draw(target?.Target, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.White);
+
+        Main.spriteBatch.Restart(in ss);
+
+        return false;
     }
 
     public override bool HasWalkDust()
@@ -91,7 +134,7 @@ public class AerieCloudTile : ModTile
     public override void NumDust(int i, int j, bool fail, ref int num)
     {
         num = fail ? 1 : 3;
-    }
+    }*/
 }
 
 public sealed class AerieCloudWall : ModItem

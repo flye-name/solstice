@@ -11,5 +11,8 @@
 	<ItemGroup>
 		<Publicize Include="tModLoader;ReLogic;FNA;SubworldLibrary" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ClCompile Include="Assets\Effects\AerieCloudOverlay.hlsl" />
+	</ItemGroup>
 
 </Project>
