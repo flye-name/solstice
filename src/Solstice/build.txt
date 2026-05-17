@@ -3,5 +3,6 @@ author = flye, Lion8cake, Incattus, DannnDrawsThings, boredguy9, Maskano, Zoey, 
 version = 0.1
 
 modReferences = Daybreak@2.4.0, SubworldLibrary@2.2.3.3
+sortAfter = Daybreak
 
-buildIgnore = .tml-build\*, lib\*, .idea\*, .vs\*, *.tmp, Assets\Effects\Compiler\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, .editorconfig, TemplateEngineHost\*, Subworld_Save
+buildIgnore = .tml-build\*, lib\*, .idea\*, .vs\*, *.tmp, Assets\Effects\Compiler\*, Properties\*, *.csproj, *.user, obj\*, bin\*, *.config, .editorconfig, TemplateEngineHost\*, Subworld_Save\*

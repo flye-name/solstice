@@ -99,11 +99,6 @@ Items: {
 		Tooltip: ""
 	}
 
-	AerieLeafCoating: {
-		DisplayName: Aerie Leaf Litter
-		Tooltip: ""
-	}
-
 	AerieLeafLitter: {
 		DisplayName: Aerie Leaf Litter
 		Tooltip: ""

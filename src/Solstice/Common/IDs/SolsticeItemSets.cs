@@ -107,16 +107,9 @@ public static class SolsticeItemSets
         // any tiles.
         // TODO:
         //      - HitSound options
-        //      - Better impl that integrates with vanilla moss replacement correctly
         // tMod hooks do not support non-publicized types.
-        MonoModHooks.Add(
-            typeof(SmartCursorHelper).GetMethod(
-                nameof(SmartCursorHelper.Step_GrassSeeds),
-                BindingFlags.NonPublic | BindingFlags.Static
-            ),
-            Step_GrassSeeds_Replacements
-        );
         On_Player.PlaceThing_TryReplacingTiles += PlaceThing_TryReplacingTiles_Replacements;
+        IL_Player.PlaceThing_Tiles += PlaceThing_Tiles_Replacements;
     }
 
 #region Static Frame
@@ -359,76 +352,6 @@ public static class SolsticeItemSets
 #endregion
 
 #region Tile Replacements
-    private delegate void orig_Step_GrassSeeds(
-        SmartCursorHelper.SmartCursorUsageInfo providedInfo,
-        ref int focusedX,
-        ref int focusedY
-    );
-
-    private static void Step_GrassSeeds_Replacements(orig_Step_GrassSeeds orig, SmartCursorHelper.SmartCursorUsageInfo providedInfo, ref int focusedX, ref int focusedY)
-    {
-        int type = providedInfo.item.type;
-
-        var info = TileReplacements[type];
-
-        if (info is null)
-        {
-            orig(providedInfo, ref focusedX, ref focusedY);
-
-            return;
-        }
-
-        var replacementInfo = info.Value;
-
-        SmartCursorHelper._targets.Clear();
-        for (int i = providedInfo.reachableStartX; i <= providedInfo.reachableEndX; i++)
-        {
-            for (int j = providedInfo.reachableStartY; j <= providedInfo.reachableEndY; j++)
-            {
-                Tile tile = Main.tile[i, j];
-                if (tile.HasTile && replacementInfo.Replacements.ContainsKey(tile.TileType))
-                {
-                    SmartCursorHelper._targets.Add(new Tuple<int, int>(i, j));
-                }
-            }
-        }
-
-        if (SmartCursorHelper._targets.Count <= 0)
-        {
-            return;
-        }
-
-        float distance = -1f;
-        Tuple<int, int> first = SmartCursorHelper._targets[0];
-
-        foreach (Tuple<int, int> target in SmartCursorHelper._targets)
-        {
-            Vector2 position = new Vector2(target.Item1, target.Item2) * 16f;
-            position += new Vector2(8f);
-
-            float newDistance = Vector2.Distance(position, providedInfo.mouse);
-
-            if ((int)distance != -1 && !(newDistance < distance))
-            {
-                continue;
-            }
-
-            distance = newDistance;
-            first = target;
-        }
-
-        if (!Collision.InTileBounds(
-                first.Item1, first.Item2,
-                providedInfo.reachableStartX, providedInfo.reachableStartY,
-                providedInfo.reachableEndX, providedInfo.reachableEndY))
-        {
-            return;
-        }
-
-        focusedX = first.Item1;
-        focusedY = first.Item2;
-    }
-
     private static bool PlaceThing_TryReplacingTiles_Replacements(On_Player.orig_PlaceThing_TryReplacingTiles orig, Player self, bool canUse)
     {
         int i = Player.tileTargetX;
@@ -464,6 +387,34 @@ public static class SolsticeItemSets
         self.ApplyItemTime(item, self.tileSpeed);
 
         return false;
+    }
+
+    private static void PlaceThing_Tiles_Replacements(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        int selfIndex = -1;
+
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchLdarg(out selfIndex),
+            i => i.MatchCall<Player>($"get_{nameof(Player.TileReplacementEnabled)}")
+        );
+
+        c.EmitLdarg(selfIndex);
+
+        c.EmitDelegate(
+            static (Player player) =>
+            {
+                Item item = player.inventory[player.selectedItem];
+
+                var info = TileReplacements[item.type];
+
+                return info is not null;
+            }
+        );
+
+        c.EmitOr();
     }
 #endregion
 #endregion

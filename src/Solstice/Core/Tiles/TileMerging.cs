@@ -103,7 +103,10 @@ public static class TileMerging
     [GlobalTileHooks.PostDraw]
     private static void PostDraw(int i, int j, int type, SpriteBatch spriteBatch)
     {
-        if (MergesWith.TryGetValue(type, out var merges) && merges.Count > 0)
+        Tile tile = Framing.GetTileSafely(i, j);
+
+        if (tile.HasTile && TileDrawing.IsVisible(tile)
+         && MergesWith.TryGetValue(type, out var merges) && merges.Count > 0)
         {
             DrawMerge(spriteBatch, i, j, merges);
         }

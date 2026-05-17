@@ -1,7 +1,8 @@
 ﻿using Daybreak.Common.Features.Hooks;
-using Solstice.Common;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Solstice.Common;
+using Solstice.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +46,7 @@ public sealed class AerieGrassDust : ModDust
     }
 }
 
-public class AerieGrassSeeds : ModItem
+public class AerieGrassSeeds : ModItem, ISmartCursorBehavior
 {
     public override string Texture => Assets.Images.Aerie.Placements.AerieGrassSeeds.KEY;
 
@@ -68,6 +69,56 @@ public class AerieGrassSeeds : ModItem
     {
         Item.DefaultToPlaceableTile(0);
         Item.useTime = Item.useAnimation;
+    }
+
+    Point ISmartCursorBehavior.FindSmartCursorTarget(SmartCursorHelper.SmartCursorUsageInfo info)
+    {
+        var targets = new List<Point>();
+
+        for (int i = info.reachableStartX; i <= info.reachableEndX; i++)
+        {
+            for (int j = info.reachableStartY; j <= info.reachableEndY; j++)
+            {
+                Tile tile = Main.tile[i, j];
+                if (tile.HasTile && grass_replacements.ContainsKey(tile.TileType))
+                {
+                    targets.Add(new Point(i, j));
+                }
+            }
+        }
+
+        if (targets.Count <= 0)
+        {
+            return new Point(-1, -1);
+        }
+
+        float distance = -1f;
+        Point first = targets[0];
+
+        foreach (Point target in targets)
+        {
+            var position = target.ToWorldCoordinates();
+
+            float newDistance = Vector2.Distance(position, info.mouse);
+
+            if ((int)distance != -1 && !(newDistance < distance))
+            {
+                continue;
+            }
+
+            distance = newDistance;
+            first = target;
+        }
+
+        if (!Collision.InTileBounds(
+                first.X, first.Y,
+                info.reachableStartX, info.reachableStartY,
+                info.reachableEndX, info.reachableEndY))
+        {
+            return new Point(-1, -1);
+        }
+
+        return first;
     }
 }
 
