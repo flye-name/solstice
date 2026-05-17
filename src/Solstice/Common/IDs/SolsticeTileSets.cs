@@ -133,6 +133,11 @@ public static class SolsticeTileSets
 
                     TileObjectData alternateTileData = GetAlternateTileObjectData(type, style);
 
+                    if (TileObject.objectPreview.Random >= alternateTileData.RandomStyleRange)
+                    {
+                        TileObject.objectPreview.Random = alternateTileData.RandomStyleRange - 1;
+                    }
+
                     return alternateTileData.RandomStyleRange;
                 }
             );
@@ -143,23 +148,14 @@ public static class SolsticeTileSets
     {
         TileObjectData tileObjectData = TileObjectData._data[type];
 
-        // TODO: SubTile support (no)
+        // TODO: SubTile support
 
-        if (tileObjectData._alternates == null)
+        if (tileObjectData.Alternates is null || tileObjectData.Alternates.Count <= 0 || style <= 0)
         {
             return tileObjectData;
         }
 
-        foreach (TileObjectData data in tileObjectData.Alternates)
-        {
-            if (data != null &&
-                style >= data.Style &&
-                style <= data.Style + data.RandomStyleRange)
-            {
-                return data;
-            }
-        }
-        return tileObjectData;
+        return tileObjectData.Alternates[style - 1];
     }
 #endregion
 #endregion
