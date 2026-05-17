@@ -495,6 +495,8 @@ public class AerieLeafLitter : ModItem, ISmartCursorBehavior
     public override void SetStaticDefaults()
     {
         CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 25;
+
+        SolsticeItemSets.UseCursorPlacementIcon[Type] = true;
     }
 
     public override void SetDefaults()

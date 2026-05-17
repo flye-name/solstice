@@ -44,6 +44,8 @@ public static class SolsticeItemSets
     /// </summary>
     public static Rectangle?[] StaticFrame { get; private set; } = [];
 
+    public static bool[] UseCursorPlacementIcon { get; private set; } = [];
+
     private static Mod Mod => ModContent.GetInstance<Solstice>();
 
     [ModSystemHooks.ResizeArrays]
@@ -53,6 +55,7 @@ public static class SolsticeItemSets
         SwapsTo = CreateSet<ItemSwapInfo?>(nameof(SwapsTo), null);
         CountsAs = CreateSet<int[]?>(nameof(CountsAs), null);
         StaticFrame = CreateSet<Rectangle?>(nameof(StaticFrame), null);
+        UseCursorPlacementIcon = CreateSet(nameof(UseCursorPlacementIcon), false);
 
         return;
 
@@ -110,6 +113,8 @@ public static class SolsticeItemSets
         // tMod hooks do not support non-publicized types.
         On_Player.PlaceThing_TryReplacingTiles += PlaceThing_TryReplacingTiles_Replacements;
         IL_Player.PlaceThing_Tiles += PlaceThing_Tiles_Replacements;
+
+        On_Player.PlaceThing_Tiles += PlaceThing_Tiles_CursorPlacementIcon;
     }
 
 #region Static Frame
@@ -415,6 +420,22 @@ public static class SolsticeItemSets
         );
 
         c.EmitOr();
+    }
+#endregion
+
+#region Cursor Placement Icon
+    private static void PlaceThing_Tiles_CursorPlacementIcon(On_Player.orig_PlaceThing_Tiles orig, Player self)
+    {
+        Item item = self.inventory[self.selectedItem];
+
+        if (UseCursorPlacementIcon[item.type]
+         && self.IsInTileInteractionRange(Player.tileTargetX, Player.tileTargetY, new TileReachCheckSettings { TileRangeMultiplier = 1 }))
+        {
+            self.cursorItemIconEnabled = true;
+            self.cursorItemIconID = item.type;
+        }
+
+        orig(self);
     }
 #endregion
 #endregion
