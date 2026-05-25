@@ -32,8 +32,8 @@ float4 oklabLerp(float4 a, float4 b, float t)
 
 float4 SkyShaderFragment(float4 baseColor : COLOR0, float2 uv : TEXCOORD0) : COLOR0 
 {
-    float4 bottomToMiddle = oklabLerp(BottomColor, MiddleColor, (1 - uv.y) * 1.7);
-    float4 middleToTop = oklabLerp(MiddleColor, TopColor, pow(1 - uv.y, 1.5));
+    float4 bottomToMiddle = oklabLerp(BottomColor, MiddleColor, 1 - uv.y);
+    float4 middleToTop = oklabLerp(MiddleColor, TopColor, 1 - uv.y);
     
     return pow(oklab2rgb(lerp(bottomToMiddle, middleToTop, 1 - uv.y)), 1.5);
 }

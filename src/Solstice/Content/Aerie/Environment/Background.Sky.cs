@@ -25,11 +25,20 @@ public static class PresetSkyColors
 
 public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 {
+    /// <summary>
+    /// The sky gradient in the Aerie.
+    /// </summary>
     public static Color[] SkyColor = PresetSkyColors.DefaultDay.ToArray();
+
+    /// <summary>
+    /// Value of <see cref="Main.ColorOfTheSkies"/>.
+    /// </summary>
+    public static Color SkyTint => Color.Lerp(SkyMiddleColor, SkyBottomColor, 0.3f);
 
     public static ref Color SkyTopColor => ref SkyColor[0];
     public static ref Color SkyMiddleColor => ref SkyColor[1];
     public static ref Color SkyBottomColor => ref SkyColor[2];
+    
     
     private static void DrawSky()
     {
@@ -42,5 +51,18 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
         skyShader.Parameters.BottomColor = SkyColor[2].ToVector4();
         skyShader.Apply();
         Main.spriteBatch.Draw(sky, skyDest, Color.White);
+    }
+}
+
+public class AerieSkyTint : ModSystem
+{
+    public override void ModifySunLightColor(ref Color tileColor, ref Color backgroundColor)
+    {
+        if (!AerieSubworld.Active)
+            return;
+        
+        tileColor = Color.Lerp(AerieBackground.SkyTopColor, AerieBackground.SkyMiddleColor, 0.3f);
+        backgroundColor = AerieBackground.SkyTint;
+        Main.ColorOfTheSkies = backgroundColor;
     }
 }

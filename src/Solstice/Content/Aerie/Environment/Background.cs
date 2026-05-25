@@ -41,10 +41,10 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
     }
 
     #region Edits
-    private static readonly Color far_fog_color = new(247, 177, 155);
-    private static readonly Color mid_fog_color = new(255, 218, 176);
-    private static readonly Color near_fog_color = new(255, 248, 227);
-    private static readonly Color behind_tiles_fog_color = Color.Lerp(mid_fog_color, near_fog_color, 0.65f);
+    private static Color FarFogColor => Color.Lerp(SkyMiddleColor, SkyBottomColor, 0.5f);
+    private static Color MidFogColor => Color.Lerp(SkyMiddleColor, SkyBottomColor, 0.8f);
+    private static Color NearFogColor => SkyBottomColor;
+    private static Color BehindTilesFogColor => Color.Lerp(MidFogColor, NearFogColor, 0.65f);
 
     [OnLoad(Side = ModSide.Client)]
     private static new void Load()
@@ -98,7 +98,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         top *= parallax;
 
-        DrawFog(Main.spriteBatch, behind_tiles_fog_color, (int)top, parallax, true);
+        DrawFog(Main.spriteBatch, BehindTilesFogColor, (int)top, parallax, true);
     }
 
     private static void DrawInfernoRings_Fog(On_Main.orig_DrawInfernoRings orig, Main self)
@@ -118,7 +118,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         top *= parallax;
 
-        DrawFog(Main.spriteBatch, near_fog_color, (int)top, parallax, true);
+        DrawFog(Main.spriteBatch, NearFogColor, (int)top, parallax, true);
     }
 
     private static void DrawBG_RemoveSpaceOffset(ILContext il)
@@ -167,7 +167,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBGTopHack);
 
-        DrawFog(Main.spriteBatch, far_fog_color);
+        DrawFog(Main.spriteBatch, FarFogColor);
     }
 
     private static void DrawSurfaceBG_BackMountainsStep2_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
@@ -180,7 +180,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         orig(self, pushBGTopHack);
 
-        DrawFog(Main.spriteBatch, mid_fog_color);
+        DrawFog(Main.spriteBatch, MidFogColor);
 
         _ = Main.treeMntBGSet1[1];
     }
