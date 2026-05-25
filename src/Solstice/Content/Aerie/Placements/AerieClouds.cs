@@ -1,5 +1,4 @@
-﻿using Daybreak.Common.Features.Hooks;
-using Solstice.Core;
+﻿using Solstice.Core;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.DataStructures;
@@ -41,8 +40,9 @@ public sealed class AerieCloud : ModItem
 }
 
 // MaskedTile is used to place clouds in the foreground
-public sealed class AerieCloudTile : MaskedTile
+public sealed class AerieCloudTile : ModTile
 {
+    /*
     public override void Load()
     {
         On_Main.DrawInfernoRings += DrawInfernoRings_DrawTarget;
@@ -54,6 +54,7 @@ public sealed class AerieCloudTile : MaskedTile
 
         orig(self);
     }
+    */
 
     public override string Texture => Assets.Images.Aerie.Placements.AerieCloudTile.KEY;
 
@@ -109,6 +110,7 @@ public sealed class AerieCloudTile : MaskedTile
         num = fail ? 1 : 3;
     }
 
+    /*
     protected override void RenderIntoMask(int i, int j)
     {
         TileDrawing.Instance.DrawSingleTile(new TileDrawInfo(), false, -1, Main.screenPosition, Vector2.Zero, i, j);
@@ -134,6 +136,7 @@ public sealed class AerieCloudTile : MaskedTile
 
         TileDrawing.Instance.DrawSingleTile(new TileDrawInfo(), false, -1, Main.screenPosition, offset, i, j);
     }
+    */
 }
 
 public sealed class AerieCloudWall : ModItem

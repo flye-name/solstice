@@ -49,7 +49,12 @@ public class AerieBrickErodedTile : ModTile
 
         AddMapEntry(new Color(138, 158, 168));
 
-        DustType = DustID.Tin;
+        DustType = ModContent.DustType<AerieBrickDust>();
         HitSound = SoundID.Tink;
+    }
+
+    public override void NumDust(int i, int j, bool fail, ref int num)
+    {
+        num = fail ? 1 : 4;
     }
 }

@@ -7,13 +7,13 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
 using System;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.GameContent.Skies;
 using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
 
 namespace Solstice.Content.Aerie;
 
+// TODO: DrawCapture support
 public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 {
     private sealed class Data : IStatic<Data>
@@ -40,11 +40,16 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
         { }
     }
 
-    #region Edits
-    private static Color FarFogColor => Color.Lerp(SkyMiddleColor, SkyBottomColor, 0.5f);
-    private static Color MidFogColor => Color.Lerp(SkyMiddleColor, SkyBottomColor, 0.8f);
+#region Edits
+    private static Color FarFogColor => Color.OklabLerp(SkyMiddleColor, SkyBottomColor, 0.5f);
+
+    private static Color MidFogColor => Color.OklabLerp(SkyMiddleColor, SkyBottomColor, 0.8f);
+
     private static Color NearFogColor => SkyBottomColor;
-    private static Color BehindTilesFogColor => Color.Lerp(MidFogColor, NearFogColor, 0.65f);
+
+    private static Color BehindTilesFogColor => Color.OklabLerp(NearFogColor, Color.White, 0.2f);
+
+    private static Color OverTilesFogColor => Color.OklabLerp(NearFogColor, Color.White, 0.5f);
 
     [OnLoad(Side = ModSide.Client)]
     private static new void Load()
@@ -79,6 +84,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         // Should be loaded after main loading is complete to render above wind.
         On_Main.DrawBackgroundBlackFill += DrawBackgroundBlackFill_Fog;
+        IL_Main.DoDraw += _ => { };
 
         On_Main.DrawInfernoRings += DrawInfernoRings_Fog;
     }
@@ -118,7 +124,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         top *= parallax;
 
-        DrawFog(Main.spriteBatch, NearFogColor, (int)top, parallax, true);
+        DrawFog(Main.spriteBatch, OverTilesFogColor, (int)top, parallax, true);
     }
 
     private static void DrawBG_RemoveSpaceOffset(ILContext il)
@@ -167,7 +173,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBGTopHack);
 
-        DrawFog(Main.spriteBatch, FarFogColor);
+        DrawFog(Main.spriteBatch, FarFogColor, Main.instance.bgTopY);
     }
 
     private static void DrawSurfaceBG_BackMountainsStep2_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
@@ -180,7 +186,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         orig(self, pushBGTopHack);
 
-        DrawFog(Main.spriteBatch, MidFogColor);
+        DrawFog(Main.spriteBatch, MidFogColor, Main.instance.bgTopY);
 
         _ = Main.treeMntBGSet1[1];
     }
@@ -232,12 +238,8 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
         );
     }
 
-    private static void DrawFog(SpriteBatch spriteBatch, Color color, int top = -1, float parallax = -1, bool useZoom = false)
+    private static void DrawFog(SpriteBatch spriteBatch, Color color, int top, float parallax = -1, bool useZoom = false)
     {
-        if (top == -1)
-        {
-            top = Main.instance.bgTopY;
-        }
         if (parallax < 0f)
         {
             parallax = (float)Main.instance.bgParallax;
@@ -258,6 +260,11 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
             float size = MathF.Max(Main.screenWidth, Main.screenHeight);
 
             var source = new Rectangle(0, (int)MathF.Max(top, Main.screenHeight - size), (int)size, (int)size);
+
+            if (color == BehindTilesFogColor)
+            {
+                Main.NewText(source);
+            }
 
             fogShader.Parameters.Parallax = Main.screenPosition.X * parallax / Main.screenWidth;
 
@@ -359,7 +366,9 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
                 ringShader.Apply();
 
-                Main.spriteBatch.Draw(ring, ringsDest, Color.White);
+                var color = Color.Pow(SkyBottomColor, 4f);
+
+                Main.spriteBatch.Draw(ring, ringsDest, color);
             }
             Main.spriteBatch.Restart(in snapshot);
         }

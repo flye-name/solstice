@@ -4,7 +4,7 @@ sampler2D Texture : register(s0);
 
 #define PI (3.14159265359)
 
-float4 RingShaderFragment(float2 coords : TEXCOORD0) : SV_TARGET
+float4 RingShaderFragment(float2 coords : TEXCOORD0, float4 baseColor : COLOR0) : SV_TARGET
 {
     coords -= float2(0, 1);
     
@@ -21,7 +21,7 @@ float4 RingShaderFragment(float2 coords : TEXCOORD0) : SV_TARGET
     
     float4 rings = tex2D(Texture, polar);
     
-    return rings;
+    return rings * baseColor;
 }
 
 BEGIN_TECHNIQUE(Technique1)  

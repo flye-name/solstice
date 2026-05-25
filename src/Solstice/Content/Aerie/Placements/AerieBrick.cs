@@ -8,6 +8,36 @@ using Terraria.ModLoader;
 
 namespace Solstice.Content.Aerie;
 
+public sealed class AerieBrickDust : ModDust
+{
+    public override string Texture => Assets.Images.Aerie.Placements.AerieBrickDust.KEY;
+
+    public override void OnSpawn(Dust dust)
+    {
+        dust.rotation = Main.rand.NextFloatDirection();
+        dust.frame = new Rectangle(0, Main.rand.Next(6) * 16, 16, 16);
+    }
+
+    public override bool Update(Dust dust)
+    {
+        dust.rotation += 0.07f * dust.velocity.X;
+
+        dust.scale *= 0.98f;
+        dust.velocity.Y += 0.06f;
+
+        dust.velocity.X *= 0.98f;
+
+        dust.position += dust.velocity;
+
+        if (dust.scale < 0.15f)
+        {
+            dust.active = false;
+        }
+
+        return false;
+    }
+}
+
 public sealed class AerieBrick : ModItem
 {
     public override string Texture => Assets.Images.Aerie.Placements.AerieBrick.KEY;
@@ -65,7 +95,7 @@ public class AerieBrickTile : ModTile
 
         AddMapEntry(new Color(138, 158, 168));
 
-        DustType = DustID.Tin;
+        DustType = ModContent.DustType<AerieBrickDust>();
         HitSound = SoundID.Tink;
     }
 
@@ -75,6 +105,11 @@ public class AerieBrickTile : ModTile
         {
             tileFrameY += 270;
         }
+    }
+
+    public override void NumDust(int i, int j, bool fail, ref int num)
+    {
+        num = fail ? 1 : 4;
     }
 }
 
@@ -105,9 +140,8 @@ public sealed class AerieBrickGrassTile : AerieBrickTile
             ModContent.TileType<AerieBrickErodedTile>()
         );
 
-        HitSound = SoundID.Dig;
-
         DustType = ModContent.DustType<AerieGrassDust>();
+        HitSound = SoundID.Dig;
     }
 
     public override void NumDust(int i, int j, bool fail, ref int num)
@@ -151,11 +185,11 @@ public sealed class AerieBrickWallTile : ModWall
 
         AddMapEntry(new Color(100, 98, 90));
 
-        DustType = DustID.Tin;
+        DustType = ModContent.DustType<AerieBrickDust>();
     }
 
     public override void NumDust(int i, int j, bool fail, ref int num)
     {
-        num = fail ? 1 : 3;
+        num = fail ? 1 : 4;
     }
 }

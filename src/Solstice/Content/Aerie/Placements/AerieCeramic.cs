@@ -7,16 +7,6 @@ using Terraria.ModLoader;
 
 namespace Solstice.Content.Aerie;
 
-public sealed class AerieCeramicDust : ModDust
-{
-    public override string Texture => Assets.Images.Aerie.Placements.AerieCeramicDust.KEY;
-
-    public override void OnSpawn(Dust dust)
-    {
-        dust.frame = new(0, Main.rand.Next(3) * 10, 10, 10);
-    }
-}
-
 public sealed class AerieCeramic : ModItem
 {
     public override string Texture => Assets.Images.Aerie.Placements.AerieCeramic.KEY;
@@ -61,7 +51,7 @@ public class AerieCeramicTile : ModTile
 
         AddMapEntry(new Color(108, 93, 78));
 
-        DustType = ModContent.DustType<AerieCeramicDust>();
+        DustType = ModContent.DustType<AerieStoneDust>();
 
         HitSound = SoundID.Tink;
     }

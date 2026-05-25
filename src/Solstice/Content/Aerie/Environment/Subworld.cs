@@ -1,6 +1,7 @@
 ﻿using Daybreak.Common.Features.Hooks;
 using Microsoft.Xna.Framework;
 using MonoMod.Cil;
+using Solstice.Core;
 using SubworldLibrary;
 using System;
 using System.Collections;
@@ -271,12 +272,12 @@ public partial class AerieSubworld : Subworld
 
         for (int i = 0; i < upper; i++)
         {
-            colors[i] = Color.Lerp(aerie_map_sky_gradient_top, aerie_map_sky_gradient_mid, (float)i / upper);
+            colors[i] = Color.OklabLerp(aerie_map_sky_gradient_top, aerie_map_sky_gradient_mid, (float)i / upper);
         }
 
         for (int i = 0; i < colors.Length - upper; i++)
         {
-            colors[upper + i] = Color.Lerp(aerie_map_sky_gradient_mid, aerie_map_sky_gradient_bot, (float)i / (colors.Length - upper));
+            colors[upper + i] = Color.OklabLerp(aerie_map_sky_gradient_mid, aerie_map_sky_gradient_bot, (float)i / (colors.Length - upper));
         }
 
         Array.Resize(ref MapHelper.colorLookup, aerieMapSkyPosition + colors.Length);
