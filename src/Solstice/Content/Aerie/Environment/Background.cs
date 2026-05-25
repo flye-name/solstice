@@ -7,19 +7,22 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
 using System;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.Skies;
 using Terraria.Graphics.Effects;
 using Terraria.ModLoader;
 
 namespace Solstice.Content.Aerie;
 
-public sealed class AerieBackground : ModSurfaceBackgroundStyle
+public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 {
     private sealed class Data : IStatic<Data>
     {
         public required WrapperShaderData<Assets.Effects.AerieFog.Parameters> AerieFogShader { get; init; }
 
         public required WrapperShaderData<Assets.Effects.AerieRing.Parameters> AerieRingShader { get; init; }
+
+        public required WrapperShaderData<Assets.Effects.AerieSky.Parameters> AerieSkyShader { get; init; }
 
         public static Data LoadData(Mod mod)
         {
@@ -28,6 +31,7 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
                 {
                     AerieFogShader = Assets.Effects.AerieFog.CreateFogShader(),
                     AerieRingShader = Assets.Effects.AerieRing.CreateRingShader(),
+                    AerieSkyShader = Assets.Effects.AerieSky.CreateSkyShader(),
                 }
             ).GetAwaiter().GetResult();
         }
@@ -333,18 +337,20 @@ public sealed class AerieBackground : ModSurfaceBackgroundStyle
     {
         if (AerieSubworld.Active)
         {
-            var sky = Assets.Images.Aerie.Backgrounds.Sky.Asset.Value;
             var ring = Assets.Images.Aerie.Backgrounds.Ring.Asset.Value;
 
             var ringShader = Data.Instance.AerieRingShader;
 
-            var skyDest = new Rectangle(0, 0, Main.screenWidth, Math.Max(Main.screenHeight, sky.Height));
-
-            Main.spriteBatch.Draw(sky, skyDest, Color.White);
+            Main.spriteBatch.End(out var snapshot);
+            Main.spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearClamp });
+            {
+                DrawSky();
+            }
+            Main.spriteBatch.Restart(in snapshot);
 
             Stars.DrawStars(Main.spriteBatch);
 
-            Main.spriteBatch.End(out var snapshot);
+            Main.spriteBatch.End(out snapshot);
             Main.spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearClamp, BlendState = BlendState.Additive });
             {
                 Vector2 size = new(Main.screenWidth, Main.screenHeight);
