@@ -5,6 +5,7 @@ using Solstice.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
+using Solstice.Content.Aerie.Weather;
 using System;
 using Terraria;
 using Terraria.GameContent.Skies;
@@ -261,11 +262,6 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
             var source = new Rectangle(0, (int)MathF.Max(top, Main.screenHeight - size), (int)size, (int)size);
 
-            if (color == BehindTilesFogColor)
-            {
-                Main.NewText(source);
-            }
-
             fogShader.Parameters.Parallax = Main.screenPosition.X * parallax / Main.screenWidth;
 
             fogShader.Parameters.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f);
@@ -371,6 +367,8 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
                 Main.spriteBatch.Draw(ring, ringsDest, color);
             }
             Main.spriteBatch.Restart(in snapshot);
+
+            RedThunderstorm.DrawRedSprites();
         }
         else
         {
