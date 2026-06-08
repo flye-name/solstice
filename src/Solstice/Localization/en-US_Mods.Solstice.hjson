@@ -103,6 +103,11 @@ Items: {
 		DisplayName: Aerie Leaf Litter
 		Tooltip: ""
 	}
+
+	AerieCliffRock: {
+		DisplayName: Aerie Cliff Rock
+		Tooltip: ""
+	}
 }
 
 Biomes: {
