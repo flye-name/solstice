@@ -42,8 +42,8 @@ public class AerieCliffRockTile : ModTile
     {
         //offset every other X pos
         Tile tile = Main.tile[i, j];
-        int frameX = tile.TileFrameX / 16;
-        int frameY = tile.TileFrameY / 16;
+        int frameX = tile.TileFrameX / 18;
+        int frameY = tile.TileFrameY / 18;
         int numX = 0;
         int numY = 0;
         bool isLeft = i % 2 == 0;
