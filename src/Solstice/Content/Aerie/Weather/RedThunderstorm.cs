@@ -54,7 +54,7 @@ public class RedThunderstorm
         if (Main.mouseRightRelease && Main.mouseRight)
         {
             Main.NewText("gai");
-            SpawnRedSprite(new RedSprite(Main.MouseWorld, 60));
+            SpawnRedSprite(new RedSprite(Main.MouseScreen, 60));
         }
 
         if (!Active)
@@ -71,13 +71,25 @@ public class RedThunderstorm
         Main.NewText(rs.Lifetime);
         if (--rs.Lifetime < 0)
         {
-            rs.Points.Clear();
+            for (int i = 0; i < RedSprite.MaxBranches; i++)
+                rs.Points[i].Clear();
             rs.Active = false;
         }
 
         float progress = Utils.GetLerpValue(rs.MaxLifetime, 0, rs.Lifetime);
-        Vector2 position = Vector2.Lerp(rs.Position, rs.Position + rs.Random.NextVector2Circular(500, 500), progress);
-        rs.Points.Add(position);
+
+        if (progress < 0.5f)
+        {
+            int branchAmount = rs.Random.Next(RedSprite.MaxBranches - 3, RedSprite.MaxBranches);
+            for (int i = 0; i < branchAmount; i++)
+            {
+                UnifiedRandom branchRand = new(rs.Seed + i + 1);
+                Vector2 direction = new Vector2(0, 1 * branchRand.Next([1, -1])).RotatedBy(branchRand.NextFloat(-0.4f, 0.4f));
+                Vector2 newPosition = rs.Position + direction.RotatedByRandom(0.2f) * branchRand.NextFloat(100, 400);
+                Vector2 position = Vector2.Lerp(rs.Position, newPosition, progress * branchRand.Next(1, 3));
+                rs.Points[i].Add(position);
+            }
+        }
     }
 
     public static void DrawRedSprites()
@@ -88,13 +100,13 @@ public class RedThunderstorm
             if (!rs.Active)
                 continue;
             
-            Vector2 transformScale = Main.BackgroundViewMatrix.Zoom * rs.Random.NextFloat(0.1f, 0.2f);
+            Vector2 transformScale = Main.BackgroundViewMatrix.Zoom * rs.Random.NextFloat(0.4f, 0.5f);
             Matrix transform = Main.BackgroundViewMatrix.TransformationMatrix;
             Vector2 translation = new Vector2(Main.screenWidth, Main.screenHeight) / 2f * (Vector2.One - transformScale);
             transform *= Matrix.CreateScale(transformScale.X, transformScale.Y, 1) * Matrix.CreateTranslation(new Vector3(translation, 0));
                 
             Main.spriteBatch.End(out var snapshot);
-            Main.spriteBatch.Begin(snapshot with { TransformMatrix = transform });
+            Main.spriteBatch.Begin(snapshot);
             {
                 DrawRedSprite(i);
             }
@@ -106,9 +118,10 @@ public class RedThunderstorm
     {
         ref RedSprite rs = ref RedSprites[index];
 
-        foreach (var point in rs.Points)
+        for (int j = 0; j < RedSprite.MaxBranches; j++)
+        for (int i = 1; i < rs.Points[j].Count; i++)
         {
-            Main.spriteBatch.Draw(TextureAssets.SunOrb.Value, point - Main.screenPosition, Color.White);
+            Utils.DrawLine(Main.spriteBatch, rs.Points[j][i-1] + Main.screenPosition, rs.Points[j][i] + Main.screenPosition, Color.Red, Color.Red, 4);
         }
     }
 }
