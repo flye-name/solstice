@@ -18,41 +18,32 @@ namespace Solstice.Content.Aerie;
 /// </summary>
 public static class PresetSkyColors
 {
-    public static readonly ImmutableArray<Color> DAY_COLORS =
+    public static readonly ImmutableArray<Color> BASIC =
     [
         new(170, 202, 249),
         new(254, 153, 156),
+        new(255, 220, 177)
+    ];
+    
+    public static readonly ImmutableArray<Color> BASIC_ALTERNATE =
+    [
+        new(140, 122, 249),
+        new(255, 100, 106),
         new(255, 220, 177)
     ];
 }
 
 public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 {
-    /// <summary>
-    /// The sky gradient in the Aerie.
-    /// </summary>
-    public static readonly Color[] SkyColor = PresetSkyColors.DAY_COLORS.ToArray();
-
-    /// <summary>
-    /// Value of <see cref="Main.ColorOfTheSkies"/>.
-    /// </summary>
-    public static Color SkyTint => Color.Lerp(SkyMiddleColor, SkyBottomColor, 0.3f);
-
-    public static ref Color SkyTopColor => ref SkyColor[0];
-
-    public static ref Color SkyMiddleColor => ref SkyColor[1];
-
-    public static ref Color SkyBottomColor => ref SkyColor[2];
-    
     private static void DrawSky()
     {
         var sky = TextureAssets.MagicPixel.Value;
         var skyShader = Data.Instance.AerieSkyShader;
         var skyDest = new Rectangle(0, 0, Main.screenWidth, Math.Max(Main.screenHeight, sky.Height));
         
-        skyShader.Parameters.TopColor =    SkyColor[0].ToVector4(); 
-        skyShader.Parameters.MiddleColor = SkyColor[1].ToVector4();
-        skyShader.Parameters.BottomColor = SkyColor[2].ToVector4();
+        skyShader.Parameters.TopColor =    SkyManagement.SkyColor[0].ToVector4(); 
+        skyShader.Parameters.MiddleColor = SkyManagement.SkyColor[1].ToVector4();
+        skyShader.Parameters.BottomColor = SkyManagement.SkyColor[2].ToVector4();
 
         skyShader.Apply();
 
@@ -67,8 +58,8 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
             return;
         }
 
-        tileColor = Color.OklabLerp(SkyTopColor, SkyMiddleColor, 0.3f);
-        backgroundColor = SkyTint;
+        tileColor = Color.OklabLerp(SkyManagement.SkyTopColor, SkyManagement.SkyMiddleColor, 0.3f);
+        backgroundColor = SkyManagement.SkyTint;
         Main.ColorOfTheSkies = backgroundColor;
     }
 }

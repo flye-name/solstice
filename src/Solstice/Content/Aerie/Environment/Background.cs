@@ -42,11 +42,11 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
     }
 
 #region Edits
-    private static Color FarFogColor => Color.OklabLerp(SkyMiddleColor, SkyBottomColor, 0.5f);
+    private static Color FarFogColor => Color.OklabLerp(SkyManagement.SkyMiddleColor, SkyManagement.SkyBottomColor, 0.5f);
 
-    private static Color MidFogColor => Color.OklabLerp(SkyMiddleColor, SkyBottomColor, 0.8f);
+    private static Color MidFogColor => Color.OklabLerp(SkyManagement.SkyMiddleColor, SkyManagement.SkyBottomColor, 0.8f);
 
-    private static Color NearFogColor => SkyBottomColor;
+    private static Color NearFogColor => SkyManagement.SkyBottomColor;
 
     private static Color BehindTilesFogColor => Color.OklabLerp(NearFogColor, Color.White, 0.2f);
 
@@ -362,7 +362,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
                 ringShader.Apply();
 
-                var color = Color.Pow(SkyBottomColor, 4f);
+                var color = Color.Pow(SkyManagement.SkyBottomColor, 4f);
 
                 Main.spriteBatch.Draw(ring, ringsDest, color);
             }
