@@ -13,7 +13,7 @@ public class NormalSky : SkyModifier
 
     public override void UpdateSky()
     {
-        Color[] colors = Color.ArrayLerp(PresetSkyColors.BASIC, PresetSkyColors.BASIC_ALTERNATE, (MathF.Sin((float)Main.timeForVisualEffects * 0.001f) + 1) * 0.5f);
+        var colors = Color.ArrayLerp(PresetSkyColors.BASIC, PresetSkyColors.BASIC_ALTERNATE, (MathF.Sin((float)Main.timeForVisualEffects * 0.001f) + 1) * 0.5f);
         SkyManagement.LerpSkyColors(colors, TransitionTime = MathF.Min(TransitionTime + 0.001f, 1f));
     }
     

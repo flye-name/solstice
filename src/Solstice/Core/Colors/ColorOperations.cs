@@ -30,9 +30,9 @@ public static class ColorOperations
             var innerColors1 = colors1.ToArray();
             var innerColors2 = colors2.ToArray();
             
-            int length = Math.Min(innerColors1.Length, innerColors2.Length);
+            var length = Math.Min(innerColors1.Length, innerColors2.Length);
 
-            Color[] result = new Color[length];
+            var result = new Color[length];
             for (int i = 0; i < length; i++)
             {
                 result[i] = Color.Lerp(innerColors1[i], innerColors2[i], t);

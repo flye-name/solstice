@@ -1,16 +1,32 @@
 using Daybreak.Common.Features.Hooks;
 using Daybreak.Common.Rendering;
 using Microsoft.Xna.Framework;
+using Solstice.Core;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.Utilities;
 
 namespace Solstice.Content.Aerie.Weather;
 
-public class RedThunderstorm
+public class RedThunderstorm : SkyModifier
 {
+    #region sky modifier
+    public override SkyModifierPriority Priority => SkyModifierPriority.StrongWeather;
+    public override bool IsActive => Active;
+    public override void UpdateSky()
+    {
+        
+    }
+    public override void ResetSkyModifierInformation()
+    {
+        base.ResetSkyModifierInformation();
+        Main.NewText("Resetting Red Thunderstorm");
+    }
+
+    #endregion
+
+    #region red sprites
     public static bool Active;
-    
     public const int MaxSprites = 10; 
     public static RedSprite[] RedSprites = new RedSprite[MaxSprites];
 
@@ -39,28 +55,6 @@ public class RedThunderstorm
             return;
 
         RedSprites[index] = obj;
-    }
-
-    [ModSystemHooks.PostUpdateEverything]
-    public static void Update()
-    {
-        // Red sprites are updated even if the event is inactive so clearing ones can fade out properly.
-        for (int i = 0; i < MaxSprites; i++)
-        {
-            if (RedSprites[i].Active)
-                UpdateRedSprite(i);
-        }
-
-        if (Main.mouseRightRelease && Main.mouseRight)
-        {
-            Main.NewText("gai");
-            SpawnRedSprite(new RedSprite(Main.MouseScreen, 60));
-        }
-
-        if (!Active)
-            return;
-        
-        
     }
 
     static void UpdateRedSprite(int index)
@@ -123,5 +117,26 @@ public class RedThunderstorm
         {
             Utils.DrawLine(Main.spriteBatch, rs.Points[j][i-1] + Main.screenPosition, rs.Points[j][i] + Main.screenPosition, Color.Red, Color.Red, 4);
         }
+    }
+    #endregion
+
+    [ModSystemHooks.PostUpdateEverything]
+    public static void Update()
+    {
+        // Red sprites are updated even if the event is inactive so clearing ones can fade out properly.
+        for (int i = 0; i < MaxSprites; i++)
+        {
+            if (RedSprites[i].Active)
+                UpdateRedSprite(i);
+        }
+
+        if (Main.mouseRightRelease && Main.mouseRight)
+        {
+            Main.NewText("gai");
+            SpawnRedSprite(new RedSprite(Main.MouseScreen, 60));
+        }
+
+        if (!Active)
+            return;
     }
 }
