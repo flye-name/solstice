@@ -217,8 +217,6 @@ public static class Wind
         c.EmitDelegate(
             static () =>
             {
-                RedThunderstorm.Active = true;
-
                 if (ModLoader.isLoading)
                 {
                     return false;
