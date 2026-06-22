@@ -2,6 +2,7 @@
 using Daybreak.Common.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Solstice.Core;
 using System;
 using Terraria;
 using Terraria.ModLoader;
@@ -13,7 +14,7 @@ public static class Stars
 {
     private readonly record struct Star(Vector3 Position, float Scale, float Phase);
 
-    private const int star_count = 1200;
+    private const int star_count = 1800;
 
     private static readonly Star[] stars = new Star[star_count];
 
@@ -73,6 +74,7 @@ public static class Stars
 
         var origin = texture.Size() * 0.5f;
 
+        var rand = new UnifiedRandom(7483);
         foreach (var star in stars)
         {
             var position = Vector3.Transform(star.Position, transform);
@@ -86,9 +88,10 @@ public static class Stars
 
             float fade = 1f - MathF.Pow(position.Y / Main.screenHeight, 2f);
 
-            float scale = MathF.Max(star.Scale * star_max_scale, star_min_scale) * fade * twinkle;
+            float scale = MathF.Max(star.Scale * star_max_scale, star_min_scale) * fade * twinkle + PreBossNight.Intensity * 0.1f;
 
-            var color = Color.White * star_alpha;
+            var baseColor = PreBossNight.Active && rand.NextBool() ? new Color(116, 131, 250) : Color.White;
+            var color = baseColor * star_alpha * (1f + PreBossNight.Intensity * 2);
             color.A = 0;
 
             spriteBatch.Draw(

@@ -71,8 +71,8 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
             return;
         }
 
-        tileColor = Color.OklabLerp(SkyManagement.SkyTopColor, SkyManagement.SkyMiddleColor, 0.3f);
-        backgroundColor = SkyManagement.SkyTint;
-        Main.ColorOfTheSkies = backgroundColor;
+        tileColor = Color.OklabLerp(SkyManagement.SkyTopColor, SkyManagement.SkyMiddleColor, 0.3f) with { A = 255 };
+        backgroundColor = SkyManagement.SkyTint with { A = 255 };
+        Main.ColorOfTheSkies = backgroundColor with { A = 255 };
     }
 }
