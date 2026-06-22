@@ -34,8 +34,8 @@ public static class PresetSkyColors
     
     public static readonly ImmutableArray<Color> RED_THUNDERSTORM =
     [
-        new(40, 20, 20),
-        new(105, 60, 50),
+        new(20, 0, 0),
+        new(105, 40, 20),
         new(255, 60, 100)
     ];
     

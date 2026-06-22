@@ -30,7 +30,7 @@ public class RedThunderstorm : SkyModifier
     public override SkyModifierPriority Priority => SkyModifierPriority.StrongWeather;
     public override bool IsActive => Active;
     private float _skyFlash;
-    private float _musicVolume;
+    private int _soundTimer;
     public override void UpdateSky()
     {
         _skyFlash = MathHelper.Lerp(_skyFlash, 0, 0.01f);
@@ -38,31 +38,25 @@ public class RedThunderstorm : SkyModifier
         var colors = Color.ArrayLerp(PresetSkyColors.RED_THUNDERSTORM, PresetSkyColors.RED_THUNDERSTORM_FLASH, _skyFlash);
         
         SkyManagement.LerpSkyColors(colors, TransitionTime = MathF.Min(TransitionTime + 0.001f, 1f));
-        
-        if (_skyFlash > 0.27f)
-            Main.musicVolume = MathHelper.Lerp(Main.musicVolume, MathF.Min(_musicVolume, 0.25f), 0.1f);
-        else if (_skyFlash > 0.1f)
-            Main.musicVolume = MathHelper.Lerp(Main.musicVolume, _musicVolume, 0.01f);
-        else if (_skyFlash > 0.01f)
-            Main.musicVolume = _musicVolume;
-        else
-            _musicVolume = Main.musicVolume;
 
         if (TransitionTime > 0.3f && Main.mouseRight && _skyFlash <= 0.1f)
         {
             _skyFlash = Main.rand.NextFloat(0.6f, 0.8f);
-            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder") with { Pitch = -0.5f }, Main.LocalPlayer.Center + Main.rand.NextVector2CircularEdge(500, 500));
+            _soundTimer = 40;
             
             for (int i = 0; i < 3; i++)
                 SpawnDefaultRedSprite();
         }
+        
+        if (--_soundTimer == 0)
+            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder") with { Pitch = -1f });
     }
 
     public override void ResetSkyModifierInformation()
     {
         base.ResetSkyModifierInformation();
-        _musicVolume = Main.musicVolume;
         _skyFlash = 0f;
+        _soundTimer = 0;
     }
 
     #endregion
@@ -88,7 +82,7 @@ public class RedThunderstorm : SkyModifier
     {
         Point screenSize = new(Main.screenWidth, Main.screenHeight);
 
-        Rectangle area = new Rectangle(0, screenSize.Y / 3, screenSize.X, screenSize.Y);
+        Rectangle area = new Rectangle(0, screenSize.Y - 200, screenSize.X, screenSize.Y);
         
         SpawnRedSprite(new RedSprite(Main.rand.NextVector2FromRectangle(area), 120));
     }
@@ -180,7 +174,7 @@ public class RedThunderstorm : SkyModifier
             var positions = curPositions.Select(x => new Vector3(x, 0)).ToList();
 
             var color = PresetSkyColors.RED_THUNDERSTORM[2] with { A = 0 } * Intensity; 
-            var opacity = (1f - MathHelper.Clamp(progress - 0.5f, 0, 1) * 2) * MathF.Pow(progress * 0.6f, 2) * new UnifiedRandom(rs.Seed).NextFloat(3, 6);
+            var opacity = (1f - MathHelper.Clamp(progress - 0.5f, 0, 1) * 2) * new UnifiedRandom(rs.Seed).NextFloat(0.25f, 1);
 
             opacity *= 2;
             float width = 40;
