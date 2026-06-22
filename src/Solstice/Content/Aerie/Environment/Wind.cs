@@ -2,12 +2,16 @@
 using Daybreak.Common.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoMod.Cil;
 using Solstice.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Terraria;
+using Terraria.Audio;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using BitOperations = System.Numerics.BitOperations;
@@ -176,6 +180,119 @@ public static class Wind
         On_Main.DrawInfernoRings += DrawInfernoRings_ForegroundWind;
 
         On_Dust.UpdateDust += UpdateDust_Wind;
+    }
+
+    [ModSystemHooks.ResizeArrays]
+    private static void ResizeArrays()
+    {
+        IL_Main.UpdateAudio += UpdateAudio_WindAmbience;
+    }
+
+    private static void UpdateAudio_WindAmbience(ILContext il)
+    {
+        var c = new ILCursor(il);
+
+        ILLabel? windAmbienceTarget = null;
+        ILLabel? escapeSwitchTarget = null;
+
+        int indexIndex = -1;
+
+        c.GotoNext(
+            i => i.MatchLdloc(out _),
+            i => i.MatchLdcI4(45),
+            i => i.MatchBeq(out windAmbienceTarget)
+        );
+
+        Debug.Assert(windAmbienceTarget is not null);
+
+        c.GotoLabel(windAmbienceTarget);
+
+        c.FindPrev(
+            out _,
+            i => i.MatchBr(out escapeSwitchTarget)
+        );
+
+        Debug.Assert(escapeSwitchTarget is not null);
+
+        c.EmitDelegate(
+            static () =>
+            {
+                RedThunderstorm.Active = true;
+
+                if (ModLoader.isLoading)
+                {
+                    return false;
+                }
+
+                const float decay = 0.005f;
+
+                Ambient(Assets.Music.Wind.HeavenWind.Slot, AerieSubworld.Active && !RedThunderstorm.Active);
+                Ambient(Assets.Music.Wind.RedStormWind.Slot, AerieSubworld.Active && RedThunderstorm.Active);
+
+                if (AerieSubworld.Active)
+                {
+                    const int slot = 45;
+
+                    float volume = Main.musicFade[slot];
+
+                    Main.audioSystem.UpdateAmbientCueTowardStopping(slot, decay, ref volume, Main.ambientVolume);
+
+                    Main.musicFade[slot] = volume;
+                }
+
+                return AerieSubworld.Active;
+
+                static void Ambient(int slot, bool active)
+                {
+                    const float decay = 0.005f;
+
+                    float volume = Main.musicFade[slot];
+
+                    if (active)
+                    {
+                        Main.audioSystem.UpdateAmbientCueState(slot, Main.instance.IsActive, ref volume, Main.ambientVolume);
+                    }
+                    else
+                    {
+                        Main.audioSystem.UpdateAmbientCueTowardStopping(slot, decay, ref volume, Main.ambientVolume);
+                    }
+
+                    Main.musicFade[slot] = volume;
+                }
+            }
+        );
+
+        c.EmitBrtrue(escapeSwitchTarget);
+
+        // Make sure the game doesn't treat the wind as music.
+        c.GotoNext(
+            MoveType.After,
+            i => i.MatchLdsfld<Main>(nameof(Main.curMusic))
+        );
+
+        c.GotoPrev(
+            MoveType.After,
+            i => i.MatchBr(out _)
+        );
+
+        c.GotoNext(
+            MoveType.Before,
+            i => i.MatchLdsfld<Main>(nameof(Main.musicFade)),
+            i => i.MatchLdloc(out indexIndex)
+        );
+
+        c.MoveAfterLabels();
+
+        c.EmitLdloc(indexIndex);
+        c.EmitDelegate(
+            static (int index) =>
+            {
+                return index == Assets.Music.Wind.HeavenWind.Slot
+                    || index == Assets.Music.Wind.RedStormWind.Slot;
+            }
+        );
+
+        c.EmitBrtrue(escapeSwitchTarget);
     }
 
     [OnUnload]
