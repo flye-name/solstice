@@ -361,6 +361,14 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
             Main.spriteBatch.Restart(in snapshot);
 
             Stars.DrawStars(Main.spriteBatch);
+            
+            Main.spriteBatch.End(out snapshot);
+            Main.spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.PointWrap, BlendState = BlendState.Additive });
+            {
+                PreBossNight.DrawComet();
+            }
+            Main.spriteBatch.Restart(in snapshot);
+            
 
             Main.spriteBatch.End(out snapshot);
             Main.spriteBatch.Begin(snapshot with { SortMode = SpriteSortMode.Immediate, SamplerState = SamplerState.LinearClamp, BlendState = BlendState.Additive });

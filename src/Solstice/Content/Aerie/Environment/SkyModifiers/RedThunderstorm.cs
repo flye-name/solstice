@@ -198,10 +198,5 @@ public class RedThunderstorm : SkyModifier
             if (RedSprites[i].Active)
                 UpdateRedSprite(i);
         }
-
-        if (!Active)
-            return;
-            
-        Wind.SpawnChance = 3f;
     }
 }
