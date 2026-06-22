@@ -1,17 +1,23 @@
 ﻿using Daybreak.Common.Features.Hooks;
 using Daybreak.Common.Rendering;
-using Solstice.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Solstice.Core;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using BitOperations = System.Numerics.BitOperations;
 
 namespace Solstice.Content.Aerie;
 
 // TODO: HighFPSSupport Compatibility
-public record struct WindParticle : IParticle
+
+[Autoload(Side = ModSide.Client)]
+public static class Wind
 {
     private const int max_old_positions = 50;
 
@@ -24,146 +30,147 @@ public record struct WindParticle : IParticle
     private const float parallax_min = -0.5f;
     private const float parallax_max = 0.15f;
 
-    public Vector2 Position { get; set; }
-
-    public Vector2[] OldPositions { get; init; }
-
-    public Vector2 Velocity { get; set; }
-
-    public float Wind { get; init; }
-
-    public float Parallax { get; init; }
-
-    public float LoopOffset { get; init; }
-
-    public bool ShouldLoop { get; init; }
-
-    public float Lifetime { get; set; }
-
-    public bool IsActive { get; set; }
-
-    private Vector2 parallaxOffset;
-
-    public WindParticle(Vector2 position, float wind, bool shouldLoop, bool foreground)
+    private record struct WindParticle(Vector2 Position, Vector2[] OldPositions, Vector2 Velocity, float Wind, float Parallax, Vector2 ParallaxOffset, float LoopOffset, bool ShouldLoop, float Lifetime)
     {
-        Position = position;
-        OldPositions = new Vector2[max_old_positions];
-        Velocity = Vector2.Zero;
-        Wind = wind;
-        Parallax = Main.rand.NextFloat(foreground ? 0 : parallax_min, foreground ? parallax_max : 0);
-        LoopOffset = Main.rand.NextFloat(-loop_offset, loop_offset);
-        ShouldLoop = shouldLoop;
-        Lifetime = 0f;
-        IsActive = true;
+        public bool Update()
+        {
+            const float lifetime_increment = 0.0063f;
+
+            float increment = lifetime_increment * MathF.Abs(Wind);
+
+            Lifetime += increment;
+
+            if (Lifetime > 1f)
+            {
+                return false;
+            }
+
+            ParallaxOffset += (Main.screenPosition - Main.screenLastPosition) * -Parallax;
+
+            const float wave_frequency = 0.6f;
+            const float wave_amplitude = 0.1f;
+
+            float wave = MathF.Sin((Lifetime + ((float)Main.timeForVisualEffects / 60f)) * wave_frequency) * wave_amplitude;
+
+            var newVelocity = new Vector2(Wind, wave) * Utils.Remap(Parallax, parallax_min, parallax_max, 0.6f, 1.2f);
+
+            // Loop behavior, similar to vanilla paper airplanes
+            if (ShouldLoop)
+            {
+                const float loop_range = 0.06f;
+
+                float range = loop_range / MathHelper.Clamp(MathF.Abs(Wind), 0.01f, 1);
+                range *= 0.5f;
+
+                float offset = 0.5f + LoopOffset;
+
+                float interpolator = Utils.Remap(Lifetime, offset - range, offset + range, 0f, 1f);
+
+                newVelocity = newVelocity.RotatedBy(MathHelper.TwoPi * interpolator * -MathF.Sign(Wind));
+            }
+
+            Velocity = newVelocity.SafeNormalize(Vector2.UnitY) * velocity_magnitude * MathF.Abs(Wind);
+
+            Position += Velocity;
+
+            for (int i = OldPositions.Length - 2; i >= 0; i--)
+            {
+                OldPositions[i + 1] = OldPositions[i];
+            }
+
+            OldPositions[0] = Position;
+
+            return true;
+        }
+
+        public readonly void GenerateVertices(List<VertexPositionColorTexture> currentVertices, List<int> currentIndices)
+        {
+            const float parallax_scale_min = 0.3f;
+            const float parallax_scale_max = 1.65f;
+
+            const float alpha = 0.14f;
+
+            var offset = ParallaxOffset;
+
+            Vector3[] positions =
+                OldPositions.Where(pos => pos != default)
+                .Select(p => new Vector3(p + offset - Main.screenPosition, 0))
+                .ToArray();
+
+            if (positions.Length <= 2)
+            {
+                return;
+            }
+
+            float brightness =
+                MathF.Sin(Lifetime * MathHelper.Pi)
+              * Main.atmo
+              * MathF.Abs(Wind)
+              * Utils.Remap(Parallax, parallax_min, parallax_max, parallax_scale_min, parallax_scale_max);
+
+            Color color = Main.ColorOfTheSkies * brightness * alpha;
+            color.A = 0;
+
+            VertexPositionColorTexture[] vertices = TriangleStripBuilder.BuildPath(
+                positions,
+                t => MathF.Sin(t * MathHelper.Pi) * brightness * width,
+                _ => color,
+                smoothingSubdivisions: 2
+            );
+
+            if (vertices.Length <= 4)
+            {
+                return;
+            }
+
+            int[] indices = new int[((vertices.Length / 2) * 6) - 6];
+
+            int start = currentVertices.Count;
+
+            for (var i = 0; i < (vertices.Length / 2) - 2; i++)
+            {
+                indices[(i * 6)] = start + (i * 2);
+                indices[(i * 6) + 1] = start + (i * 2) + 3;
+                indices[(i * 6) + 2] = start + (i * 2) + 1;
+
+                indices[(i * 6) + 3] = start + (i * 2);
+                indices[(i * 6) + 4] = start + (i * 2) + 2;
+                indices[(i * 6) + 5] = start + (i * 2) + 3;
+            }
+
+            currentVertices.AddRange(vertices);
+            currentIndices.AddRange(indices);
+        }
     }
 
-    void IParticle.Update()
-    {
-        const float lifetime_increment = 0.0063f;
+    private const int bits_per_chunk = sizeof(ulong) * 8;
 
-        float increment = lifetime_increment * MathF.Abs(Wind);
+    private const int max_wind = 512;
 
-        Lifetime += increment;
+    private static readonly WindParticle[] background_wind = new WindParticle[max_wind];
+    private static readonly ulong[] background_wind_mask = new ulong[(int)Math.Ceiling((double)max_wind / bits_per_chunk)];
 
-        if (Lifetime > 1f)
-        {
-            IsActive = false;
-        }
+    private static readonly WindParticle[] foreground_wind = new WindParticle[max_wind];
+    private static readonly ulong[] foreground_wind_mask = new ulong[(int)Math.Ceiling((double)max_wind / bits_per_chunk)];
 
-        parallaxOffset += (Main.screenPosition - Main.screenLastPosition) * -Parallax;
+    private static int activeParticles;
 
-        const float wave_frequency = 0.6f;
-        const float wave_amplitude = 0.1f;
+    // TODO: Use IStatic data
+    private static DynamicVertexBuffer? vertexBuffer;
 
-        float wave = MathF.Sin((Lifetime + ((float)Main.timeForVisualEffects / 60f)) * wave_frequency) * wave_amplitude;
-
-        var newVelocity = new Vector2(Wind, wave) * Utils.Remap(Parallax, parallax_min, parallax_max, 0.6f, 1.2f);
-
-        // Loop behavior, similar to vanilla paper airplanes
-        if (ShouldLoop)
-        {
-            const float loop_range = 0.06f;
-
-            float range = loop_range / MathHelper.Clamp(MathF.Abs(Wind), 0.01f, 1);
-            range *= 0.5f;
-
-            float offset = 0.5f + LoopOffset;
-
-            float interpolator = Utils.Remap(Lifetime, offset - range, offset + range, 0f, 1f);
-
-            newVelocity = newVelocity.RotatedBy(MathHelper.TwoPi * interpolator * -MathF.Sign(Wind));
-        }
-
-        Velocity = newVelocity.SafeNormalize(Vector2.UnitY) * velocity_magnitude * MathF.Abs(Wind);
-
-        Position += Velocity;
-
-        for (int i = OldPositions.Length - 2; i >= 0; i--)
-        {
-            OldPositions[i + 1] = OldPositions[i];
-        }
-
-        OldPositions[0] = Position;
-    }
-
-    readonly void IParticle.Draw(SpriteBatch spriteBatch, GraphicsDevice device)
-    {
-        var offset = parallaxOffset;
-
-        Vector3[] positions =
-            OldPositions.Where(pos => pos != default)
-            .Select(p => new Vector3(p + offset - Main.screenPosition, 0))
-            .ToArray();
-
-        if (positions.Length <= 2)
-        {
-            return;
-        }
-
-        const float parallax_scale_min = 0.3f;
-        const float parallax_scale_max = 1.65f;
-
-        const float alpha = 0.14f;
-
-        float brightness =
-            MathF.Sin(Lifetime * MathHelper.Pi)
-            * Main.atmo
-            * MathF.Abs(Wind)
-            * Utils.Remap(Parallax, parallax_min, parallax_max, parallax_scale_min, parallax_scale_max);
-
-        Color color = Main.ColorOfTheSkies * brightness * alpha;
-        color.A = 0;
-
-        VertexPositionColorTexture[] vertices =
-            TriangleStripBuilder.BuildPath(positions,
-            t => MathF.Sin(t * MathHelper.Pi) * brightness * width,
-            _ => color,
-            smoothingSubdivisions: 2);
-
-        if (vertices.Length > 3)
-        {
-            device.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertices, 0, vertices.Length - 2);
-        }
-    }
-}
-
-[Autoload(Side = ModSide.Client)]
-public static class Wind
-{
-    private const int loop_chance = 10;
-
-    private const int offscreen_margin = 100;
-
-    public const int WIND_COUNT = 80;
-
-    public static float SpawnChance = 15f;
-    
-    public static readonly ParticleHandler<WindParticle> BackgroundWind = new(WIND_COUNT);
-    public static readonly ParticleHandler<WindParticle> ForegroundWind = new(WIND_COUNT);
+    private static DynamicIndexBuffer? indexBuffer;
 
     [OnLoad]
     private static void Load()
     {
+        Main.RunOnMainThread(
+            static () =>
+            {
+                vertexBuffer = new DynamicVertexBuffer(Main.graphics.GraphicsDevice, typeof(VertexPositionColorTexture), max_wind * max_old_positions * 2, BufferUsage.None);
+                indexBuffer = new DynamicIndexBuffer(Main.graphics.GraphicsDevice, typeof(int), max_wind * max_old_positions * 6, BufferUsage.None);
+            }
+        ).GetAwaiter().GetResult();
+
         On_Main.DrawBackgroundBlackFill += DrawBackgroundBlackFill_BackgroundWind;
 
         On_Main.DrawInfernoRings += DrawInfernoRings_ForegroundWind;
@@ -171,24 +178,35 @@ public static class Wind
         On_Dust.UpdateDust += UpdateDust_Wind;
     }
 
+    [OnUnload]
+    private static void Unload()
+    {
+        Main.RunOnMainThread(
+            static () =>
+            {
+                vertexBuffer?.Dispose();
+                indexBuffer?.Dispose();
+            }
+        ).GetAwaiter().GetResult();
+    }
+
     private static void DrawBackgroundBlackFill_BackgroundWind(On_Main.orig_DrawBackgroundBlackFill orig, Main self)
     {
         orig(self);
 
-        if (Main.gameMenu || !AerieSubworld.Active)
+        if (Main.gameMenu || !AerieSubworld.Active || activeParticles == 0)
         {
             return;
         }
 
-        SpriteBatch spriteBatch = Main.spriteBatch;
-
-        GraphicsDevice device = Main.graphics.GraphicsDevice;
-
-        device.Textures[0] = Assets.Images.Bloom.Asset.Value;
-
-        BackgroundWind.Draw(spriteBatch, device);
-
+        // I'm lazy, don't do this.
         var snapshot = new SpriteBatchSnapshot(Main.spriteBatch);
+        Main.spriteBatch.Restart(in snapshot);
+
+        DrawWind(false);
+
+        Main.spriteBatch.PrepRenderState();
+
         Main.spriteBatch.Restart(in snapshot);
     }
 
@@ -196,25 +214,27 @@ public static class Wind
     {
         orig(self);
 
-        if (Main.gameMenu || !AerieSubworld.Active)
+        if (Main.gameMenu || !AerieSubworld.Active || activeParticles == 0)
         {
             return;
         }
 
-        SpriteBatch spriteBatch = Main.spriteBatch;
-
-        GraphicsDevice device = Main.graphics.GraphicsDevice;
-
-        device.Textures[0] = Assets.Images.Bloom.Asset.Value;
-
-        ForegroundWind.Draw(spriteBatch, device);
-
+        // I'm lazy, don't do this.
         var snapshot = new SpriteBatchSnapshot(Main.spriteBatch);
+        Main.spriteBatch.Restart(in snapshot);
+
+        DrawWind(true);
+
+        Main.spriteBatch.PrepRenderState();
+
         Main.spriteBatch.Restart(in snapshot);
     }
 
     private static void UpdateDust_Wind(On_Dust.orig_UpdateDust orig)
     {
+        const float spawn_chance = 7f;
+        const float red_thunder_spawn_chance = 18f;
+
         orig();
 
         if (Main.gameMenu || !AerieSubworld.Active)
@@ -222,22 +242,93 @@ public static class Wind
             return;
         }
 
-        BackgroundWind.Update();
-        ForegroundWind.Update();
+        UpdateWind();
 
-        SpawnWind();
+        float spawnChance = RedThunderstorm.Active ? red_thunder_spawn_chance : spawn_chance;
+        spawnChance /= MathF.Abs(Main.WindForVisuals);
+
+        if (Main.rand.NextBool((int)spawnChance))
+        {
+            SpawnWind(Main.rand.NextBool());
+        }
     }
 
-    private static void SpawnWind()
+    private static void UpdateWind()
     {
-        float spawnChance = SpawnChance / MathF.Abs(Main.WindForVisuals);
+        activeParticles = 0;
 
-        if (!Main.rand.NextBool((int)spawnChance))
+        Update(false);
+        Update(true);
+
+        return;
+
+        static void Update(bool foreground)
+        {
+            var bitChunks = foreground ? foreground_wind_mask : background_wind_mask;
+            var array = foreground ? foreground_wind : background_wind;
+
+            for (var i = 0; i < bitChunks.Length; i++)
+            {
+                var bits = bitChunks[i];
+
+                while (bits != 0)
+                {
+                    var bitIndex = BitOperations.TrailingZeroCount(bits);
+                    var index = i * bits_per_chunk + bitIndex;
+
+                    ref var wind = ref array[index];
+
+                    if (!wind.Update())
+                    {
+                        bitChunks[i] ^= 1uL << bitIndex;
+                    }
+                    else
+                    {
+                        activeParticles++;
+                    }
+
+                    bits &= bits - 1;
+                }
+            }
+        }
+    }
+
+    private static int GetFirstInactive(ulong[] bitChunks)
+    {
+        for (var i = 0; i < bitChunks.Length; i++)
+        {
+            var offset = BitOperations.TrailingZeroCount(~bitChunks[i]);
+
+            var allBitsAreOccupied = offset == bits_per_chunk;
+
+            if (allBitsAreOccupied)
+            {
+                continue;
+            }
+
+            return offset + i * bits_per_chunk;
+        }
+
+        return -1;
+    }
+
+    private static void SpawnWind(bool foreground)
+    {
+        var bitChunks = foreground ? foreground_wind_mask : background_wind_mask;
+        var array = foreground ? foreground_wind : background_wind;
+
+        var index = GetFirstInactive(bitChunks);
+
+        if (index <= -1)
         {
             return;
         }
 
-        Vector2 screensize = new(Main.screenWidth, Main.screenHeight);
+        const int loop_chance = 10;
+
+        const int offscreen_margin = 100;
+
+        Vector2 screenSize = new(Main.screenWidth, Main.screenHeight);
 
         float offset = -Main.WindForVisuals + Math.Clamp(Main.LocalPlayer.velocity.X / 50, -3f, 3f);
 
@@ -245,26 +336,76 @@ public static class Wind
 
         Vector2 screenCenter = Main.screenPosition +
             new Vector2(
-                screensize.X * offset,
-                screensize.Y * 0.5f
+                screenSize.X * offset,
+                screenSize.Y * 0.5f
             );
 
-        Rectangle spawn = Utils.CenteredRectangle(screenCenter, new(screensize.X * 0.8f, screensize.Y + 600));
+        Rectangle spawn = Utils.CenteredRectangle(screenCenter, new Vector2(screenSize.X * 0.8f, screenSize.Y + 600));
 
         spawn.Inflate(offscreen_margin, offscreen_margin);
 
         Vector2 position = Main.rand.NextVector2FromRectangle(spawn);
 
-        if (Main.rand.NextBool())
+        array[index] = CreateWind();
+
+        var chunkIndex = index / bits_per_chunk;
+        var bitIndex = index % bits_per_chunk;
+        bitChunks[chunkIndex] ^= 1uL << bitIndex;
+
+        return;
+
+        WindParticle CreateWind()
         {
-            ForegroundWind.Spawn(new(position, Main.WindForVisuals, !RedThunderstorm.Active && Main.rand.NextBool(loop_chance), true));
+            return new WindParticle(
+                position,
+                new Vector2[max_old_positions],
+                Vector2.Zero,
+                Main.WindForVisuals,
+                Main.rand.NextFloat(foreground ? 0 : parallax_min, foreground ? parallax_max : 0),
+                Vector2.Zero,
+                Main.rand.NextFloat(-loop_offset, loop_offset),
+                !RedThunderstorm.Active && Main.rand.NextBool(loop_chance),
+                0f
+            );
         }
-        else
+    }
+
+    private static void DrawWind(bool foreground)
+    {
+        GraphicsDevice device = Main.graphics.GraphicsDevice;
+
+        var bitChunks = foreground ? foreground_wind_mask : background_wind_mask;
+        var array = foreground ? foreground_wind : background_wind;
+
+        var vertices = new List<VertexPositionColorTexture>();
+        var indices = new List<int>();
+
+        for (var i = 0; i < bitChunks.Length; i++)
         {
-            BackgroundWind.Spawn(new(position, Main.WindForVisuals, !RedThunderstorm.Active && Main.rand.NextBool(loop_chance), false));
+            var bits = bitChunks[i];
+
+            while (bits != 0)
+            {
+                var bitIndex = BitOperations.TrailingZeroCount(bits);
+                var index = i * bits_per_chunk + bitIndex;
+
+                var wind = array[index];
+
+                wind.GenerateVertices(vertices, indices);
+
+                bits &= bits - 1;
+            }
         }
 
-        SpawnChance = 15f;
+        vertexBuffer?.SetData(vertices.ToArray(), 0, vertices.Count);
+        indexBuffer?.SetData(indices.ToArray(), 0, indices.Count);
+
+        device.Textures[0] = Assets.Images.Bloom.Asset.Value;
+
+        device.RasterizerState = RasterizerState.CullNone;
+        device.Indices = indexBuffer;
+        device.SetVertexBuffer(vertexBuffer);
+        device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertices.Count, 0, indices.Count / 3);
     }
 }
 
