@@ -7,11 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 // ReSharper disable InconsistentNaming
 
@@ -307,6 +309,23 @@ public sealed class TallAerieGrass1x1 : ModTile
         }
     }
 
+    public override void NearbyEffects(int i, int j, bool closer)
+    {
+        if (Main.gamePaused)
+            return;
+
+        var tilePos = new Vector2(i, j).ToWorldCoordinates();
+
+        if (Main.rand.NextBool(5) && Main.LocalPlayer.Distance(tilePos) < 16 && Main.LocalPlayer.velocity.Length() > 0)
+            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/GrassBrush", 4)
+            {
+                MaxInstances = 10,
+                SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
+                pitchVariance = 0.1f,
+                Volume = 0.2f
+            }, new Vector2(i, j).ToWorldCoordinates());
+    }
+
     public override bool CanPlace(int i, int j)
     {
         return TallAerieGrassHelper.CanPlaceAerieGrass(i, j);
@@ -377,6 +396,23 @@ public sealed class TallAerieGrass1x2 : ModTile
         {
             spriteEffects = SpriteEffects.FlipHorizontally;
         }
+    }
+
+    public override void NearbyEffects(int i, int j, bool closer)
+    {
+        if (Main.gamePaused)
+            return;
+
+        var tilePos = new Vector2(i, j).ToWorldCoordinates();
+
+        if (Main.rand.NextBool(5) && Main.LocalPlayer.Distance(tilePos) < 16 && Main.LocalPlayer.velocity.Length() > 0)
+            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/GrassBrush", 4)
+            {
+                MaxInstances = 10,
+                SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
+                pitchVariance = 0.1f,
+                Volume = 0.2f
+            }, new Vector2(i, j).ToWorldCoordinates());
     }
 
     public override bool CanPlace(int i, int j)
