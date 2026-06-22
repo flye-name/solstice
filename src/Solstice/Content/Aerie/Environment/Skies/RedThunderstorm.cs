@@ -191,9 +191,7 @@ public class RedThunderstorm : SkyModifier
     public static void Update()
     {
         Intensity = Active ? MathF.Min(1f, Intensity + 0.05f) : MathF.Max(0f, Intensity - 0.05f);
-            
-        Wind.SpawnChance = 3f;
-
+        
         // Red sprites are updated even if the event is inactive so clearing ones can fade out properly.
         for (int i = 0; i < MaxSprites; i++)
         {
