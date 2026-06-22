@@ -48,7 +48,7 @@ public class RedThunderstorm : SkyModifier
                 SpawnDefaultRedSprite();
         }
         
-        if (--_soundTimer == 0)
+        if (--_soundTimer == 1)
             SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder") with { Pitch = -1f });
     }
 
