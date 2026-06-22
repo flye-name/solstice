@@ -2,7 +2,6 @@ using Daybreak.Common.Features.Hooks;
 using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using Solstice.Content.Aerie;
-using Solstice.Content.Aerie.Weather;
 using System;
 using System.Collections.Generic;
 using System.Linq;

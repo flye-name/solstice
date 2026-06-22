@@ -5,7 +5,6 @@ using Solstice.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
-using Solstice.Content.Aerie.Weather;
 using System;
 using Terraria;
 using Terraria.GameContent.Skies;

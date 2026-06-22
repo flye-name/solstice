@@ -1,7 +1,6 @@
 using Daybreak.Common.Features.Hooks;
 using Daybreak.Common.Features.Models;
 using Microsoft.Xna.Framework;
-using Solstice.Content.Aerie.Weather;
 using Solstice.Core;
 using System;
 using System.Collections.Immutable;

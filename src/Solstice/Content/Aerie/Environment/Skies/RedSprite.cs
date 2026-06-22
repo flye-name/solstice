@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.Utilities;
 
-namespace Solstice.Content.Aerie.Weather;
+namespace Solstice.Content.Aerie;
 
 public struct RedSprite
 {

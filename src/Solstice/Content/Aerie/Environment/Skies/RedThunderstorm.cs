@@ -13,11 +13,11 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.Utilities;
 
-namespace Solstice.Content.Aerie.Weather;
+namespace Solstice.Content.Aerie;
 
 public class RedThunderstormScene : ModSceneEffect
 {
-    public override int Music => MusicLoader.GetMusicSlot(Mod, "Assets/Music/Stormseeker");
+    public override int Music => Assets.Music.Stormseeker.Slot;
 
     public override bool IsSceneEffectActive(Player player) => AerieSubworld.Active && RedThunderstorm.Active;
 
@@ -191,8 +191,6 @@ public class RedThunderstorm : SkyModifier
     public static void Update()
     {
         Intensity = Active ? MathF.Min(1f, Intensity + 0.05f) : MathF.Max(0f, Intensity - 0.05f);
-        
-        Active = true;
             
         Wind.SpawnChance = 3f;
 

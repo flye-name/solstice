@@ -3,7 +3,6 @@ using Daybreak.Common.Rendering;
 using Solstice.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Solstice.Content.Aerie.Weather;
 using System;
 using System.Linq;
 using Terraria;
