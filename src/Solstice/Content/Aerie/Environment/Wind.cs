@@ -3,6 +3,7 @@ using Daybreak.Common.Rendering;
 using Solstice.Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Solstice.Content.Aerie.Weather;
 using System;
 using System.Linq;
 using Terraria;
@@ -154,7 +155,10 @@ public static class Wind
 
     private const int offscreen_margin = 100;
 
-    public const int WIND_COUNT = 60;
+    public const int WIND_COUNT = 80;
+
+    public static float SpawnChance = 15f;
+    
     public static readonly ParticleHandler<WindParticle> BackgroundWind = new(WIND_COUNT);
     public static readonly ParticleHandler<WindParticle> ForegroundWind = new(WIND_COUNT);
 
@@ -227,9 +231,7 @@ public static class Wind
 
     private static void SpawnWind()
     {
-        const float spawn_chance = 15f;
-
-        float spawnChance = spawn_chance / MathF.Abs(Main.WindForVisuals);
+        float spawnChance = SpawnChance / MathF.Abs(Main.WindForVisuals);
 
         if (!Main.rand.NextBool((int)spawnChance))
         {
@@ -256,12 +258,14 @@ public static class Wind
 
         if (Main.rand.NextBool())
         {
-            ForegroundWind.Spawn(new(position, Main.WindForVisuals, Main.rand.NextBool(loop_chance), true));
+            ForegroundWind.Spawn(new(position, Main.WindForVisuals, !RedThunderstorm.Active && Main.rand.NextBool(loop_chance), true));
         }
         else
         {
-            BackgroundWind.Spawn(new(position, Main.WindForVisuals, Main.rand.NextBool(loop_chance), false));
+            BackgroundWind.Spawn(new(position, Main.WindForVisuals, !RedThunderstorm.Active && Main.rand.NextBool(loop_chance), false));
         }
+
+        SpawnChance = 15f;
     }
 }
 

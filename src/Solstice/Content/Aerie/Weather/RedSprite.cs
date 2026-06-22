@@ -15,19 +15,23 @@ public struct RedSprite
     public readonly Vector2 Position;
     public readonly List<Vector2>[] Points = new List<Vector2>[MaxBranches];
     public readonly float MaxLifetime;
-    public float Lifetime;
+    public int Lifetime;
 
     public bool Active;
 
-    public RedSprite(Vector2 position, float lifetime)
+    public RedSprite(Vector2 position, int lifetime)
     {
         Seed = Main.rand.Next(int.MaxValue - 1000);
 
         Position = position;
-        
+
         for (int i = 0; i < MaxBranches; i++)
+        {
             Points[i] = new();
-        
+
+            Points[i].Add(position + new UnifiedRandom(Seed + i + 1).NextVector2Circular(70, 70));
+        }
+
         MaxLifetime = lifetime;
         Lifetime = lifetime;
 

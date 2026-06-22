@@ -31,6 +31,20 @@ public static class PresetSkyColors
         new(255, 100, 106),
         new(255, 220, 177)
     ];
+    
+    public static readonly ImmutableArray<Color> RED_THUNDERSTORM =
+    [
+        new(40, 20, 20),
+        new(105, 60, 50),
+        new(255, 60, 100)
+    ];
+    
+    public static readonly ImmutableArray<Color> RED_THUNDERSTORM_FLASH =
+    [
+        new(255, 205, 205),
+        new(255, 205, 205),
+        new(255, 205, 205)
+    ];
 }
 
 public sealed partial class AerieBackground : ModSurfaceBackgroundStyle

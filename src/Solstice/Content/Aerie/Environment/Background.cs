@@ -126,6 +126,13 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
         top *= parallax;
 
         DrawFog(Main.spriteBatch, OverTilesFogColor, (int)top, parallax, true);
+
+        if (RedThunderstorm.Active)
+        {
+            DrawFog(Main.spriteBatch, FarFogColor * 0.4f * RedThunderstorm.Intensity, Main.instance.bgTopY - 700, speed: 20);
+            
+            DrawFog(Main.spriteBatch, NearFogColor * 0.3f * RedThunderstorm.Intensity, Main.instance.bgTopY - 500, speed: 22);
+        }
     }
 
     private static void DrawBG_RemoveSpaceOffset(ILContext il)
@@ -175,6 +182,9 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
         orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBGTopHack);
 
         DrawFog(Main.spriteBatch, FarFogColor, Main.instance.bgTopY);
+        
+        if (RedThunderstorm.Active)
+            DrawFog(Main.spriteBatch, FarFogColor * 0.3f * RedThunderstorm.Intensity, Main.instance.bgTopY - 1000, speed: 14);
     }
 
     private static void DrawSurfaceBG_BackMountainsStep2_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
@@ -239,7 +249,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
         );
     }
 
-    private static void DrawFog(SpriteBatch spriteBatch, Color color, int top, float parallax = -1, bool useZoom = false)
+    private static void DrawFog(SpriteBatch spriteBatch, Color color, int top, float parallax = -1, bool useZoom = false, float speed = 1f)
     {
         if (parallax < 0f)
         {
@@ -264,7 +274,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
             fogShader.Parameters.Parallax = Main.screenPosition.X * parallax / Main.screenWidth;
 
-            fogShader.Parameters.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f);
+            fogShader.Parameters.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f) * speed;
 
             var offset = new Vector2(Main.screenPosition.X % 2, Main.screenPosition.Y % 2);
 

@@ -8,5 +8,6 @@ public sealed class Solstice : Mod
     public Solstice()
     {
         MusicAutoloadingEnabled = false;
+        MusicSkipsVolumeRemap = true;
     }
 }
