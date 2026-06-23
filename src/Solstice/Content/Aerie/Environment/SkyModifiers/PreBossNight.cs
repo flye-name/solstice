@@ -108,9 +108,7 @@ public class PreBossNight : SkyModifier
     
     [ModSystemHooks.PostUpdateEverything]
     public static void Update()
-    {
-        Active = true;
-        
+    {   
         Intensity = Active ? MathF.Min(1f, Intensity + 0.05f) : MathF.Max(0f, Intensity - 0.05f);
     }
 }

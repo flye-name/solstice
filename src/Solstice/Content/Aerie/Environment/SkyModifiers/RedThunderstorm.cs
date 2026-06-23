@@ -39,17 +39,27 @@ public class RedThunderstorm : SkyModifier
         
         SkyManagement.LerpSkyColors(colors, TransitionTime = MathF.Min(TransitionTime + 0.001f, 1f));
 
-        if (TransitionTime > 0.3f && Main.mouseRight && _skyFlash <= 0.1f)
+        if (TransitionTime > 0.3f && Main.mouseRight && _skyFlash <= 0.1f && _soundTimer < 0)
         {
             _skyFlash = Main.rand.NextFloat(0.6f, 0.8f);
-            _soundTimer = 40;
+            _soundTimer = 140;
             
             for (int i = 0; i < 3; i++)
                 SpawnDefaultRedSprite();
         }
+
+        _soundTimer--;
+        if (_soundTimer == 100)
+        {
+            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/Timpani") with { PitchVariance = 0.2f });
+            
+            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/CloseThunder" + Main.rand.Next(1, 4)) with { PitchVariance = 0.2f });
+        }
         
-        if (--_soundTimer == 1)
-            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder") with { Pitch = -1f });
+        if (_soundTimer == 1)
+        {
+            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/StormPiano" + Main.rand.Next(1, 4)));
+        }
     }
 
     public override void ResetSkyModifierInformation()
@@ -190,6 +200,8 @@ public class RedThunderstorm : SkyModifier
     [ModSystemHooks.PostUpdateEverything]
     public static void Update()
     {
+        Active = true;
+        
         Intensity = Active ? MathF.Min(1f, Intensity + 0.05f) : MathF.Max(0f, Intensity - 0.05f);
         
         // Red sprites are updated even if the event is inactive so clearing ones can fade out properly.
@@ -198,5 +210,11 @@ public class RedThunderstorm : SkyModifier
             if (RedSprites[i].Active)
                 UpdateRedSprite(i);
         }
+        
+        if (!Active)
+            return;
+        
+        if (Main.rand.NextBool(300))
+            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/FarThunder" + Main.rand.Next(1, 5)) with { PitchVariance = 0.2f, MaxInstances = 3});
     }
 }

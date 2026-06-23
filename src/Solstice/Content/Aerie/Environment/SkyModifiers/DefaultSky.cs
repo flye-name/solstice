@@ -6,7 +6,7 @@ using Terraria;
 
 namespace Solstice.Content.Aerie;
 
-public class NormalSky : SkyModifier
+public class DefaultSky : SkyModifier
 {
     public override SkyModifierPriority Priority => SkyModifierPriority.Normal;
     public override bool IsActive => true;
