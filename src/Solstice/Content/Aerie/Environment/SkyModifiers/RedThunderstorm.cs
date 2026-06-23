@@ -58,7 +58,7 @@ public class RedThunderstorm : SkyModifier
         
         if (_soundTimer == 1)
         {
-            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/StormPiano" + Main.rand.Next(1, 4)));
+            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/StormPiano" + Main.rand.Next(1, 12)));
         }
     }
 
