@@ -53,7 +53,11 @@ public class RedThunderstorm : SkyModifier
         {
             SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/Timpani") with { PitchVariance = 0.2f });
             
-            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/CloseThunder" + Main.rand.Next(1, 4)) with { PitchVariance = 0.2f });
+            var slot = SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/CloseThunder" + Main.rand.Next(1, 4)) with { PitchVariance = 0.2f, Volume = 2 });
+            if (SoundEngine.TryGetActiveSound(slot, out var sound))
+            {
+                sound.Sound.INTERNAL_applyReverb(0.5f);
+            }
         }
         
         if (_soundTimer == 1)
@@ -215,6 +219,12 @@ public class RedThunderstorm : SkyModifier
             return;
         
         if (Main.rand.NextBool(300))
-            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/FarThunder" + Main.rand.Next(1, 5)) with { PitchVariance = 0.2f, MaxInstances = 3});
+        {
+            var slot = SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/FarThunder" + Main.rand.Next(1, 5)) with { PitchVariance = 0.2f, MaxInstances = 3 });
+            if (SoundEngine.TryGetActiveSound(slot, out var sound))
+            {
+                sound.Sound.INTERNAL_applyReverb(0.1f);
+            }
+        }
     }
 }
