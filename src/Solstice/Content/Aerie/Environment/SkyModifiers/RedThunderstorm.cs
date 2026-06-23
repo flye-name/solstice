@@ -211,7 +211,7 @@ public class RedThunderstorm : SkyModifier
                 UpdateRedSprite(i);
         }
         
-        if (!Active)
+        if (!Active || !AerieSubworld.Active)
             return;
         
         if (Main.rand.NextBool(300))
