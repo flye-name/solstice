@@ -6,6 +6,7 @@ using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.GameContent.Drawing;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
@@ -49,6 +50,15 @@ public sealed class CenserTile : ModTile
         AddMapEntry(new(199, 162, 82));
 
         TileObjectData.addTile(Type);
+    }
+
+    public override void EmitParticles(int i, int j, Tile tile, short tileFrameX, short tileFrameY, Color tileLight, bool visible)
+    {
+        if (TileObjectData.IsTopLeft(tile) && Main.rand.NextBool(2))
+        {
+            var dust = Dust.NewDustPerfect(new Vector2(i, j).ToWorldCoordinates(16) + new Vector2(Main.rand.NextFloat(-8, 8), 10), DustID.Smoke, -Vector2.UnitY * Main.rand.NextFloat(0f, 0.6f) + new Vector2(Main.windSpeedCurrent, 0), 100, default, 0.1f);
+            dust.fadeIn = 1;
+        }
     }
 
     public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
