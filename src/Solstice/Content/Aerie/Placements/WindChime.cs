@@ -71,14 +71,20 @@ public sealed class WindChimeTile : ModTile
         var tilePos = new Vector2(i, j).ToWorldCoordinates();
 
         if (MathF.Abs(Main.windSpeedCurrent) > 0.4f && Main.rand.NextBool(120))
-            SoundEngine.PlaySound(new SoundStyle(Assets.Sounds.Windchime.KEY, 4, SoundType.Ambient)
-            {
-                MaxInstances = 2,
-                pitchVariance = 0.2f,
-                Volume = 0.03f,
-                SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
-                PauseBehavior = PauseBehavior.PauseWithGame
-            }, tilePos);
+        {
+            SoundEngine.PlaySound(
+                Assets.Sounds.Windchime.Asset with
+                {
+                    Type = SoundType.Ambient,
+                    MaxInstances = 2,
+                    pitchVariance = 0.2f,
+                    Volume = 0.03f,
+                    SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
+                    PauseBehavior = PauseBehavior.PauseWithGame
+                },
+                tilePos
+            );
+        }
     }
 
     public override void AdjustMultiTileVineParameters(int i, int j, ref float? overrideWindCycle, ref float windPushPowerX, ref float windPushPowerY, ref bool dontRotateTopTiles, ref float totalWindMultiplier, ref Texture2D glowTexture, ref Color glowColor)
