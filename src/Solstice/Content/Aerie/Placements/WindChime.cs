@@ -65,42 +65,20 @@ public sealed class WindChimeTile : ModTile
 
     public override void NearbyEffects(int i, int j, bool closer)
     {
-        // TODO: reimplement ambient sounds
-
-        /*if (Main.gamePaused)
+        if (Main.gamePaused)
             return;
 
-        SoundStyle soundStyle = new("VoidseekerBoss/Assets/WindChime", 3)
-        {
-            Volume = 0.4f,
-            PitchVariance = 0.1f,
-            SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
-            PauseBehavior = PauseBehavior.PauseWithGame
-        };
+        var tilePos = new Vector2(i, j).ToWorldCoordinates();
 
-        if (MathF.Abs(Main.windSpeedCurrent) > 0.4f)
-            if (Main.rand.NextBool(30))
-                SoundEngine.PlaySound(soundStyle, new Vector2(i, j).ToWorldCoordinates());
-
-        float length = Main.LocalPlayer.velocity.Length();
-        float mag = MathHelper.Clamp(length / 10f, 0, 1);
-        float chance = 1f - mag;
-
-        soundStyle = new("VoidseekerBoss/Assets/WindChime", 3)
-        {
-            Volume = 0.4f,
-            PitchVariance = 0.1f,
-            SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
-            PauseBehavior = PauseBehavior.PauseWithGame
-        };
-
-        if (Main.rand.NextFloat(chance) < 0.1f)
-        {
-            if (Main.LocalPlayer.velocity.Length() < 2 || !new Rectangle(i * 16, j * 16, 16, 16).Intersects(Main.LocalPlayer.getRect()))
-                return;
-
-            SoundEngine.PlaySound(soundStyle, new Vector2(i, j).ToWorldCoordinates());
-        }*/
+        if (MathF.Abs(Main.windSpeedCurrent) > 0.4f && Main.rand.NextBool(120))
+            SoundEngine.PlaySound(new SoundStyle(Assets.Sounds.Windchime.KEY, 4, SoundType.Ambient)
+            {
+                MaxInstances = 2,
+                pitchVariance = 0.2f,
+                Volume = 0.03f,
+                SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
+                PauseBehavior = PauseBehavior.PauseWithGame
+            }, tilePos);
     }
 
     public override void AdjustMultiTileVineParameters(int i, int j, ref float? overrideWindCycle, ref float windPushPowerX, ref float windPushPowerY, ref bool dontRotateTopTiles, ref float totalWindMultiplier, ref Texture2D glowTexture, ref Color glowColor)

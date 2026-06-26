@@ -323,7 +323,7 @@ public sealed class TallAerieGrass1x1 : ModTile
                 SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
                 pitchVariance = 0.1f,
                 Volume = 0.2f
-            }, new Vector2(i, j).ToWorldCoordinates());
+            }, tilePos);
     }
 
     public override bool CanPlace(int i, int j)
