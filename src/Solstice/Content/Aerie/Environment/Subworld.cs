@@ -12,6 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.GameContent.Generation;
 using Terraria.GameContent.UI.States;
@@ -408,6 +409,35 @@ public partial class AerieSubworld : Subworld
     public override void OnLoad()
     {
         SubworldSystem.hideUnderworld = true;
+    }
+
+    [ModSystemHooks.PreUpdateWorld]
+    private static void HandleTileEntities()
+    {
+        if (!Active)
+        {
+            return;
+        }
+        
+        Wiring.UpdateMech();
+        Liquid.skipCount++;
+        TileEntity.UpdateStart();
+        foreach (TileEntity te in TileEntity.ByID.Values)
+            te.Update();
+        TileEntity.UpdateEnd();
+        if (Liquid.skipCount > 1)
+        {
+            Liquid.UpdateLiquid();
+            Liquid.skipCount = 0;
+        }
+        for (int num = 0; num < 20; num++)
+        {
+            int i = Main.rand.Next(Main.offLimitBorderTiles, Main.maxTilesX - Main.offLimitBorderTiles);
+            int j = Main.rand.Next(Main.offLimitBorderTiles, Main.maxTilesY - Main.offLimitBorderTiles);
+            ModTile tile = TileLoader.GetTile(Main.tile[i, j].TileType);
+
+            tile?.RandomUpdate(i, j);
+        }
     }
 
     [ModSystemHooks.PreUpdatePlayers]
