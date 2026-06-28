@@ -3,7 +3,9 @@ using ReLogic.Graphics;
 using System;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.GameContent.Drawing;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
 
@@ -51,7 +53,7 @@ public struct DialogueData
         for (int i = 0; i < Colors.Length; i++)
         {
             Colors[i] = Color.Transparent;
-            Scales[i] = scale * 1.4f;
+            Scales[i] = scale * (Type == DialogueType.Normal ? 1.4f : 1);
         }
     }
 }
@@ -86,55 +88,56 @@ public class DialogueObject
         }
 
         Delay--;
-        if (Main.ambientCounter % Data.CharacterInterval == 0 && HighlightedCharacterIndex <= BaseData.Text.Length && Delay <= 0)
+        if (Main.timeForVisualEffects % Data.CharacterInterval == 0 && HighlightedCharacterIndex <= BaseData.Text.Length && Delay <= 0)
         {
             HighlightedCharacterIndex++;
-            Data.Colors[HighlightedCharacterIndex] = Color.White;
+            
             Data.Text = BaseData.Text[..(HighlightedCharacterIndex + 1)];
 
-            SetDelays();
+            OnCharacterAppearPerType();
         }
 
-        if (Data.CharacterSound.HasValue &&
-            Main.ambientCounter % Data.SoundInterval == 0 &&
-            BaseData.Text[HighlightedCharacterIndex] != ' ' &&
-            Delay <= 0)
+        if (Data.CharacterSound.HasValue && Main.timeForVisualEffects % Data.SoundInterval == 0 && BaseData.Text[HighlightedCharacterIndex] != ' ' && Delay <= 0)
         {
             SoundEngine.PlaySound(Data.CharacterSound.Value, Data.Position);
         }
-
-        for (int i = 0; i < BaseData.Text.Length; i++)
-        {
-            if (i >= HighlightedCharacterIndex)
+        
+        if (Data.LifetimeAfterCompletion >= BaseData.LifetimeAfterCompletion)
+            for (int i = 0; i < BaseData.Text.Length; i++)
             {
-                continue;
+                if (i >= HighlightedCharacterIndex)
+                {
+                    continue;
+                }
+                    
+                Data.Colors[i] = Color.Lerp(Data.Colors[i], BaseData.Color, 0.1f);
+                Data.Scales[i] = MathHelper.Lerp(Data.Scales[i], BaseData.Scale, 0.2f);
             }
-                
-            Data.Colors[i] = Color.Lerp(Data.Colors[i], BaseData.Color, 0.1f);
-            Data.Scales[i] = MathHelper.Lerp(Data.Scales[i], BaseData.Scale, 0.2f);
-        }
 
         if (HighlightedCharacterIndex > BaseData.Text.Length)
         {
             FadeOut();
         }
-        
-        UpdateUniqueTypes();
     }
 
-    void UpdateUniqueTypes()
+    void OnCharacterAppearPerType()
     {
         switch (Data.Type)
         {
+            case DialogueType.Normal:
+                Data.Colors[HighlightedCharacterIndex] = Color.White;
+                SetDelays();
+                break;
+            
             case DialogueType.Wind:
                 
                 break;
             
             case DialogueType.Storm:
-
+                
                 break;
         }
-    }
+    } 
 
     private void SetDelays()
     {
@@ -158,17 +161,29 @@ public class DialogueObject
         {
             OnEnd?.Invoke(this);
         }
-
-        if (!(Data.LifetimeAfterCompletion < BaseData.LifetimeAfterCompletion / 2f))
-        {
-            return;
-        }
-
+        
         float progress = Utils.GetLerpValue(0, BaseData.LifetimeAfterCompletion / 2f, Data.LifetimeAfterCompletion);
-
-        for (int i = 0; i < BaseData.Text.Length; i++)
+        switch (Data.Type)
         {
-            Data.Colors[i] = BaseData.Colors[i] * progress;
+            case DialogueType.Normal:
+                if (Data.LifetimeAfterCompletion < BaseData.LifetimeAfterCompletion / 2f)
+                    for (int i = 0; i < BaseData.Text.Length; i++)
+                    {
+                        Data.Colors[i] = BaseData.Colors[i] * progress;
+                    }
+                break;
+            
+            case DialogueType.Wind:
+                if (HighlightedCharacterIndex <= BaseData.Text.Length * 2)
+                {
+                    HighlightedCharacterIndex++;
+                }
+
+                for (int i = 0; i < HighlightedCharacterIndex - BaseData.Text.Length; i++)
+                {
+                    Data.Colors[i] *= 0.9f;
+                }
+                break;
         }
     }
 
@@ -206,7 +221,7 @@ public class DialogueObject
         DynamicSpriteFont font = FontAssets.DeathText.Value;
         
         Vector2 origin = font.MeasureString(" ") * 0.5f;
-
+        
         for (int i = 0; i < Data.Text.Length; i++)
         {   
             var charData = font.GetCharacterData(Data.Text[i]);
@@ -217,11 +232,24 @@ public class DialogueObject
             {
                 positions[i] += new Vector2(charData.Kerning.X * Data.Scale * 1.2f, 0).RotatedBy(rotations[i]);
             }
-
-            float windFactor = (1f + MathF.Sin((float)Main.timeForVisualEffects * 0.01f + i * 0.3f)) * 0.5f;
-            float progress = Utils.GetLerpValue(0, Data.Text.Length, i);
-            positions[i] += new Vector2(Main.windSpeedCurrent * progress * 40, windFactor * 30);
             
+            if (!new Rectangle(-200, -200, Main.screenWidth + 200, Main.screenHeight + 200).Contains(positions[i].ToPoint()))
+                continue;
+
+            float progress = Utils.GetLerpValue(0, Data.Text.Length, i);
+            
+            float startFactor = MathHelper.Clamp(progress * 3, 0, 1);
+            float additionalScale = MathHelper.Lerp(0.5f, 1, startFactor);
+            float windFactor = (1f + MathF.Sin((float)Main.timeForVisualEffects * 0.01f + i * 0.3f)) * 0.5f;
+            positions[i] += new Vector2(Main.windSpeedCurrent * progress * 40, windFactor * 30 * progress);
+
+            var coord = new Point16((int)(positions[i].X + Main.screenPosition.X) / 16, (int)(positions[i].Y + Main.screenPosition.Y) / 16);
+            if (coord.X > Main.offLimitBorderTiles && coord.X < Main.maxTilesX - Main.offLimitBorderTiles && coord.Y > Main.offLimitBorderTiles && coord.Y < Main.maxTilesY - Main.offLimitBorderTiles) 
+            {
+                Main.instance.TilesRenderer.Wind.GetWindTime(coord.X, coord.Y, 100, out var timeLeft, out var dirX, out var dirY);
+                positions[i] += new Vector2(dirX, dirY) * MathF.Sin(MathF.PI * timeLeft / 100f) * 6;
+            }
+
             ChatManager.DrawColorCodedString(
                 Main.spriteBatch,
                 font,
@@ -230,7 +258,7 @@ public class DialogueObject
                 Data.Colors[i],
                 rotations[i],
                 origin,
-                Data.Scales[i] * Vector2.One
+                Data.Scales[i] * Vector2.One * additionalScale
             );
         }
     }
@@ -251,6 +279,9 @@ public class DialogueObject
             {
                 position += new Vector2(charData.Kerning.X * Data.Scale * 1.2f, 0);
             }
+            
+            if (!new Rectangle(-200, -200, Main.screenWidth + 200, Main.screenHeight + 200).Contains(position.ToPoint()))
+                continue;
             
             Vector2 newPosition = ChatManager.DrawColorCodedStringWithShadow(
                 Main.spriteBatch,
