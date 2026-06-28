@@ -88,7 +88,7 @@ public class DialogueObject
         }
 
         Delay--;
-        if (Main.timeForVisualEffects % Data.CharacterInterval == 0 && HighlightedCharacterIndex <= BaseData.Text.Length && Delay <= 0)
+        if (Main.timeForVisualEffects % Data.CharacterInterval == 0 && HighlightedCharacterIndex < BaseData.Text.Length - 1 && Delay <= 0)
         {
             HighlightedCharacterIndex++;
             
@@ -166,14 +166,21 @@ public class DialogueObject
         switch (Data.Type)
         {
             case DialogueType.Normal:
-                if (Data.LifetimeAfterCompletion < BaseData.LifetimeAfterCompletion / 2f)
-                    for (int i = 0; i < BaseData.Text.Length; i++)
-                    {
-                        Data.Colors[i] = BaseData.Colors[i] * progress;
-                    }
-                break;
-            
+            {
+                if (!(Data.LifetimeAfterCompletion < BaseData.LifetimeAfterCompletion / 2f))
+                {
+                    break;
+                }
+
+                for (int i = 0; i < BaseData.Text.Length; i++)
+                {
+                    Data.Colors[i] = BaseData.Colors[i] * progress;
+                }
+            }
+            break;
+
             case DialogueType.Wind:
+            {
                 if (HighlightedCharacterIndex <= BaseData.Text.Length * 2)
                 {
                     HighlightedCharacterIndex++;
@@ -183,7 +190,8 @@ public class DialogueObject
                 {
                     Data.Colors[i] *= 0.9f;
                 }
-                break;
+            }
+            break;
         }
     }
 
@@ -197,7 +205,6 @@ public class DialogueObject
         DynamicSpriteFont font = FontAssets.DeathText.Value;
 
         Vector2 position = Data.Position;
-
 
         position -= Screenspace ? Vector2.Zero : Main.screenPosition;
 
@@ -232,8 +239,11 @@ public class DialogueObject
             {
                 positions[i] += new Vector2(charData.Kerning.X * Data.Scale * 1.2f, 0).RotatedBy(rotations[i]);
             }
+
+            var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+            screenSize *= Main.GameZoomTarget;
             
-            if (!new Rectangle(-200, -200, Main.screenWidth + 200, Main.screenHeight + 200).Contains(positions[i].ToPoint()))
+            if (!new Rectangle(-200, -200, (int)screenSize.X + 400, (int)screenSize.Y + 400).Contains(positions[i].ToPoint()))
                 continue;
 
             float progress = Utils.GetLerpValue(0, Data.Text.Length, i);
@@ -279,10 +289,13 @@ public class DialogueObject
             {
                 position += new Vector2(charData.Kerning.X * Data.Scale * 1.2f, 0);
             }
-            
-            if (!new Rectangle(-200, -200, Main.screenWidth + 200, Main.screenHeight + 200).Contains(position.ToPoint()))
+
+            var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+            screenSize *= Main.GameZoomTarget;
+
+            if (!new Rectangle(-200, -200, (int)screenSize.X + 400, (int)screenSize.Y + 400).Contains(position.ToPoint()))
                 continue;
-            
+
             Vector2 newPosition = ChatManager.DrawColorCodedStringWithShadow(
                 Main.spriteBatch,
                 font,
