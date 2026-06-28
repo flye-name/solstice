@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using ReLogic.Graphics;
+using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
@@ -8,8 +9,17 @@ using Terraria.UI.Chat;
 
 namespace Solstice.Core;
 
+public enum DialogueType : byte
+{
+    Normal = 0,
+    Wind = 1, 
+    Storm = 2
+}
+
 public struct DialogueData
 {
+    public DialogueType Type;
+    
     public string Text;
     public Vector2 Position;
     
@@ -20,13 +30,17 @@ public struct DialogueData
     public float Scale = .6f;
     public readonly float[] Scales;
     
-    public int LifetimeAfterCompletion = 150;
-    
     public SoundStyle? CharacterSound = null;
-    public int CharacterInterval = 4, SoundInterval = 5, EndTriggerTime = 1; 
+    
+    public int LifetimeAfterCompletion = 150;
+    public int CharacterInterval = 4;
+    public int SoundInterval = 5;
+    public int EndTriggerTime = 1; 
 
-    public DialogueData(string text, Vector2 position, Color color, float scale = 0.6f)
+    public DialogueData(string text, Vector2 position, Color color, float scale = 0.6f, DialogueType type = DialogueType.Normal)
     {
+        Type = type;
+        
         Text = text;
         Position = position;
 
@@ -104,6 +118,22 @@ public class DialogueObject
         {
             FadeOut();
         }
+        
+        UpdateUniqueTypes();
+    }
+
+    void UpdateUniqueTypes()
+    {
+        switch (Data.Type)
+        {
+            case DialogueType.Wind:
+                
+                break;
+            
+            case DialogueType.Storm:
+
+                break;
+        }
     }
 
     private void SetDelays()
@@ -153,10 +183,62 @@ public class DialogueObject
 
         Vector2 position = Data.Position;
 
-        position.X -= font.MeasureString(Data.Text).X * 0.5f * Data.Scale;
 
         position -= Screenspace ? Vector2.Zero : Main.screenPosition;
 
+        switch (Data.Type)
+        {
+            case DialogueType.Normal:
+                position.X -= font.MeasureString(Data.Text).X * 0.5f * Data.Scale;
+                
+                DrawNormalDialogue(position);
+                break;
+            
+            case DialogueType.Wind:
+                var spiral = DragonAlphabet.GetPoints(position, BaseData.Text.Length, out var rotations, Data.Scale);
+                DrawSpiralDialogue(spiral, rotations);
+                break;
+        }
+    }
+
+    private void DrawSpiralDialogue(Vector2[] positions, float[] rotations)
+    {
+        DynamicSpriteFont font = FontAssets.DeathText.Value;
+        
+        Vector2 origin = font.MeasureString(" ") * 0.5f;
+
+        for (int i = 0; i < Data.Text.Length; i++)
+        {   
+            var charData = font.GetCharacterData(Data.Text[i]);
+            positions[i] -= new Vector2(charData.Kerning.X * Data.Scale * 0.9f, 0).RotatedBy(rotations[i]);
+
+            // TODO: Better impl for manual kerning.
+            if (Data.Text[i] == 'j')
+            {
+                positions[i] += new Vector2(charData.Kerning.X * Data.Scale * 1.2f, 0).RotatedBy(rotations[i]);
+            }
+
+            float windFactor = (1f + MathF.Sin((float)Main.timeForVisualEffects * 0.01f + i * 0.3f)) * 0.5f;
+            float progress = Utils.GetLerpValue(0, Data.Text.Length, i);
+            positions[i] += new Vector2(Main.windSpeedCurrent * progress * 40, windFactor * 30);
+            
+            ChatManager.DrawColorCodedString(
+                Main.spriteBatch,
+                font,
+                Data.Text[i].ToString(),
+                positions[i],
+                Data.Colors[i],
+                rotations[i],
+                origin,
+                Data.Scales[i] * Vector2.One
+            );
+        }
+    }
+
+    private void DrawNormalDialogue(Vector2 position)
+    {
+        DynamicSpriteFont font = FontAssets.DeathText.Value;
+        
         Vector2 origin = font.MeasureString(" ") * 0.5f;
 
         for (int i = 0; i < Data.Text.Length; i++)
