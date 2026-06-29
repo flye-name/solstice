@@ -30,7 +30,7 @@ public class GossipStone : ModItem
 
 public class GossipStoneTile : ModTile
 {
-    public override string Texture => Assets.Images.Aerie.Placements.GossipStone.KEY;
+    public override string Texture => Assets.Images.Aerie.Placements.GossipStoneTile.KEY;
 
     public override void SetStaticDefaults()
     {
