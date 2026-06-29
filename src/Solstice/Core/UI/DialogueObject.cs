@@ -92,12 +92,12 @@ public class DialogueObject
         {
             HighlightedCharacterIndex++;
             
-            Data.Text = BaseData.Text[..(HighlightedCharacterIndex + 1)];
+            Data.Text = BaseData.Text[..Math.Min(HighlightedCharacterIndex + 1, BaseData.Text.Length - 1)];
 
             OnCharacterAppearPerType();
         }
 
-        if (Data.CharacterSound.HasValue && Main.timeForVisualEffects % Data.SoundInterval == 0 && BaseData.Text[HighlightedCharacterIndex] != ' ' && Delay <= 0)
+        if (Data.CharacterSound.HasValue && Main.timeForVisualEffects % Data.SoundInterval == 0 && HighlightedCharacterIndex < BaseData.Text.Length - 1 && BaseData.Text[HighlightedCharacterIndex] != ' ' && Delay <= 0)
         {
             SoundEngine.PlaySound(Data.CharacterSound.Value, Data.Position);
         }
@@ -114,7 +114,7 @@ public class DialogueObject
                 Data.Scales[i] = MathHelper.Lerp(Data.Scales[i], BaseData.Scale, 0.2f);
             }
 
-        if (HighlightedCharacterIndex > BaseData.Text.Length)
+        if (HighlightedCharacterIndex >= BaseData.Text.Length - 1)
         {
             FadeOut();
         }
@@ -125,7 +125,7 @@ public class DialogueObject
         switch (Data.Type)
         {
             case DialogueType.Normal:
-                Data.Colors[HighlightedCharacterIndex] = Color.White;
+                Data.Colors[Math.Min(HighlightedCharacterIndex, BaseData.Text.Length - 1)] = Color.White;
                 SetDelays();
                 break;
             
@@ -181,6 +181,11 @@ public class DialogueObject
 
             case DialogueType.Wind:
             {
+                if (!(Data.LifetimeAfterCompletion < BaseData.LifetimeAfterCompletion / 2f))
+                {
+                    break;
+                }
+
                 if (HighlightedCharacterIndex <= BaseData.Text.Length * 2)
                 {
                     HighlightedCharacterIndex++;
@@ -188,7 +193,9 @@ public class DialogueObject
 
                 for (int i = 0; i < HighlightedCharacterIndex - BaseData.Text.Length; i++)
                 {
-                    Data.Colors[i] *= 0.9f;
+                    var index = Math.Min(i, BaseData.Text.Length - 1);
+
+                    Data.Colors[index] *= 0.95f;
                 }
             }
             break;

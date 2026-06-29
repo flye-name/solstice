@@ -93,12 +93,13 @@ public class GossipStoneTileEntity : ModTileEntity
 
     public override void Update()
     {
-        if ((Main.GameUpdateCount + Position.X + Position.Y) % 400 == 0) 
+        if ((Main.GameUpdateCount + Position.X + Position.Y) % 1300 == 0) 
         {
             Dialogue.NewDialogue(new(GossipMessage, Position.ToVector2() * 16 + new Vector2(16, 22), Color.Gray with { A = 0 }, 0.3f, DialogueType.Wind)
                 {
                     SoundInterval = 20,
-                    CharacterSound = SoundID.DD2_BetsyWindAttack
+                    CharacterSound = SoundID.DD2_BetsyWindAttack,
+                    LifetimeAfterCompletion = 1400,
                 }
             );
         }
