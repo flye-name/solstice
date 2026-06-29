@@ -317,7 +317,7 @@ public sealed class TallAerieGrass1x1 : ModTile
         var tilePos = new Vector2(i, j).ToWorldCoordinates();
 
         if (Main.rand.NextBool(5) && Main.LocalPlayer.Distance(tilePos) < 16 && Main.LocalPlayer.velocity.Length() > 0)
-            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/GrassBrush", 4)
+            SoundEngine.PlaySound(Assets.Sounds.GrassBrush.Asset with
             {
                 MaxInstances = 10,
                 SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
@@ -406,7 +406,7 @@ public sealed class TallAerieGrass1x2 : ModTile
         var tilePos = new Vector2(i, j).ToWorldCoordinates();
 
         if (Main.rand.NextBool(5) && Main.LocalPlayer.Distance(tilePos) < 16 && Main.LocalPlayer.velocity.Length() > 0)
-            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/GrassBrush", 4)
+            SoundEngine.PlaySound(Assets.Sounds.GrassBrush.Asset with
             {
                 MaxInstances = 10,
                 SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,

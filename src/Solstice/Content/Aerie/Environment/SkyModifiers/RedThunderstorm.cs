@@ -51,18 +51,18 @@ public class RedThunderstorm : SkyModifier
         _soundTimer--;
         if (_soundTimer == 100)
         {
-            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/Timpani") with { PitchVariance = 0.2f });
+            SoundEngine.PlaySound(Assets.Sounds.Thunder.Timpani.Asset with { PitchVariance = 0.2f });
             
-            var slot = SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/CloseThunder" + Main.rand.Next(1, 4)) with { PitchVariance = 0.2f, Volume = 2 });
+            var slot = SoundEngine.PlaySound(Assets.Sounds.Thunder.CloseThunder.Asset with { PitchVariance = 0.2f, Volume = 2 });
             if (SoundEngine.TryGetActiveSound(slot, out var sound))
             {
-                sound.Sound.INTERNAL_applyReverb(0.5f);
+                sound.Sound?.INTERNAL_applyReverb(0.5f);
             }
         }
         
         if (_soundTimer == 1)
         {
-            SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/StormPiano" + Main.rand.Next(1, 12)));
+            SoundEngine.PlaySound(Assets.Sounds.Thunder.StormPiano.Asset);
         }
     }
 
@@ -218,10 +218,10 @@ public class RedThunderstorm : SkyModifier
         
         if (Main.rand.NextBool(300))
         {
-            var slot = SoundEngine.PlaySound(new SoundStyle("Solstice/Assets/Sounds/Thunder/FarThunder" + Main.rand.Next(1, 5)) with { PitchVariance = 0.2f, MaxInstances = 3 });
+            var slot = SoundEngine.PlaySound(Assets.Sounds.Thunder.FarThunder.Asset with { PitchVariance = 0.2f, MaxInstances = 3 });
             if (SoundEngine.TryGetActiveSound(slot, out var sound))
             {
-                sound.Sound.INTERNAL_applyReverb(0.1f);
+                sound.Sound?.INTERNAL_applyReverb(0.1f);
             }
         }
     }
