@@ -94,7 +94,11 @@ public class GossipStoneTileEntity : ModTileEntity
 
     public override void Update()
     {
-        if ((Main.GameUpdateCount + Position.X + Position.Y) % 1300 == 0) 
+        GossipMessage = "Satanic black magic. That's what this is. Fuckin' QUEERS.";
+        
+        var worldPosition = Position.ToVector2() * 16;
+        var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
+        if ((Main.GameUpdateCount + Position.X + Position.Y) % 1300 == 0 && worldPosition.Between(-screenSize, screenSize * 2)) 
         {
             Dialogue.NewDialogue(new(GossipMessage, Position.ToVector2() * 16 + new Vector2(16, 22), Color.Gray with { A = 0 }, 0.3f, DialogueType.Wind)
                 {
@@ -107,7 +111,7 @@ public class GossipStoneTileEntity : ModTileEntity
                 MaxInstances = 3,
                 PitchVariance = 0.2f,
                 SoundLimitBehavior = SoundLimitBehavior.IgnoreNew
-            }, Position.ToVector2() * 16);
+            }, worldPosition);
         }
     }
 }

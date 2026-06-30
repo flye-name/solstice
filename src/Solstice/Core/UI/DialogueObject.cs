@@ -129,12 +129,9 @@ public class DialogueObject
         switch (Data.Type)
         {
             case DialogueType.Wind:
-                float progress = Utils.GetLerpValue(0, BaseData.LifetimeAfterCompletion, Data.LifetimeAfterCompletion);
-                progress *= Utils.GetLerpValue(0, BaseData.Text.Length, Data.Text.Length);
-                progress = MathF.Pow(MathHelper.Clamp(progress, 0, 1), 2);
-                float strength = 0.4f * progress;
-                if (strength > 0.05f)
-                    Lighting.AddLight(Data.Position, new Vector3(strength));
+                float progress = MathF.Sin(Utils.GetLerpValue(0, BaseData.Text.Length, Data.Text.Length) * MathF.PI);
+                float strength = 0.1f + 0.4f * progress;
+                Lighting.AddLight(Data.Position, new Vector3(strength));
                 break;
         }
     }
