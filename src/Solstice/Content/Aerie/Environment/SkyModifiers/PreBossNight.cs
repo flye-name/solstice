@@ -45,12 +45,13 @@ public class PreBossNight : SkyModifier
 
         var baseColor = new Color(116, 131, 250);
 
-        var position = Main.MouseScreen;
+        // TODO: variable position ?
+        var position = new Vector2(Main.screenWidth * 0.78f, Main.screenHeight * 0.2f);
         var positions = new List<Vector3>();
         var altPositions = new List<Vector3>();
         var flarePosition = position;
 
-        var sin = MathF.Sin(Main.GlobalTimeWrappedHourly * 14);
+        var sin = MathF.Sin(Main.GlobalTimeWrappedHourly * 10);
         var flicker = 1f + sin * (MathF.Sign(sin) <= 0 ? 0.025f : 0.01f);
 
         for (float i = 0; i < 1; i += 0.025f)
@@ -92,7 +93,7 @@ public class PreBossNight : SkyModifier
             for (int i = 0; i < vertices.Length; i++)
             {
                 vertices[i].Color *= 0.3f;
-                vertices[i].TextureCoordinate.X += Main.GlobalTimeWrappedHourly * -.1f;
+                vertices[i].TextureCoordinate.X += Main.GlobalTimeWrappedHourly * -.03f;
             }
             
             Main.graphics.GraphicsDevice.Textures[0] = trail;   
@@ -108,7 +109,7 @@ public class PreBossNight : SkyModifier
     
     [ModSystemHooks.PostUpdateEverything]
     public static void Update()
-    {   
+    {
         Intensity = Active ? MathF.Min(1f, Intensity + 0.05f) : MathF.Max(0f, Intensity - 0.05f);
     }
 }
