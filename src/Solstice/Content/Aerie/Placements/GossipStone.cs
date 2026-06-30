@@ -63,14 +63,13 @@ public class GossipStoneTile : ModTile
 
 public class GossipStoneTileEntity : ModTileEntity
 {
-    private const string placeholder = "im gossiping my stone rn,, i got, wind all up my stone...";
     public override bool IsTileValidForEntity(int x, int y) 
     {
         Tile tile = Main.tile[x, y];
         return tile.HasTile && tile.TileType == ModContent.TileType<GossipStoneTile>();
     }
 
-    public string GossipMessage = placeholder;
+    public string GossipMessage = "   ";
     public override void SaveData(TagCompound tag) => tag[nameof(GossipMessage)] = GossipMessage;
 
     public override void LoadData(TagCompound tag) => GossipMessage = tag.GetString(nameof(GossipMessage));
@@ -94,8 +93,6 @@ public class GossipStoneTileEntity : ModTileEntity
 
     public override void Update()
     {
-        GossipMessage = "Satanic black magic. That's what this is. Fuckin' QUEERS.";
-        
         var worldPosition = Position.ToVector2() * 16;
         var screenSize = new Vector2(Main.screenWidth, Main.screenHeight);
         if ((Main.GameUpdateCount + Position.X + Position.Y) % 1300 == 0 && worldPosition.Between(-screenSize, screenSize * 2)) 
