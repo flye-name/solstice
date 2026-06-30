@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Solstice.Core;
 using System.IO;
 using Terraria;
+using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
@@ -97,11 +98,16 @@ public class GossipStoneTileEntity : ModTileEntity
         {
             Dialogue.NewDialogue(new(GossipMessage, Position.ToVector2() * 16 + new Vector2(16, 22), Color.Gray with { A = 0 }, 0.3f, DialogueType.Wind)
                 {
-                    SoundInterval = 20,
-                    CharacterSound = SoundID.DD2_BetsyWindAttack,
                     LifetimeAfterCompletion = 1400,
                 }
             );
+            
+            SoundEngine.PlaySound(Assets.Sounds.Decorative.GossipStone.Asset with
+            {
+                MaxInstances = 3,
+                PitchVariance = 0.2f,
+                SoundLimitBehavior = SoundLimitBehavior.IgnoreNew
+            }, Position.ToVector2() * 16);
         }
     }
 }

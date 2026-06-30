@@ -108,6 +108,11 @@ Items: {
 		DisplayName: Aerie Cliff Rock
 		Tooltip: ""
 	}
+
+	GossipStone: {
+		DisplayName: Gossip Stone
+		Tooltip: ""
+	}
 }
 
 Biomes: {
