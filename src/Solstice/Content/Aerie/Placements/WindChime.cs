@@ -73,7 +73,7 @@ public sealed class WindChimeTile : ModTile
         if (MathF.Abs(Main.windSpeedCurrent) > 0.4f && Main.rand.NextBool(120))
         {
             SoundEngine.PlaySound(
-                Assets.Sounds.Windchime.Asset with
+                Assets.Sounds.Decorative.Windchime.Asset with
                 {
                     Type = SoundType.Ambient,
                     MaxInstances = 2,
