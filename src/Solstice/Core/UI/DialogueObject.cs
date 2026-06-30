@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using ReLogic.Graphics;
 using System;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -8,6 +9,7 @@ using Terraria.GameContent;
 using Terraria.GameContent.Drawing;
 using Terraria.ModLoader;
 using Terraria.UI.Chat;
+using Terraria.Utilities;
 
 namespace Solstice.Core;
 
@@ -102,7 +104,7 @@ public class DialogueObject
             SoundEngine.PlaySound(Data.CharacterSound.Value, Data.Position);
         }
         
-        if (Data.LifetimeAfterCompletion >= BaseData.LifetimeAfterCompletion)
+        if (Data.LifetimeAfterCompletion >= BaseData.LifetimeAfterCompletion / 2f)
             for (int i = 0; i < BaseData.Text.Length; i++)
             {
                 if (i >= HighlightedCharacterIndex)
@@ -117,6 +119,23 @@ public class DialogueObject
         if (HighlightedCharacterIndex >= BaseData.Text.Length - 1)
         {
             FadeOut();
+        }
+
+        UniqueUpdates();
+    }
+
+    void UniqueUpdates()
+    {
+        switch (Data.Type)
+        {
+            case DialogueType.Wind:
+                float progress = Utils.GetLerpValue(0, BaseData.LifetimeAfterCompletion, Data.LifetimeAfterCompletion);
+                progress *= Utils.GetLerpValue(0, BaseData.Text.Length, Data.Text.Length);
+                progress = MathF.Pow(MathHelper.Clamp(progress, 0, 1), 2);
+                float strength = 0.4f * progress;
+                if (strength > 0.05f)
+                    Lighting.AddLight(Data.Position, new Vector3(strength));
+                break;
         }
     }
 
@@ -167,7 +186,7 @@ public class DialogueObject
         {
             case DialogueType.Normal:
             {
-                if (!(Data.LifetimeAfterCompletion < BaseData.LifetimeAfterCompletion / 2f))
+                if (Data.LifetimeAfterCompletion > BaseData.LifetimeAfterCompletion / 2f)
                 {
                     break;
                 }
@@ -181,7 +200,7 @@ public class DialogueObject
 
             case DialogueType.Wind:
             {
-                if (!(Data.LifetimeAfterCompletion < BaseData.LifetimeAfterCompletion / 2f))
+                if (Data.LifetimeAfterCompletion > BaseData.LifetimeAfterCompletion / 2f)
                 {
                     break;
                 }
@@ -235,6 +254,8 @@ public class DialogueObject
         DynamicSpriteFont font = FontAssets.DeathText.Value;
         
         Vector2 origin = font.MeasureString(" ") * 0.5f;
+
+        UnifiedRandom rand = new((int)(BaseData.Position.X + Data.Position.Y));
         
         for (int i = 0; i < Data.Text.Length; i++)
         {   
@@ -264,7 +285,8 @@ public class DialogueObject
             if (coord.X > Main.offLimitBorderTiles && coord.X < Main.maxTilesX - Main.offLimitBorderTiles && coord.Y > Main.offLimitBorderTiles && coord.Y < Main.maxTilesY - Main.offLimitBorderTiles) 
             {
                 Main.instance.TilesRenderer.Wind.GetWindTime(coord.X, coord.Y, 100, out var timeLeft, out var dirX, out var dirY);
-                positions[i] += new Vector2(dirX, dirY) * MathF.Sin(MathF.PI * timeLeft / 100f) * 6;
+                float strength = MathF.Sin(MathF.PI * timeLeft / 100f) * rand.NextFloat(3, 6);
+                positions[i] += new Vector2(dirX, dirY).RotatedBy(rand.NextFloat(-0.1f, 0.1f)) * strength;
             }
 
             ChatManager.DrawColorCodedString(
