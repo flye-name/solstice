@@ -411,7 +411,7 @@ public static class AerieLeafLitterRendering
         position += new Vector2(8);
         position.X += sway;
 
-        float rotation = offset + (sway * 0.05f);
+        float rotation = sway * 0.05f;
 
         int paint = wall ? tile.WallColor : tile.TileColor;
 
