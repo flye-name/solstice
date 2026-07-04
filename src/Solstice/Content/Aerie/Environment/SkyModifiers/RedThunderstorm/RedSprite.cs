@@ -28,7 +28,7 @@ public struct RedSprite
 
         for (int i = 0; i < MaxBranches; i++)
         {
-            Points[i] = new(250);
+            Points[i] = new(MaxPoints);
 
             Points[i].Add(position + new UnifiedRandom(Seed + i + 1).NextVector2Circular(70, 70));
         }
