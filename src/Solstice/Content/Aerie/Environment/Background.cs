@@ -42,6 +42,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
 #region Edits
 
+    private static float FogTime;
     public static float TargetFogSpeed = 1f;
     public static float FogSpeed = 1f;
 
@@ -94,17 +95,21 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
     }
 
     [ModSystemHooks.PostUpdateEverything]
-    private static void UpdateFogSpeed()
+    private static void UpdateFogTime()
     {
         if (!AerieSubworld.Active)
         {
             FogSpeed = 1f;
             TargetFogSpeed = 1f;
+            FogTime = 0f;
             
             return;
         }
         
-        FogSpeed = MathHelper.Lerp(FogSpeed, TargetFogSpeed, 0.1f);
+        FogSpeed = MathHelper.Lerp(FogSpeed, TargetFogSpeed, 0.005f);
+
+        if ((FogTime += FogSpeed) < 0f)
+            FogTime = 0f;
     }
 
     private static void DrawBackgroundBlackFill_Fog(On_Main.orig_DrawBackgroundBlackFill orig, Main self)
@@ -291,7 +296,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
             fogShader.Parameters.Parallax = Main.screenPosition.X * parallax / Main.screenWidth;
 
-            fogShader.Parameters.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f) * speed * FogSpeed;
+            fogShader.Parameters.Time = FogTime * 0.0015f * (parallax + 1f) * speed;
 
             var offset = new Vector2(Main.screenPosition.X % 2, Main.screenPosition.Y % 2);
 
