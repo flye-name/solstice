@@ -17,6 +17,8 @@ public class PreBossNight : SkyModifier
     public override bool IsActive => Active;
     public override void UpdateSky()
     {
+        AerieBackground.TargetFogSpeed = 0.1f;
+        
         SkyManagement.LerpSkyColors([
             new Color(0,0,0),
             new Color(116, 131, 250) * 0.07f,

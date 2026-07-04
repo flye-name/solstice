@@ -33,6 +33,8 @@ public class RedThunderstorm : SkyModifier
     private int _soundTimer;
     public override void UpdateSky()
     {
+        AerieBackground.TargetFogSpeed = 15f;
+        
         _skyFlash = MathHelper.Lerp(_skyFlash, 0, 0.01f);
         
         var colors = Color.ArrayLerp(PresetSkyColors.RED_THUNDERSTORM, PresetSkyColors.RED_THUNDERSTORM_FLASH, _skyFlash);
@@ -204,6 +206,7 @@ public class RedThunderstorm : SkyModifier
     [ModSystemHooks.PostUpdateEverything]
     public static void Update()
     {
+        Active = true;
         Intensity = Active ? MathF.Min(1f, Intensity + 0.05f) : MathF.Max(0f, Intensity - 0.05f);
         
         // Red sprites are updated even if the event is inactive so clearing ones can fade out properly.

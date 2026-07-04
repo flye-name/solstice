@@ -41,6 +41,10 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
     }
 
 #region Edits
+
+    public static float TargetFogSpeed = 1f;
+    public static float FogSpeed = 1f;
+
     private static Color FarFogColor => Color.OklabLerp(SkyManagement.SkyMiddleColor, SkyManagement.SkyBottomColor, 0.5f);
 
     private static Color MidFogColor => Color.OklabLerp(SkyManagement.SkyMiddleColor, SkyManagement.SkyBottomColor, 0.8f);
@@ -89,6 +93,20 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
         On_Main.DrawInfernoRings += DrawInfernoRings_Fog;
     }
 
+    [ModSystemHooks.PostUpdateEverything]
+    private static void UpdateFogSpeed()
+    {
+        if (!AerieSubworld.Active)
+        {
+            FogSpeed = 1f;
+            TargetFogSpeed = 1f;
+            
+            return;
+        }
+        
+        FogSpeed = MathHelper.Lerp(FogSpeed, TargetFogSpeed, 0.1f);
+    }
+
     private static void DrawBackgroundBlackFill_Fog(On_Main.orig_DrawBackgroundBlackFill orig, Main self)
     {
         orig(self);
@@ -124,13 +142,13 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         top *= parallax;
 
-        DrawFog(Main.spriteBatch, OverTilesFogColor, (int)top, parallax, true);
+        DrawFog(Main.spriteBatch, OverTilesFogColor, (int)top, parallax, true, speed: 0.5f);
 
         if (RedThunderstorm.Active)
         {
-            DrawFog(Main.spriteBatch, FarFogColor * 0.4f * RedThunderstorm.Intensity, Main.instance.bgTopY - 700, speed: 20);
+            DrawFog(Main.spriteBatch, FarFogColor * 0.4f * RedThunderstorm.Intensity, Main.instance.bgTopY - 700, speed: 1.5f);
             
-            DrawFog(Main.spriteBatch, NearFogColor * 0.3f * RedThunderstorm.Intensity, Main.instance.bgTopY - 500, speed: 22);
+            DrawFog(Main.spriteBatch, NearFogColor * 0.3f * RedThunderstorm.Intensity, Main.instance.bgTopY - 500, speed: 1.75f);
         }
     }
 
@@ -180,10 +198,10 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         orig(self, backgroundTopMagicNumber, bgGlobalScaleMultiplier, pushBGTopHack);
 
-        DrawFog(Main.spriteBatch, FarFogColor, Main.instance.bgTopY);
+        DrawFog(Main.spriteBatch, FarFogColor, Main.instance.bgTopY, speed: 0.5f);
         
         if (RedThunderstorm.Active)
-            DrawFog(Main.spriteBatch, FarFogColor * 0.3f * RedThunderstorm.Intensity, Main.instance.bgTopY - 1000, speed: 14);
+            DrawFog(Main.spriteBatch, FarFogColor * 0.3f * RedThunderstorm.Intensity, Main.instance.bgTopY - 1000);
     }
 
     private static void DrawSurfaceBG_BackMountainsStep2_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
@@ -196,7 +214,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         orig(self, pushBGTopHack);
 
-        DrawFog(Main.spriteBatch, MidFogColor, Main.instance.bgTopY);
+        DrawFog(Main.spriteBatch, MidFogColor, Main.instance.bgTopY, speed: 0.75f);
 
         _ = Main.treeMntBGSet1[1];
     }
@@ -273,7 +291,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
             fogShader.Parameters.Parallax = Main.screenPosition.X * parallax / Main.screenWidth;
 
-            fogShader.Parameters.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f) * speed;
+            fogShader.Parameters.Time = Main.GlobalTimeWrappedHourly * 0.05f * (parallax + 1f) * speed * FogSpeed;
 
             var offset = new Vector2(Main.screenPosition.X % 2, Main.screenPosition.Y % 2);
 
