@@ -224,8 +224,8 @@ public static class Wind
 
                 const float decay = 0.005f;
 
-                Ambient(Assets.Music.Wind.HeavenWind.Slot, AerieSubworld.Active && !RedThunderstorm.Active);
-                Ambient(Assets.Music.Wind.RedStormWind.Slot, AerieSubworld.Active && RedThunderstorm.Active);
+                Ambient(Assets.Music.Wind.HeavenWind.Slot, AerieSubworld.Active && !RedThunderstormSky.Active);
+                Ambient(Assets.Music.Wind.RedStormWind.Slot, AerieSubworld.Active && RedThunderstormSky.Active);
 
                 if (AerieSubworld.Active)
                 {
@@ -359,7 +359,7 @@ public static class Wind
 
         UpdateWind();
 
-        float spawnChance = RedThunderstorm.Active ? red_thunder_spawn_chance : spawn_chance;
+        float spawnChance = RedThunderstormSky.Active ? red_thunder_spawn_chance : spawn_chance;
         spawnChance /= MathF.Abs(Main.WindForVisuals);
 
         if (Main.rand.NextBool((int)spawnChance))
@@ -479,7 +479,7 @@ public static class Wind
                 Main.rand.NextFloat(foreground ? 0 : parallax_min, foreground ? parallax_max : 0),
                 Vector2.Zero,
                 Main.rand.NextFloat(-loop_offset, loop_offset),
-                !RedThunderstorm.Active && Main.rand.NextBool(loop_chance),
+                !RedThunderstormSky.Active && Main.rand.NextBool(loop_chance),
                 0f
             );
         }

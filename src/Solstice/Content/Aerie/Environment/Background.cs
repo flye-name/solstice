@@ -144,11 +144,11 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         DrawFog(Main.spriteBatch, OverTilesFogColor, (int)top, parallax, true, speed: 0.5f);
 
-        if (RedThunderstorm.Active)
+        if (RedThunderstormSky.Active)
         {
-            DrawFog(Main.spriteBatch, FarFogColor * 0.4f * RedThunderstorm.Intensity, Main.instance.bgTopY - 700, speed: 1.5f);
+            DrawFog(Main.spriteBatch, FarFogColor * 0.4f * RedThunderstormSky.Intensity, Main.instance.bgTopY - 700, speed: 1.5f);
             
-            DrawFog(Main.spriteBatch, NearFogColor * 0.3f * RedThunderstorm.Intensity, Main.instance.bgTopY - 500, speed: 1.75f);
+            DrawFog(Main.spriteBatch, NearFogColor * 0.3f * RedThunderstormSky.Intensity, Main.instance.bgTopY - 500, speed: 1.75f);
         }
     }
 
@@ -200,8 +200,8 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         DrawFog(Main.spriteBatch, FarFogColor, Main.instance.bgTopY, speed: 0.5f);
         
-        if (RedThunderstorm.Active)
-            DrawFog(Main.spriteBatch, FarFogColor * 0.3f * RedThunderstorm.Intensity, Main.instance.bgTopY - 1000);
+        if (RedThunderstormSky.Active)
+            DrawFog(Main.spriteBatch, FarFogColor * 0.3f * RedThunderstormSky.Intensity, Main.instance.bgTopY - 1000);
     }
 
     private static void DrawSurfaceBG_BackMountainsStep2_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep2 orig, Main self, int pushBGTopHack)
@@ -403,7 +403,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
             }
             Main.spriteBatch.Restart(in snapshot);
 
-            RedThunderstorm.DrawRedSprites();
+            RedSpriteRendering.DrawRedSprites();
         }
         else
         {

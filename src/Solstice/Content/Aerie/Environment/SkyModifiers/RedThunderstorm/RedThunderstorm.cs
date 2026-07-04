@@ -19,12 +19,12 @@ public class RedThunderstormScene : ModSceneEffect
 {
     public override int Music => Assets.Music.Stormseeker.Slot;
 
-    public override bool IsSceneEffectActive(Player player) => AerieSubworld.Active && RedThunderstorm.Active;
+    public override bool IsSceneEffectActive(Player player) => AerieSubworld.Active && RedThunderstormSky.Active;
 
     public override SceneEffectPriority Priority => SceneEffectPriority.Event;
 }
 
-public class RedThunderstorm : SkyModifier
+public class RedThunderstormSky : SkyModifier
 {
     #region sky modifier
     public override SkyModifierPriority Priority => SkyModifierPriority.StrongWeather;
@@ -98,7 +98,7 @@ public class RedThunderstorm : SkyModifier
     {
         Point screenSize = new(Main.screenWidth, Main.screenHeight);
 
-        Rectangle area = new Rectangle(0, screenSize.Y - 200, screenSize.X, screenSize.Y);
+        Rectangle area = new(0, screenSize.Y - 200, screenSize.X, screenSize.Y);
         
         SpawnRedSprite(new RedSprite(Main.rand.NextVector2FromRectangle(area), 120));
     }
@@ -156,49 +156,6 @@ public class RedThunderstorm : SkyModifier
                 if (rs.Points[i].Count <= 2 || rs.Points[i].Last().Distance(position) > 100)
                     rs.Points[i].Add(position);
             }
-        }
-    }
-
-    public static void DrawRedSprites()
-    {
-        for (int i = 0; i < MaxSprites; i++)
-        {
-            ref var rs = ref RedSprites[i];
-            if (!rs.Active)
-                continue;
-            
-            Main.spriteBatch.End(out var snapshot);
-            Main.spriteBatch.Begin(snapshot with { SamplerState = SamplerState.PointWrap });
-            {
-                DrawRedSprite(i);
-            }
-            Main.spriteBatch.Restart(in snapshot);
-        }
-    }
-    
-    public static void DrawRedSprite(int index)
-    {
-        ref RedSprite rs = ref RedSprites[index];
-
-        Main.graphics.GraphicsDevice.Textures[0] = Assets.Images.Beam.Asset.Value;
-        var progress = Utils.GetLerpValue(rs.MaxLifetime, 0, rs.Lifetime);
-        for (int j = 0; j < RedSprite.MaxBranches; j++)
-        {
-            var curPositions = rs.Points[j].Where(x => x != default).ToList();
-            if (curPositions.Count < 2) continue;
-            
-            var positions = curPositions.Select(x => new Vector3(x, 0)).ToList();
-
-            var color = PresetSkyColors.RED_THUNDERSTORM[2] with { A = 0 } * Intensity; 
-            var opacity = (1f - MathHelper.Clamp(progress - 0.5f, 0, 1) * 2) * new UnifiedRandom(rs.Seed).NextFloat(0.25f, 1);
-
-            opacity *= 2;
-            float width = 40;
-
-            var vertices = TriangleStripBuilder.BuildPath(positions, _ => MathF.Sin(MathF.PI * _) * width, c => color * (1f - c) * opacity, smoothingSubdivisions: 2);
-            
-            if (vertices.Length > 3)
-                Main.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, vertices, 0, vertices.Length - 2);
         }
     }
     #endregion

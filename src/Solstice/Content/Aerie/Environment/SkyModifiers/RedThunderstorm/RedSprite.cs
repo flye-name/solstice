@@ -8,6 +8,7 @@ namespace Solstice.Content.Aerie;
 public struct RedSprite
 {
     public const int MaxBranches = 14;
+    public const int MaxPoints = 75;
     
     public readonly int Seed;
     public UnifiedRandom Random => new(Seed);
@@ -27,7 +28,7 @@ public struct RedSprite
 
         for (int i = 0; i < MaxBranches; i++)
         {
-            Points[i] = new();
+            Points[i] = new(250);
 
             Points[i].Add(position + new UnifiedRandom(Seed + i + 1).NextVector2Circular(70, 70));
         }
