@@ -16,7 +16,7 @@ namespace Solstice.Content.Aerie;
 public static class FlameParticles
 {
     #region data
-    private const int flame_count = 1800;
+    private const int flame_count = 600;
     
     private sealed class Data : IStatic<Data>
     {
