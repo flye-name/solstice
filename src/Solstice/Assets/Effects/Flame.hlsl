@@ -9,12 +9,14 @@ GLOBAL_TIME(uTime)
 
 float2 uDirection;
 float uNoiseStrength;
+int uColorQuantity = 32;
+int uNoiseColorQuantity = 32;
 
 float4 FlameShaderFragment(float4 pos : SV_POSITION, float2 uv : TEXCOORD0, float4 baseColor : COLOR0) : SV_TARGET
 {
     float2 noiseUV = 2 * (pos.xy / uScreenSize) + uScreenPos + uDirection * uTime;
     
-    float4 noiseColor = tex2D(Noise, noiseUV);
+    float4 noiseColor = floor(tex2D(Noise, noiseUV) * uNoiseColorQuantity) / uNoiseColorQuantity;
     float4 mask = tex2D(Texture, uv);
     float4 color = tex2D(Texture, uv + uDirection * noiseColor.r * mask.r * uNoiseStrength);
    
@@ -23,7 +25,7 @@ float4 FlameShaderFragment(float4 pos : SV_POSITION, float2 uv : TEXCOORD0, floa
     
     float4 final = mul(properColor, noiseColor);
     
-    return final * baseColor;
+    return floor(final * baseColor * uColorQuantity) / uColorQuantity;
 }
 
 BEGIN_TECHNIQUE(Technique1)  

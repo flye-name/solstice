@@ -114,15 +114,17 @@ public static class FlameParticles
     public static void DrawFlames(SpriteBatch sb)
     {
         var texture = Assets.Images.Fire.Asset.Value;
-        var textureNoise = Assets.Images.NavierNoise.Asset.Value;
+        var textureNoise = Assets.Images.CoherentNoise.Asset.Value;
         var baseOrigin = texture.Size() / 2f;
         
         sb.End(out var ss);
 
         var shader = Data.Instance.FlameShader;
 
-        shader.Parameters.uDirection = new Vector2(0.1f, 1f);
-        shader.Parameters.uNoiseStrength = 0.25f;
+        shader.Parameters.uDirection = new Vector2(0.2f, 1f);
+        shader.Parameters.uNoiseStrength = 0.2f;
+        shader.Parameters.uColorQuantity = 8;
+        shader.Parameters.uNoiseColorQuantity = 4;
         
         shader.Apply();
         
@@ -154,6 +156,16 @@ public static class FlameParticles
             if (!charred)
                 color = Color.Lerp(Color.Gold with { A = 30 }, Color.OrangeRed with { A = 120 }, (1.1f - flame.Progress) * 5) * MathF.Pow(flame.Progress, 2);
             color *= flame.Progress;
+            
+            if (!charred)
+                sb.Draw(new DrawParameters(texture)
+                {
+                    Position = position,
+                    Origin = origin,
+                    Color = color * 0.25f * scale.X,
+                    Rotation = rotation,
+                    Scale = scale * 1.5f
+                });
             
             sb.Draw(new DrawParameters(texture)
             {
