@@ -1,5 +1,6 @@
 using Daybreak.Common.Features.Hooks;
 using Daybreak.Common.Features.Models;
+using Daybreak.Common.Mathematics;
 using Daybreak.Common.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -39,6 +40,7 @@ public static class FlameParticles
     {
         public Vector2 Position = Vector2.Zero;
         public float Progress = 0f;
+        public Angle Rotation;
     }
     
     private static readonly Flame[] flames = new Flame[flame_count];
@@ -68,17 +70,29 @@ public static class FlameParticles
     {
         for (int i = 0; i < flame_count; i++)
         {
-            if (flames[i].Progress <= 0f)
-                continue;
+            ref float progress = ref flames[i].Progress;
             
-            var decrement = new UnifiedRandom(flames[i].Seed).NextFloat(0.02f, 0.05f);
-            flames[i].Progress = MathF.Max(flames[i].Progress - decrement, 0);
+            if (progress <= 0f)
+                continue;
+
+            var rand = new UnifiedRandom(flames[i].Seed);
+            
+            var decrement = rand.NextFloat(0.02f, 0.05f);
+            progress = MathF.Max(progress - decrement, 0);
+
+            var fallingVelocity = rand.NextVector2Unit() * rand.NextFloat(5, 15);
+            var risingVelocity = new Vector2(rand.NextFloat(-4, 4), rand.NextFloat(-30, -15));
+            var velocity = Vector2.Lerp(fallingVelocity, risingVelocity, progress * 0.8f) * progress;
+            
+            flames[i].Rotation = Angle.FromVector(velocity.RotatedBy(MathHelper.PiOver2));
+            flames[i].Position += velocity;
         }
 
 
         if (Main.mouseRight)
         {
-            New(Main.MouseWorld);
+            for (int i = 0; i < 3; i++)
+                New(Main.MouseWorld);
         }
     }
 
@@ -99,37 +113,54 @@ public static class FlameParticles
     #region rendering
     public static void DrawFlames(SpriteBatch sb)
     {
-        var texture = Assets.Images.Bloom.Asset.Value;
+        var texture = Assets.Images.Fire.Asset.Value;
         var textureNoise = Assets.Images.NavierNoise.Asset.Value;
-        var origin = texture.Size() / 2f;
+        var baseOrigin = texture.Size() / 2f;
         
         sb.End(out var ss);
 
         var shader = Data.Instance.FlameShader;
+
+        shader.Parameters.uDirection = new Vector2(0.1f, 1f);
+        shader.Parameters.uNoiseStrength = 0.25f;
+        
         shader.Apply();
         
         sb.Begin(ss with { CustomEffect = shader.Shader, SamplerState = SamplerState.PointWrap });
 
         Main.graphics.GraphicsDevice.Textures[1] = textureNoise;
         
-        foreach (var flame in flames)
+        for (int i = flame_count - 1; i > 0; i--)
         {
+            var flame = flames[i];
             if (flame.Progress <= 0f)
                 continue;
             
             var rand = new UnifiedRandom(flame.Seed);
+
+            var charred = rand.NextBool(3);
             
             var position = flame.Position - Main.screenPosition;
-            var scale = Vector2.One * flame.Progress * rand.NextFloat(0.1f, 0.25f);
+            var charredScale = new Vector2(MathF.Pow(flame.Progress, 2), 1);
+            var scale = (charred ? charredScale : Vector2.One) * flame.Progress * rand.NextFloat(.5f, 1f);
+
+            var origin = new Vector2(baseOrigin.X, baseOrigin.Y * flame.Progress);
             
-            var color = Color.Orange * flame.Progress;
-            color.A = 0;
+            var rotation = flame.Rotation.LerpTo(Angle.FromRadians(rand.NextFloat(MathF.Tau)), flame.Progress);
+
+            position += Main.rand.NextVector2Circular(5, 5) * scale;
+            
+            var color = Color.Lerp(Color.Lerp(Color.Gold with { A = 30 }, Color.OrangeRed with { A = 120 }, (1.1f - flame.Progress) * 5), Color.Black, MathHelper.Clamp((1f - flame.Progress) * 1.5f, 0, 1));
+            if (!charred)
+                color = Color.Lerp(Color.Gold with { A = 30 }, Color.OrangeRed with { A = 120 }, (1.1f - flame.Progress) * 5) * MathF.Pow(flame.Progress, 2);
+            color *= flame.Progress;
             
             sb.Draw(new DrawParameters(texture)
             {
                 Position = position,
                 Origin = origin,
                 Color = color,
+                Rotation = rotation,
                 Scale = scale
             });
         }
