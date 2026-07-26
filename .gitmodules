@@ -2,3 +2,6 @@
 	path = src/daybreak-mod
 	url = https://github.com/gold-meridian/daybreak-mod
 
+[submodule "src/subworld-library"]
+	path = src/subworld-library
+	url = https://github.com/ink-zoey/subworld-library
