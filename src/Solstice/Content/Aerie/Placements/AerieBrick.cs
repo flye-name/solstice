@@ -85,26 +85,18 @@ public class AerieBrickTile : ModTile
         Main.tileBrick[Type] = true;
         TileID.Sets.ChecksForMerge[Type] = true;
 
-        TileMerging.AddCustomMerge(
+        /*TileMerging.AddCustomMerge(
             Type,
             Assets.Images.Aerie.Placements.AerieBrickTileMerge.Asset,
             ModContent.TileType<AerieStoneTile>(),
             ModContent.TileType<AerieStoneGrassTile>(),
             ModContent.TileType<AerieBrickErodedTile>()
-        );
+        );*/
 
-        AddMapEntry(new Color(138, 158, 168));
+        AddMapEntry(new Color(147, 144, 131));
 
         DustType = ModContent.DustType<AerieBrickDust>();
         HitSound = SoundID.Tink;
-    }
-
-    public override void SetDrawPositions(int i, int j, ref int width, ref int offsetY, ref int height, ref short tileFrameX, ref short tileFrameY)
-    {
-        if (j % 2 == 0)
-        {
-            tileFrameY += 270;
-        }
     }
 
     public override void NumDust(int i, int j, bool fail, ref int num)
