@@ -193,7 +193,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
         }
     }
 
-    private static void DrawSurfaceBG_BackMountainsStep1_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, double backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBGTopHack)
+    private static void DrawSurfaceBG_BackMountainsStep1_Fog(On_Main.orig_DrawSurfaceBG_BackMountainsStep1 orig, Main self, float backgroundTopMagicNumber, float bgGlobalScaleMultiplier, int pushBGTopHack)
     {
         if (!AerieSubworld.Active)
         {
@@ -271,7 +271,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
         );
     }
 
-    private static void DrawFog(SpriteBatch spriteBatch, Color color, int top, float parallax = -1, bool useZoom = false, float speed = 1f)
+    private static void DrawFog(SpriteBatch spriteBatch, Color color, float top, float parallax = -1, bool useZoom = false, float speed = 1f)
     {
         if (parallax < 0f)
         {

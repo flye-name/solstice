@@ -313,7 +313,7 @@ public static class SolsticeItemSets
                 player.releaseUseTile = false;
                 Main.mouseRightRelease = false;
 
-                Recipe.FindRecipes();
+                // Recipe.FindRecipes();
 
                 return true;
             }
@@ -352,7 +352,7 @@ public static class SolsticeItemSets
         Main.stackSplit = 30;
         Main.mouseRightRelease = false;
 
-        Recipe.FindRecipes();
+        // Recipe.FindRecipes();
     }
 #endregion
 

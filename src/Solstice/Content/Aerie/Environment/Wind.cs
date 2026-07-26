@@ -45,7 +45,7 @@ public static class Wind
                 return false;
             }
 
-            ParallaxOffset += (Main.screenPosition - Main.screenLastPosition) * -Parallax;
+            ParallaxOffset += (Main.screenPosition - priorScreenPosition) * -Parallax;
 
             const float wave_frequency = 0.6f;
             const float wave_amplitude = 0.1f;
@@ -364,12 +364,16 @@ public static class Wind
         }
     }
 
+    private static Vector2 priorScreenPosition;
+
     private static void UpdateWind()
     {
         activeParticles = 0;
 
         Update(false);
         Update(true);
+
+        priorScreenPosition = Main.screenPosition;
 
         return;
 

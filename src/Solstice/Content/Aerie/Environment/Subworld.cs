@@ -490,7 +490,7 @@ public partial class AerieSubworld : Subworld
     public override bool ShouldSave => true;
 
     [GlobalNPCHooks.EditSpawnPool]
-    private static void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
+    private static void EditSpawnPool(IDictionary<int, float> pool, NPC.Spawner spawner)
     {
         if (!Active)
         {
