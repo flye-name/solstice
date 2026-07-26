@@ -1,4 +1,5 @@
-﻿using Daybreak.Common.Rendering;
+﻿using Daybreak.Rendering;
+using Daybreak.Rendering.Buffers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
@@ -128,7 +129,7 @@ public abstract class MaskedTile : ModTile
 
         using (Main.spriteBatch.Scope())
         {
-            Mask ??= ScreenspaceTargetPool.Shared.Rent(Main.instance.GraphicsDevice);
+            Mask ??= ScreenspaceTargetProvider.Shared.Create(Main.instance.GraphicsDevice);
 
             PreMaskTargetRender();
             using (Mask.Scope(clearColor: Color.Transparent))

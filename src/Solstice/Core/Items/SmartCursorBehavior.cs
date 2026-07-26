@@ -1,4 +1,4 @@
-﻿using Daybreak.Common.Features.Hooks;
+﻿using Daybreak.Hooks;
 using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using Terraria;

@@ -1,4 +1,4 @@
-﻿using Daybreak.Common.Features.Hooks;
+﻿using Daybreak.Hooks;
 using Solstice.Content.Aerie;
 using MonoMod.Cil;
 using SubworldLibrary;

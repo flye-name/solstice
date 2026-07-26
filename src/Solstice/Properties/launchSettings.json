@@ -1,22 +1,38 @@
 {
   "profiles": {
-    "Terraria (non-tml-build)": {
-      "commandName": "Executable",
-      "executablePath": "$(DotNetName)",
-      "commandLineArgs": "$(tMLPath)",
-      "workingDirectory": "$(tMLSteamPath)"
-    },
     "Terraria Client": {
       "commandName": "Executable",
       "executablePath": "$(DotNetName)",
       "commandLineArgs": "Tomat.TML.ClientBootstrap.dll --working-directory \"$(tMLSteamPath).\" --binary \"$(tMLPath)\" --mode client --mod $(AssemblyName) --sdk-natives-directory \"$(TmlBuildNativeRoot).\" --tml-build-version $(TmlBuildSdkVersion) --tml-version $(TmlVersion) --tml-version-resolved $(TmlVersionResolved) --features \"$(TmlBuildBootstrapFeatures)\"",
       "workingDirectory": "$(TmlBuildBootstrapRoot)"
     },
+    "Terraria Client (Standard)": {
+      "commandName": "Executable",
+      "executablePath": "$(DotNetName)",
+      "commandLineArgs": "$(tMLPath)",
+      "workingDirectory": "$(tMLSteamPath)"
+    },
+    "Terraria Client (D3D11)": {
+      "commandName": "Executable",
+      "executablePath": "$(DotNetName)",
+      "commandLineArgs": "Tomat.TML.ClientBootstrap.dll --working-directory \"$(tMLSteamPath).\" --binary \"$(tMLPath)\" --mode client --mod $(AssemblyName) --sdk-natives-directory \"$(TmlBuildNativeRoot).\" --tml-build-version $(TmlBuildSdkVersion) --tml-version $(TmlVersion) --tml-version-resolved $(TmlVersionResolved) --features \"$(TmlBuildBootstrapFeatures)\" -- /gldevice:D3D11",
+      "workingDirectory": "$(TmlBuildBootstrapRoot)"
+    },
+    "Terraria Client (D3D11, Standard)": {
+      "commandName": "Executable",
+      "executablePath": "$(DotNetName)",
+      "commandLineArgs": "$(tMLPath) -- /gldevice:D3D11",
+      "workingDirectory": "$(tMLSteamPath)"
+    },
     "Terraria Server": {
       "commandName": "Executable",
       "executablePath": "$(DotNetName)",
       "commandLineArgs": "Tomat.TML.ClientBootstrap.dll --working-directory \"$(tMLSteamPath).\" --binary \"$(tMLPath)\" --mode server --mod $(AssemblyName) --sdk-natives-directory \"$(TmlBuildNativeRoot).\" --tml-build-version $(TmlBuildSdkVersion) --tml-version $(TmlVersion) --tml-version-resolved $(TmlVersionResolved) --features \"$(TmlBuildBootstrapFeatures)\"",
       "workingDirectory": "$(TmlBuildBootstrapRoot)"
+    },
+    "Terraria Server (ProjectBuild)": {
+      "commandName": "Project",
+      "commandLineArgs": "\"$(TmlBuildBootstrapRoot)Tomat.TML.ClientBootstrap.dll\" --working-directory \"$(tMLSteamPath).\" --binary \"$(tMLPath)\" --mode server --mod $(AssemblyName) --sdk-natives-directory \"$(TmlBuildNativeRoot).\" --tml-build-version $(TmlBuildSdkVersion) --tml-version $(TmlVersion) --tml-version-resolved $(TmlVersionResolved) --features \"$(TmlBuildBootstrapFeatures)\""
     }
   }
 }

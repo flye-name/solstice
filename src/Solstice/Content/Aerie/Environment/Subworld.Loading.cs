@@ -1,4 +1,4 @@
-using Daybreak.Common.Rendering;
+using Daybreak.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SubworldLibrary;

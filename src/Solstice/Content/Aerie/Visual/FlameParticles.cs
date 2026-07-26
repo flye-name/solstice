@@ -1,7 +1,7 @@
-using Daybreak.Common.Features.Hooks;
-using Daybreak.Common.Features.Models;
-using Daybreak.Common.Mathematics;
-using Daybreak.Common.Rendering;
+using Daybreak.Hooks;
+using Daybreak.Models;
+using Daybreak.Mathematics;
+using Daybreak.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Solstice.Core;

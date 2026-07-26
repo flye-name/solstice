@@ -1,15 +1,32 @@
-﻿<Project>
+﻿<Project Sdk="Tomat.Terraria.ModLoader.Sdk">
 	
-	<Import Project="..\Mod.targets" />
+	<!-- Daybreak -->
+	<ItemGroup>
+		<Analyzer Include="libanalyzer\Daybreak.CodeAnalysis.dll" />
+	</ItemGroup>
+
+	<!-- SubworldLibrary -->
+	<ItemGroup>
+		<ProjectReference Include="..\subworld-library\src\SubworldLibrary\SubworldLibrary.csproj"/>
+	</ItemGroup>
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
-		<LangVersion>preview</LangVersion>
+		<TmlVersion>dev</TmlVersion>
 	</PropertyGroup>
 
 	<!-- Publicizer -->
 	<ItemGroup>
-		<Publicize Include="tModLoader;ReLogic;FNA;SubworldLibrary" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
+		<Publicize Include="FNA;ReLogic;MonoMod.RuntimeDetour" IncludeCompilerGeneratedMembers="false" IncludeVirtualMembers="false" />
 	</ItemGroup>
+
+	<PropertyGroup>
+		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+
+		<Nullable>enable</Nullable>
+
+		<!-- Type conflict with 'IgnoresAccessChecksToAttribute' -->
+		<NoWarn>$(NoWarn);CS0436</NoWarn>
+	</PropertyGroup>
 
 </Project>

@@ -1,10 +1,9 @@
-using Daybreak.Common.Features.Hooks;
-using Daybreak.Common.Features.Models;
+using Daybreak.Hooks;
+using Daybreak.Models;
 using Microsoft.Xna.Framework;
 using Solstice.Core;
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;

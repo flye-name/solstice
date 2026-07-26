@@ -1,4 +1,4 @@
-﻿using Daybreak.Common.Features.Hooks;
+﻿using Daybreak.Hooks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Solstice.Common;
@@ -13,7 +13,6 @@ using Terraria.GameContent;
 using Terraria.GameContent.Creative;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 // ReSharper disable InconsistentNaming
 

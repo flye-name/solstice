@@ -1,5 +1,5 @@
-using Daybreak.Common.Features.Hooks;
-using Daybreak.Common.Rendering;
+using Daybreak.Hooks;
+using Daybreak.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Solstice.Core;

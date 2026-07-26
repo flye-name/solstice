@@ -1,5 +1,5 @@
-﻿using Daybreak.Common.Features.Hooks;
-using Daybreak.Common.Rendering;
+﻿using Daybreak.Hooks;
+using Daybreak.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoMod.Cil;
@@ -9,11 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
-using Terraria.ID;
 using Terraria.ModLoader;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using BitOperations = System.Numerics.BitOperations;
 
 namespace Solstice.Content.Aerie;
