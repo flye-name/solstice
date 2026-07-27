@@ -74,11 +74,8 @@ public sealed class AerieCloudTile : ModTile
             Type,
             Assets.Images.Aerie.Placements.AerieCloudTileMerge.Asset,
             ModContent.TileType<AerieBrickTile>(),
-            ModContent.TileType<AerieBrickGrassTile>(),
-            ModContent.TileType<AerieBrickErodedTile>(),
             ModContent.TileType<AerieCeramicTile>(),
             ModContent.TileType<AerieStoneTile>(),
-            ModContent.TileType<AerieStoneGrassTile>(),
             TileID.Cloud,
             TileID.RainCloud,
             TileID.SnowCloud

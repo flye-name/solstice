@@ -44,9 +44,7 @@ public class AerieCeramicTile : ModTile
             useCorners: true,
             Assets.Images.Aerie.Placements.AerieCeramicTileMerge.Asset,
             ModContent.TileType<AerieBrickTile>(),
-            ModContent.TileType<AerieBrickGrassTile>(),
-            ModContent.TileType<AerieStoneTile>(),
-            ModContent.TileType<AerieStoneGrassTile>()
+            ModContent.TileType<AerieStoneTile>()
         );
 
         AddMapEntry(new Color(108, 93, 78));

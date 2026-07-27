@@ -246,8 +246,6 @@ public static class AerieLeafLitterRendering
 
             var velocity = Vector2.Normalize(offset) * Main.rand.NextFloat(0.3f, 2.1f);
             velocity -= Vector2.UnitY * 0.6f;
-
-            Dust.NewDustPerfect(position + offset, ModContent.DustType<AerieGrassDust>(), velocity, newColor: color);
         }
     }
 

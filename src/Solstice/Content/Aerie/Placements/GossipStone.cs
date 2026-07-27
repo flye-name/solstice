@@ -44,7 +44,6 @@ public class GossipStoneTile : ModTile
         TileObjectData.newTile.HookPostPlaceMyPlayer = new(ModContent.GetInstance<GossipStoneTileEntity>().Hook_AfterPlacement, -1, 0, true);
         TileObjectData.addTile(Type);
         Main.tileMerge[ModContent.TileType<AerieStoneTile>()][Type] = true;
-        Main.tileMerge[ModContent.TileType<AerieStoneGrassTile>()][Type] = true;
 
         DustType = ModContent.DustType<AerieStoneDust>();
         HitSound = SoundID.Tink;

@@ -59,12 +59,6 @@ public sealed class AerieBrick : ModItem
            .AddTile(TileID.WorkBenches)
            .Register();
 
-        // TODO: Recipe groups
-        CreateRecipe()
-           .AddIngredient<AerieBrickEroded>()
-           .AddTile(TileID.Furnaces)
-           .Register();
-
         CreateRecipe()
            .AddIngredient<AerieStone>(2)
            .AddTile(TileID.Furnaces)
@@ -102,43 +96,6 @@ public class AerieBrickTile : ModTile
     public override void NumDust(int i, int j, bool fail, ref int num)
     {
         num = fail ? 1 : 4;
-    }
-}
-
-public sealed class AerieBrickGrassTile : AerieBrickTile
-{
-    public override string Texture => Assets.Images.Aerie.Placements.AerieBrickGrassTile.KEY;
-
-    public override void SetStaticDefaults()
-    {
-        base.SetStaticDefaults();
-
-        RegisterItemDrop(ModContent.ItemType<AerieBrick>(), 0);
-
-        TileID.Sets.ChecksForMerge[Type] = true;
-        TileID.Sets.ResetsHalfBrickPlacementAttempt[Type] = true;
-        TileID.Sets.DoesntPlaceWithTileReplacement[Type] = true;
-
-        Main.tileMerge[Type][ModContent.TileType<AerieBrickTile>()] = true;
-        Main.tileMerge[ModContent.TileType<AerieBrickTile>()][Type] = true;
-
-        SolsticeTileSets.TransformTo[Type] = ModContent.TileType<AerieBrickTile>();
-
-        TileMerging.AddCustomMerge(
-            Type,
-            Assets.Images.Aerie.Placements.AerieBrickGrassTileMerge.Asset,
-            ModContent.TileType<AerieStoneTile>(),
-            ModContent.TileType<AerieStoneGrassTile>(),
-            ModContent.TileType<AerieBrickErodedTile>()
-        );
-
-        DustType = ModContent.DustType<AerieGrassDust>();
-        HitSound = SoundID.Dig;
-    }
-
-    public override void NumDust(int i, int j, bool fail, ref int num)
-    {
-        num = fail ? 3 : 6;
     }
 }
 
