@@ -113,6 +113,11 @@ Items: {
 		DisplayName: Gossip Stone
 		Tooltip: ""
 	}
+
+	PaperbarkShingles: {
+		DisplayName: Paperbark Shingles
+		Tooltip: ""
+	}
 }
 
 Biomes: {
