@@ -113,6 +113,11 @@ Items: {
 		DisplayName: Gossip Stone
 		Tooltip: ""
 	}
+
+	RodOfMoses: {
+		DisplayName: Rod Of Moses
+		Tooltip: ""
+	}
 }
 
 Biomes: {
