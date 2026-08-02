@@ -149,7 +149,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         DrawFog(Main.spriteBatch, OverTilesFogColor, (int)top, parallax, true, speed: 0.5f);
 
-        if (RedThunderstormSky.Active)
+        if (RedThunderstormSky.Intensity > 0f)
         {
             DrawFog(Main.spriteBatch, FarFogColor * 0.4f * RedThunderstormSky.Intensity, Main.instance.bgTopY - 700, speed: 1.5f);
             
@@ -205,7 +205,7 @@ public sealed partial class AerieBackground : ModSurfaceBackgroundStyle
 
         DrawFog(Main.spriteBatch, FarFogColor, Main.instance.bgTopY, speed: 0.5f);
         
-        if (RedThunderstormSky.Active)
+        if (RedThunderstormSky.Intensity > 0f)
             DrawFog(Main.spriteBatch, FarFogColor * 0.3f * RedThunderstormSky.Intensity, Main.instance.bgTopY - 1000);
     }
 
