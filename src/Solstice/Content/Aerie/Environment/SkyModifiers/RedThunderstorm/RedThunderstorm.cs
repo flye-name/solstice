@@ -28,7 +28,7 @@ public class RedThunderstormSky : SkyModifier
 {
     #region sky modifier
     public override SkyModifierPriority Priority => SkyModifierPriority.StrongWeather;
-    public override bool IsActive => Active;
+    public override bool IsActive => Intensity > 0f;
     private float _skyFlash;
     private int _soundTimer;
     public override void UpdateSky()
@@ -41,7 +41,7 @@ public class RedThunderstormSky : SkyModifier
         
         SkyManagement.LerpSkyColors(colors, TransitionTime = MathF.Min(TransitionTime + 0.001f, 1f));
 
-        if (TransitionTime > 0.3f && Main.mouseRight && _skyFlash <= 0.1f && _soundTimer < 0)
+        if (TransitionTime > 0.3f && Main.rand.NextBool(2000) && _skyFlash <= 0.1f && _soundTimer < 0)
         {
             _skyFlash = Main.rand.NextFloat(0.6f, 0.8f);
             _soundTimer = 140;
@@ -172,7 +172,7 @@ public class RedThunderstormSky : SkyModifier
                 UpdateRedSprite(i);
         }
         
-        if (!Active || !AerieSubworld.Active)
+        if (Intensity <= 0f || !AerieSubworld.Active)
             return;
         
         if (Main.rand.NextBool(300))
