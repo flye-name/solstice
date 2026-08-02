@@ -89,11 +89,12 @@ public static class FlameParticles
         }
 
 
-        if (Main.mouseRight)
+        /*if (Main.mouseRight)
         {
-            for (int i = 0; i < 3; i++)
-                New(Main.MouseWorld);
-        }
+            var max = 12f;
+            for (int i = 0; i < max; i++)
+                New(Vector2.Lerp(new Vector2(Main.lastMouseX, Main.lastMouseY) + Main.screenPosition, Main.MouseWorld, i / max));
+        }*/
     }
 
     public static void New(Vector2 position)
