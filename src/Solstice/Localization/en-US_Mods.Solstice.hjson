@@ -118,6 +118,11 @@ Items: {
 		DisplayName: Paperbark Shingles
 		Tooltip: ""
 	}
+
+	RodOfMoses: {
+		DisplayName: Rod Of Moses
+		Tooltip: ""
+	}
 }
 
 Biomes: {
