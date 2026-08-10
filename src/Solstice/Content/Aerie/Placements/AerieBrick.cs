@@ -78,6 +78,7 @@ public class AerieBrickTile : ModTile
         Main.tileLighted[Type] = false;
         Main.tileBrick[Type] = true;
         Main.tileMerge[Type][ModContent.TileType<PaperbarkShinglesTile>()] = true;
+        Main.tileMerge[Type][ModContent.TileType<AerieGravelTile>()] = true;
         TileID.Sets.ChecksForMerge[Type] = true;
 
         /*TileMerging.AddCustomMerge(

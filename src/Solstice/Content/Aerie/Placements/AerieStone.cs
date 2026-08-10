@@ -50,6 +50,7 @@ public class AerieStoneTile : ModTile
         Main.tileSolid[Type] = true;
         Main.tileBlockLight[Type] = true;
         Main.tileLighted[Type] = false;
+        Main.tileMerge[Type][ModContent.TileType<AerieGravelTile>()] = true;
         TileID.Sets.ChecksForMerge[Type] = true;
         
         AddMapEntry(new Color(103, 94, 78));

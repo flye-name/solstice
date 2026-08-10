@@ -123,6 +123,11 @@ Items: {
 		DisplayName: Rod Of Moses
 		Tooltip: ""
 	}
+
+	AerieGravel: {
+		DisplayName: Aerie Gravel
+		Tooltip: ""
+	}
 }
 
 Biomes: {
