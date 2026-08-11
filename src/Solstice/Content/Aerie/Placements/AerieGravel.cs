@@ -41,3 +41,40 @@ public class AerieGravelTile : ModTile
         HitSound = SoundID.Dig;
     }
 }
+
+public sealed class AerieGravelWall : ModItem
+{
+    public override string Texture => Assets.Images.Aerie.Placements.AerieGravelWall.KEY;
+
+    public override void SetStaticDefaults()
+    {
+        CreativeItemSacrificesCatalog.Instance.SacrificeCountNeededByItemId[Type] = 400;
+    }
+
+    public override void SetDefaults()
+    {
+        Item.DefaultToPlaceableWall(ModContent.WallType<AerieGravelWallTile>());
+    }
+
+    public override void AddRecipes()
+    {
+        CreateRecipe(4)
+            .AddIngredient<AerieGravel>()
+            .AddTile(TileID.WorkBenches)
+            .Register();
+    }
+}
+
+public sealed class AerieGravelWallTile : ModWall
+{
+    public override string Texture => Assets.Images.Aerie.Placements.AerieGravelWallTile.KEY;
+
+    public override void SetStaticDefaults()
+    {
+        Main.wallHouse[Type] = true;
+
+        WallID.Sets.AllowsWind[Type] = true;
+
+        AddMapEntry(new Color(53, 54, 45));
+    }
+}

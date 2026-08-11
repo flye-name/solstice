@@ -128,6 +128,11 @@ Items: {
 		DisplayName: Aerie Gravel
 		Tooltip: ""
 	}
+
+	AerieGravelWall: {
+		DisplayName: Aerie Gravel Wall
+		Tooltip: ""
+	}
 }
 
 Biomes: {
