@@ -78,3 +78,4 @@ public sealed class AerieGravelWallTile : ModWall
         AddMapEntry(new Color(53, 54, 45));
     }
 }
+
