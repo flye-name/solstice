@@ -32,8 +32,8 @@ public class RodOfMoses : ModItem
         {
             SoundEngine.PlaySound(SoundID.Item165);
             
-            RedThunderstormSky.Active = true;
-            PreBossNight.Active = false;
+            RedThunderstormSky.Active = false;
+            PreBossNight.Active = true;
         }
         else if (PreBossNight.Active)
         {
@@ -43,11 +43,11 @@ public class RodOfMoses : ModItem
                 sound.Sound?.INTERNAL_applyReverb(0.5f);
             }
             RedThunderstormSky.Active = false;
-            PreBossNight.Active = true;
+            PreBossNight.Active = false;
         }
         else
         {
-            RedThunderstormSky.Active = false;
+            RedThunderstormSky.Active = true;
             PreBossNight.Active = false;
         }
         
