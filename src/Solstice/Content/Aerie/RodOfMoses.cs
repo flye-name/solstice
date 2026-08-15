@@ -31,17 +31,26 @@ public class RodOfMoses : ModItem
         if (RedThunderstormSky.Active)
         {
             SoundEngine.PlaySound(SoundID.Item165);
+            
+            RedThunderstormSky.Active = true;
+            PreBossNight.Active = false;
         }
-        else
+        else if (PreBossNight.Active)
         {
             var slot = SoundEngine.PlaySound(Assets.Sounds.Thunder.CloseThunder.Asset with { PitchVariance = 0.2f, Volume = 2 });
             if (SoundEngine.TryGetActiveSound(slot, out var sound))
             {
                 sound.Sound?.INTERNAL_applyReverb(0.5f);
             }
+            RedThunderstormSky.Active = false;
+            PreBossNight.Active = true;
+        }
+        else
+        {
+            RedThunderstormSky.Active = false;
+            PreBossNight.Active = false;
         }
         
-        RedThunderstormSky.Active = !RedThunderstormSky.Active;
         return true;
     }
 }
