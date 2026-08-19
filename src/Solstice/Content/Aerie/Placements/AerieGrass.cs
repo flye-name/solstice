@@ -260,12 +260,12 @@ public sealed class TallAerieGrass1x1 : ModTile
         TileObjectData.newTile.CoordinateHeights = [18];
         TileObjectData.newTile.LavaDeath = true;
         TileObjectData.newTile.StyleHorizontal = true;
-        TileObjectData.newTile.RandomStyleRange = 7;
-        TileObjectData.newTile.StyleMultiplier = 7;
+        TileObjectData.newTile.RandomStyleRange = 4;
+        TileObjectData.newTile.StyleMultiplier = 4;
 
         TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
-        TileObjectData.newAlternate.RandomStyleRange = 3;
-        TileObjectData.newAlternate.StyleMultiplier = 3;
+        TileObjectData.newAlternate.RandomStyleRange = 4;
+        TileObjectData.newAlternate.StyleMultiplier = 4;
         TileObjectData.addAlternate(1);
 
         TileObjectData.addTile(Type);
@@ -279,7 +279,7 @@ public sealed class TallAerieGrass1x1 : ModTile
 
         SolsticeTileSets.UseAlternateTileObjectDataRandomStyles[Type] = true;
 
-        AddMapEntry(new Color(185, 168, 72));
+        AddMapEntry(new Color(148, 125, 64));
         //DustType = ModContent.DustType<AerieGrassDust>();
         HitSound = SoundID.Grass;
     }
@@ -337,94 +337,94 @@ public sealed class TallAerieGrass1x1 : ModTile
     }
 }
 
-public sealed class TallAerieGrass1x2 : ModTile
-{
-    public override string Texture => Assets.Images.Aerie.Placements.TallerAerieGrassTile.KEY;
-
-    public override void SetStaticDefaults()
-    {
-        RegisterItemDrop(0, 0, 1);
-
-        Main.tileFrameImportant[Type] = true;
-        Main.tileCut[Type] = true;
-        Main.tileSolid[Type] = false;
-        Main.tileNoAttach[Type] = true;
-        Main.tileNoFail[Type] = true;
-        Main.tileLavaDeath[Type] = true;
-
-        TileObjectData.newTile.CopyFrom(TileObjectData.Style1x2);
-        TileObjectData.newTile.Origin = new(0, 1);
-        TileObjectData.newTile.CoordinateHeights = [16, 18];
-        TileObjectData.newTile.LavaDeath = true;
-        TileObjectData.newTile.StyleHorizontal = true;
-        TileObjectData.newTile.RandomStyleRange = 4;
-        TileObjectData.newTile.StyleMultiplier = 4;
-
-        TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
-        TileObjectData.newAlternate.Origin = new(0, 1);
-        TileObjectData.newAlternate.RandomStyleRange = 4;
-        TileObjectData.newAlternate.StyleMultiplier = 4;
-        TileObjectData.addAlternate(1);
-
-        TileObjectData.addTile(Type);
-
-        TileID.Sets.TileCutIgnore.Regrowth[Type] = true;
-        TileID.Sets.ReplaceTileBreakUp[Type] = true;
-        TileID.Sets.SlowlyDiesInWater[Type] = true;
-        TileID.Sets.SwaysInWindBasic[Type] = true;
-        TileID.Sets.DrawFlipMode[Type] = 1;
-        TileID.Sets.IgnoredByGrowingSaplings[Type] = true;
-
-        SolsticeTileSets.UseAlternateTileObjectDataRandomStyles[Type] = true;
-
-        AddMapEntry(new Color(185, 168, 72));
-        //DustType = ModContent.DustType<AerieGrassDust>();
-        HitSound = SoundID.Grass;
-    }
-
-    public override void PlaceInWorld(int i, int j, Item item)
-    {
-        // Vanilla flower seeds change random style after each placement.
-        TileObjectPreviewData.randomCache.Reset();
-
-        TileObject.CanPlace(i, j, Type, item.placeStyle, Main.LocalPlayer.direction, out _, onlyCheck: true);
-    }
-
-    public override void SetSpriteEffects(int i, int j, ref SpriteEffects spriteEffects)
-    {
-        if (i % 2 == 0)
-        {
-            spriteEffects = SpriteEffects.FlipHorizontally;
-        }
-    }
-
-    public override void NearbyEffects(int i, int j, bool closer)
-    {
-        if (Main.gamePaused)
-            return;
-
-        var tilePos = new Vector2(i, j).ToWorldCoordinates();
-
-        if (Main.rand.NextBool(5) && Main.LocalPlayer.Distance(tilePos) < 16 && Main.LocalPlayer.velocity.Length() > 0)
-            SoundEngine.PlaySound(Assets.Sounds.GrassBrush.Asset with
-            {
-                MaxInstances = 10,
-                SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
-                pitchVariance = 0.1f,
-                Volume = 0.2f
-            }, new Vector2(i, j).ToWorldCoordinates());
-    }
-
-    public override bool CanPlace(int i, int j)
-    {
-        return TallAerieGrassHelper.CanPlaceAerieGrass(i, j);
-    }
-
-    public override void NumDust(int i, int j, bool fail, ref int num)
-    {
-        num = 2;
-    }
-}
+// public sealed class TallAerieGrass1x2 : ModTile
+// {
+//     public override string Texture => Assets.Images.Aerie.Placements.TallerAerieGrassTile.KEY;
+//
+//     public override void SetStaticDefaults()
+//     {
+//         RegisterItemDrop(0, 0, 1);
+//
+//         Main.tileFrameImportant[Type] = true;
+//         Main.tileCut[Type] = true;
+//         Main.tileSolid[Type] = false;
+//         Main.tileNoAttach[Type] = true;
+//         Main.tileNoFail[Type] = true;
+//         Main.tileLavaDeath[Type] = true;
+//
+//         TileObjectData.newTile.CopyFrom(TileObjectData.Style1x2);
+//         TileObjectData.newTile.Origin = new(0, 1);
+//         TileObjectData.newTile.CoordinateHeights = [16, 18];
+//         TileObjectData.newTile.LavaDeath = true;
+//         TileObjectData.newTile.StyleHorizontal = true;
+//         TileObjectData.newTile.RandomStyleRange = 4;
+//         TileObjectData.newTile.StyleMultiplier = 4;
+//
+//         TileObjectData.newAlternate.CopyFrom(TileObjectData.newTile);
+//         TileObjectData.newAlternate.Origin = new(0, 1);
+//         TileObjectData.newAlternate.RandomStyleRange = 4;
+//         TileObjectData.newAlternate.StyleMultiplier = 4;
+//         TileObjectData.addAlternate(1);
+//
+//         TileObjectData.addTile(Type);
+//
+//         TileID.Sets.TileCutIgnore.Regrowth[Type] = true;
+//         TileID.Sets.ReplaceTileBreakUp[Type] = true;
+//         TileID.Sets.SlowlyDiesInWater[Type] = true;
+//         TileID.Sets.SwaysInWindBasic[Type] = true;
+//         TileID.Sets.DrawFlipMode[Type] = 1;
+//         TileID.Sets.IgnoredByGrowingSaplings[Type] = true;
+//
+//         SolsticeTileSets.UseAlternateTileObjectDataRandomStyles[Type] = true;
+//
+//         AddMapEntry(new Color(185, 168, 72));
+//         //DustType = ModContent.DustType<AerieGrassDust>();
+//         HitSound = SoundID.Grass;
+//     }
+//
+//     public override void PlaceInWorld(int i, int j, Item item)
+//     {
+//         // Vanilla flower seeds change random style after each placement.
+//         TileObjectPreviewData.randomCache.Reset();
+//
+//         TileObject.CanPlace(i, j, Type, item.placeStyle, Main.LocalPlayer.direction, out _, onlyCheck: true);
+//     }
+//
+//     public override void SetSpriteEffects(int i, int j, ref SpriteEffects spriteEffects)
+//     {
+//         if (i % 2 == 0)
+//         {
+//             spriteEffects = SpriteEffects.FlipHorizontally;
+//         }
+//     }
+//
+//     public override void NearbyEffects(int i, int j, bool closer)
+//     {
+//         if (Main.gamePaused)
+//             return;
+//
+//         var tilePos = new Vector2(i, j).ToWorldCoordinates();
+//
+//         if (Main.rand.NextBool(5) && Main.LocalPlayer.Distance(tilePos) < 16 && Main.LocalPlayer.velocity.Length() > 0)
+//             SoundEngine.PlaySound(Assets.Sounds.GrassBrush.Asset with
+//             {
+//                 MaxInstances = 10,
+//                 SoundLimitBehavior = SoundLimitBehavior.IgnoreNew,
+//                 pitchVariance = 0.1f,
+//                 Volume = 0.2f
+//             }, new Vector2(i, j).ToWorldCoordinates());
+//     }
+//
+//     public override bool CanPlace(int i, int j)
+//     {
+//         return TallAerieGrassHelper.CanPlaceAerieGrass(i, j);
+//     }
+//
+//     public override void NumDust(int i, int j, bool fail, ref int num)
+//     {
+//         num = 2;
+//     }
+// }
 
 public static class TallAerieGrassHelper
 {
@@ -434,8 +434,8 @@ public static class TallAerieGrassHelper
         new TallAerieGrassSeeds<TallAerieGrass1x1>(placeStyle: 0, frameX: 0, frameY: 0),
         new TallAerieGrassSeeds<TallAerieGrass1x1>(placeStyle: 1, frameX: 0, frameY: 1),
         // 1x2
-        new TallAerieGrassSeeds<TallAerieGrass1x2>(placeStyle: 0, frameX: 1, frameY: 0),
-        new TallAerieGrassSeeds<TallAerieGrass1x2>(placeStyle: 1, frameX: 1, frameY: 1),
+        // new TallAerieGrassSeeds<TallAerieGrass1x2>(placeStyle: 0, frameX: 1, frameY: 0),
+        // new TallAerieGrassSeeds<TallAerieGrass1x2>(placeStyle: 1, frameX: 1, frameY: 1),
     ];
 
     [OnLoad]
@@ -450,6 +450,7 @@ public static class TallAerieGrassHelper
     public static readonly int[] ValidGrasses =
     [
         ModContent.TileType<AerieGravelTile>(),
+        ModContent.TileType<AerieStoneTile>(),
         TileID.Grass,
         TileID.Dirt,
     ];
