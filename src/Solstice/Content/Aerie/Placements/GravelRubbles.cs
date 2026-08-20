@@ -19,6 +19,7 @@ public abstract class GravelPile : ModTile
         DustType = DustID.Asphalt;
         Main.tileMerge[ModContent.TileType<AerieGravelTile>()][Type] = true;
         TileObjectData.newTile.CopyFrom(TileObjectData.Style2x1);
+        TileObjectData.newTile.StyleHorizontal = true;  
         TileObjectData.addTile(Type);
         
         AddMapEntry(new Color(88, 83, 65));
@@ -37,6 +38,7 @@ public abstract class GravelDebris : ModTile
         DustType = ModContent.DustType<AerieBrickDust>();
         Main.tileMerge[ModContent.TileType<AerieGravelTile>()][Type] = true;
         TileObjectData.newTile.CopyFrom(TileObjectData.Style2x2);
+        TileObjectData.newTile.StyleHorizontal = true;  
         TileObjectData.addTile(Type);
         
         AddMapEntry(new Color(88, 83, 65));
