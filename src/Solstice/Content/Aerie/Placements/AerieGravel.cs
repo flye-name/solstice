@@ -75,7 +75,7 @@ public sealed class AerieGravelWallTile : ModWall
 
         WallID.Sets.AllowsWind[Type] = true;
 
-        AddMapEntry(new Color(53, 54, 45));
+        AddMapEntry(new Color(95, 90, 70));
     }
 }
 
