@@ -75,9 +75,9 @@ public class GravelPebbleEcho : GravelPebble
     public override void SetStaticDefaults() {
         base.SetStaticDefaults();
         
-        FlexibleTileWand.RubblePlacementSmall.AddVariations(ModContent.ItemType<AerieGravel>(), Type, 0, 1, 2, 3);
+        FlexibleTileWand.RubblePlacementSmall.AddVariations(ModContent.ItemType<AerieStone>(), Type, 0, 1, 2, 3, 4);
         
-        RegisterItemDrop(ModContent.ItemType<AerieGravel>());
+        RegisterItemDrop(ModContent.ItemType<AerieStone>());
     }
 }
 
@@ -86,7 +86,7 @@ public class GravelPileEcho : GravelPile
     public override void SetStaticDefaults() {
         base.SetStaticDefaults();
         
-        FlexibleTileWand.RubblePlacementMedium.AddVariations(ModContent.ItemType<AerieGravel>(), Type, 0, 1);
+        FlexibleTileWand.RubblePlacementSmall.AddVariations(ModContent.ItemType<AerieGravel>(), Type, 0, 1);
         
         RegisterItemDrop(ModContent.ItemType<AerieGravel>());
     }
@@ -97,7 +97,7 @@ public class GravelDebrisEcho : GravelDebris
     public override void SetStaticDefaults() {
         base.SetStaticDefaults();
         
-        FlexibleTileWand.RubblePlacementMedium.AddVariations(ModContent.ItemType<AerieGravel>(), Type, 0, 1);
+        FlexibleTileWand.RubblePlacementMedium.AddVariations(ModContent.ItemType<AerieGravel>(), Type, 0, 1, 2);
         
         RegisterItemDrop(ModContent.ItemType<AerieGravel>());
     }
