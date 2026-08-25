@@ -34,9 +34,14 @@ public class AerieGravelTile : ModTile
         TileID.Sets.CanBeDugByShovel[Type] = true;
         
         Main.tileMerge[Type][ModContent.TileType<AerieBrickTile>()] = true;
-        Main.tileMerge[Type][ModContent.TileType<AerieStoneTile>()] = true;
         TileID.Sets.ChecksForMerge[Type] = true;
-
+        
+        TileMerging.AddCustomMerge(
+            Type,
+            Assets.Images.Aerie.Placements.AerieGravelTileMerge.Asset,
+            ModContent.TileType<AerieStoneTile>()
+        );
+        
         AddMapEntry(new Color(95, 90, 70));
         HitSound = SoundID.Dig;
     }
